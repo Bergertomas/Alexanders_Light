@@ -10,31 +10,35 @@ public class CourageManager : MonoBehaviour
     Slider courageGauge;
     [SerializeField]
     PlayerController pControl;
+    private float increasePerSecond = 7f;
+    [SerializeField]
+    float maxHealth = 100f;
+    [SerializeField]
+    float minHealth = 0f;
+    [SerializeField]
+    float currentHealth = 50f;
+    [SerializeField]
+    float waitUntilBallArrives = 0.5f;
 
     // Start is called before the first frame update
     void Start()
     {
-        courageGauge.minValue = 0;
-        courageGauge.maxValue = 100;
+        courageGauge.minValue = minHealth;
+        courageGauge.maxValue = maxHealth;
         //courageGauge.value = courageGauge.maxValue;
-        courageGauge.value = 50;
+        courageGauge.value = currentHealth;
         //StartCoroutine(IncreaseCourage());
     }
 
 
-    IEnumerator IncreaseCourage()
+    void IncreaseCourage()
     {
-        //while (pControl.hasCalledBoL == true)
-        //{
-        if (courageGauge.value < courageGauge.maxValue)
-        {
-            courageGauge.value += 1;
-            Debug.Log(courageGauge.value);
-            yield return new WaitForSeconds(1);
-        }
-        //else yield return null;
+        currentHealth += (increasePerSecond * Time.deltaTime);
+        //courageGauge.value += (increasePerSecond * Time.deltaTime);
+        courageGauge.value = currentHealth;
+        Debug.Log(courageGauge.value);
+        return;
     }
-    //}
 
 
     void DecreaseCourage()
@@ -44,12 +48,12 @@ public class CourageManager : MonoBehaviour
     }
 
 
-
+    // TODO: Understand why health keeps on increasing after hasCalledBoL turns False.
     private void FixedUpdate()
     {
         if (pControl.hasCalledBoL == true)
         {
-            IncreaseCourage();
+            Invoke("IncreaseCourage", waitUntilBallArrives);
         }
     }
 

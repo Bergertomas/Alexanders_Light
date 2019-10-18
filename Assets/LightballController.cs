@@ -17,11 +17,28 @@ public class LightballController : MonoBehaviour
     [SerializeField]
     public Transform targetSpot;
     [SerializeField] public float moveSpeed;
-  
 
 
 
-// Start is called before the first frame update
+    //void RecognizeChargable()
+    //{
+    //    //var forward = transform.TransformDirection(Vector3.forward);
+    //    //RaycastHit hit;
+    //    //Vector3 BoLpos = this.transform.position;
+    //    //float distance = 1f;
+    //    //if (Physics.Raycast(BoLpos, forward, distance, hit) && hit.transform.tag == "Chargable")
+    //    //{
+    //    //    Debug.Log("first stage");
+    //    //    if (hit.collider.CompareTag("Chargable"))
+    //    //    {
+    //    //        Debug.Log("NOW");
+    //    //    }
+    //    }
+    //    //yield return null;
+    //}
+
+
+    // Start is called before the first frame update
     void Start()
     {
         
