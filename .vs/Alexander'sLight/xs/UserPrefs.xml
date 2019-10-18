@@ -1,0 +1,16 @@
+﻿<Properties StartupConfiguration="{93A9E995-1EC7-29F8-A89E-A7D97C49BB44}|">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/CourageManager.cs">
+    <Files>
+      <File FileName="Assets/PlayerController.cs" Line="50" Column="119" />
+      <File FileName="Assets/LightballController.cs" />
+      <File FileName="Assets/CourageManager.cs" Line="16" Column="9" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="837ada9f-47f5-4ecd-aa1b-ca336f4b9d66" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+</Properties>
