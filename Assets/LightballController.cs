@@ -9,9 +9,11 @@ public class LightballController : MonoBehaviour
     float light;
     bool isControlled;
     bool isAmp;
-    bool isCharging;
+    public bool isCharging;
     bool isCalled;
     bool turretMode;
+    [SerializeField]
+    private LightManager lm;
 
 
     [SerializeField]
@@ -19,7 +21,19 @@ public class LightballController : MonoBehaviour
     [SerializeField] public float moveSpeed;
 
 
-
+    private void OnTriggerStay(Collider other)
+    {
+        Debug.Log("OnTriggerStay()");
+        if (isCharging==true)//We want to allow charging only when isCharging is true (which happens when PlayerController does (Input.GetButton("Charge"))
+        {
+            var c = other.gameObject.GetComponent<Charger>();
+            if (c != null)
+            {
+               // Debug.Log("charger is being touched by me balls");
+                lm.HandleCharge(c);//if a charger is touching the ball, send it to the light manager so it handles stuff
+            }
+        }
+    }
     //void RecognizeChargable()
     //{
     //    //var forward = transform.TransformDirection(Vector3.forward);

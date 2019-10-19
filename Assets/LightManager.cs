@@ -11,6 +11,8 @@ public class LightManager : MonoBehaviour
     PlayerController pControl;
     [SerializeField]
     public LightballController bControl;
+    [SerializeField]
+    GameObject bGraphics;
     private float increasePerSecond = 10f;
     private float decreasePerSecond = 0.5f;
     [SerializeField]
@@ -19,9 +21,30 @@ public class LightManager : MonoBehaviour
     float minCharge = 0f;
     [SerializeField]
     float currentCharge = 50f;
-    public float sphereRadius = 100f;
+    public float sphereRadius = 10f;
+    private string chargeableTag = "Chargeable";
+    [SerializeField]
+    float chargePerTick = 4f;
 
 
+   public void HandleCharge(Charger c) //Recieves a charger from LightBallConbtroller and manipulates the player's current charge and the charger's chrge
+    {
+        //Debug.Log("HandleCharge()");
+        if (currentCharge < maxCharge)
+        { 
+             if (c.Charge > chargePerTick)
+             {
+                 c.Charge -= (chargePerTick * Time.deltaTime);
+                 currentCharge += (chargePerTick * Time.deltaTime);
+                //c.mat.SetColor("_EmissionColor", new Color(25.68894f, 18.1571f, 1.479468f, 1.0f) * 0);
+             }
+             else//if the charge's charge is less than what we take per tick, take everything it's got left
+             {
+                currentCharge += c.Charge;
+                c.Charge = 0f;
+             }
+        }
+   }
 
     // Start is called before the first frame update
     void Start()
@@ -43,6 +66,12 @@ public class LightManager : MonoBehaviour
     {
         currentCharge -= (decreasePerSecond * Time.deltaTime);
         lightGauge.value = currentCharge;
+    }
+
+
+    void RecognizeChargable()
+    {
+
     }
 
 
@@ -78,7 +107,7 @@ public class LightManager : MonoBehaviour
 
 
 
-    void RecognizeChargable()
+    /*void RecognizeChargable()
     {
         Collider[] hitColliders = Physics.OverlapSphere(bControl.transform.position, sphereRadius);
         for (int i = 0; i < hitColliders.Length; i++)
@@ -89,7 +118,7 @@ public class LightManager : MonoBehaviour
             }
         }
     }
-
+    */
 
     private void FixedUpdate()
     {
@@ -99,6 +128,7 @@ public class LightManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        RecognizeChargable();
+        lightGauge.value = currentCharge;
+        //RecognizeChargable();
     }
 }
