@@ -19,6 +19,8 @@ public class LightManager : MonoBehaviour
     float minCharge = 0f;
     [SerializeField]
     float currentCharge = 50f;
+    public float sphereRadius = 100f;
+
 
 
     // Start is called before the first frame update
@@ -44,21 +46,48 @@ public class LightManager : MonoBehaviour
     }
 
 
+    ////void RecognizeChargable()
+    //{
+    //    RaycastHit hit;
+    //    Vector3 BoLpos = bControl.transform.position;
+    //    float distance = 1f;
+    //    if (Physics.SphereCast(BoLpos, bControl.transform.position.x, transform.forward,
+    //        out hit, 1))
+    //    {
+    //        Debug.Log("first stage");
+    //        if (hit.collider.CompareTag("Chargable"))
+    //        {
+    //            Debug.Log("NOW");
+    //        }
+    //    }
+    //    //yield return null;
+    //}
+
+
+
+    //void RecognizeChargable()
+    //{
+    //    if (Physics.CheckSphere(bControl.transform.position, sphereRadius) &&) {
+    //        Debug.Log("YEP");
+    //    }
+    //    else
+    //    {
+    //        Debug.Log("Nope");
+    //    }
+    //}
+
+
+
     void RecognizeChargable()
     {
-        RaycastHit hit;
-        Vector3 BoLpos = bControl.transform.position;
-        float distance = 1f;
-        if (Physics.SphereCast(BoLpos, bControl.transform.position.x, transform.forward,
-            out hit, 1))
+        Collider[] hitColliders = Physics.OverlapSphere(bControl.transform.position, sphereRadius);
+        for (int i = 0; i < hitColliders.Length; i++)
         {
-            Debug.Log("first stage");
-            if (hit.collider.CompareTag("Chargable"))
+            if (hitColliders[i].tag == "Chargable")
             {
-                Debug.Log("NOW");
+                Debug.Log("HSDFS");
             }
         }
-        //yield return null;
     }
 
 
