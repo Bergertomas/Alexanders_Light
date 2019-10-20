@@ -29,17 +29,17 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        ChangeAnchorPosition();
+        //ChangeAnchorPosition();
     }
-    private void ChangeAnchorPosition()
-    {
+    //private void ChangeAnchorPosition()
+    //{
 
-        //ballAnchor.transform.position = Random.insideUnitSphere * 2;
-        Vector3 newPos = new Vector3(Random.Range(-2f, 2f), Random.Range(-2f, 2f), 0f);
-        ballAnchor.transform.position = this.transform.position+newPos;
-        Invoke("ChangeAnchorPosition", 5.5f);
-        //ballAnchor.transform.position = new Vector3(ballAnchor.transform.position.x, ballAnchor.transform.position.y,ballAnchorZ);
-    }
+    //    //ballAnchor.transform.position = Random.insideUnitSphere * 2;
+    //    Vector3 newPos = new Vector3(Random.Range(-2f, 2f), Random.Range(-2f, 2f), 0f);
+    //    ballAnchor.transform.position = this.transform.position+newPos;
+    //    Invoke("ChangeAnchorPosition", 5.5f);
+    //    //ballAnchor.transform.position = new Vector3(ballAnchor.transform.position.x, ballAnchor.transform.position.y,ballAnchorZ);
+    //}
     void Update()
     {
         // Movement

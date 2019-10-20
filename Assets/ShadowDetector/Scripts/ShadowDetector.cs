@@ -4,22 +4,33 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class ShadowDetector : MonoBehaviour {
-
+    /// <summary>
+    /// Where the magic happens. The majority of code here simply calculates light levels the player is struck with.
+    /// In order for it to work I copied the canvas from the shadow demo and gave the player a capsule collider.
+    /// This script is known by the ShadowDetectorChecker script. both scripts are placed on the player only.
+    /// Currently unknown why there are lists and/or arrays of lights. Further research should be considered, but for now "it just works".
+    /// </summary>
     public bool autoGetCollider = true;
     public CapsuleCollider playerCollider;
     public LayerMask lightLayers = -1;
     public LayerMask obstaclesLayers = -1;
     [Tooltip("Maximum detector brightness to trigger the stealth mode")]
+    //Once the brightness goes down to this level, the character is considered stealthed.
     public float shadedBright = 0.7f;
     [Tooltip("Response frequency")]
+    //Maybe the delay between reporting light level
     public float sensorDelay = 1f;
     [Tooltip("Brightness sensor threshold")]
-    public float maxShadowBright = 2f;
+    //Maximum detectable light level. anything above it will not be registered
+    public float maxShadowBright = 5f;
     [Tooltip("Auto brightness sensor threshold")]
+    //Sets maxShadowBright to 2f automatically even though we changed the number in code (done in first lines of Update). easily disabled in inspector so you can change max light level on the fly. 
     public bool autoMaxShadowBright = true;
     [Tooltip("Consider the ambient intensity from render settings")]
+    //???
     public bool useAmbientIntensity = true;
     [Tooltip("Consider shadow strength of the light source")]
+    //???
     public bool useShadowStrength = true;
     public bool debugMode = true;
     
