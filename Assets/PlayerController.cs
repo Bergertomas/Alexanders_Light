@@ -58,12 +58,13 @@ public class PlayerController : MonoBehaviour
 
         var bx = Input.GetAxis("BallHorizontal") * lbc.ballspeed * Time.deltaTime;
         var by = Input.GetAxis("BallVertical") * lbc.ballspeed * Time.deltaTime;
-        var bmove = new Vector3(bx, by);
+        var bmove = new Vector2(bx, by);
+
         if (Input.GetAxisRaw("BallHorizontal") == 0.0f && Input.GetAxisRaw("BallVertical") == 0.0f && !Input.GetButton("Heal"))
         {
             if(!lbc.isCharging)
             {
-                lbc.transform.position = Vector3.Lerp(lbc.transform.position, lbc.targetSpot.position, Time.deltaTime * lbc.moveSpeed);
+                lbc.transform.position = Vector2.Lerp(lbc.transform.position, lbc.targetSpot.position, Time.deltaTime * lbc.moveSpeed);
             }
         }
         else if (Input.GetButton("Heal"))
@@ -76,8 +77,6 @@ public class PlayerController : MonoBehaviour
         {
             hasCalledBoL = false;
         }
-
-
         if (Input.GetButton("Charge"))
         {
             lbc.isCharging = true;
@@ -86,15 +85,9 @@ public class PlayerController : MonoBehaviour
         {
             lbc.isCharging = false;
         }
+
         lbc.transform.Translate(bmove);
-       
-
-
-//        if (bmove == new Vector3(0, 0)) {
- //           lbc.transform.position = Vector3.Lerp(lbc.transform.position, lbc.targetSpot.position, Time.deltaTime * moveSpeed);
-   //     }
-       // lbc.transform.Translate(bmove);
-
+        //Debug.Log("Input X is " + bx + " and input Y is " + by);
     }
     private void FixedUpdate()
     {

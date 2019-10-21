@@ -16,7 +16,7 @@ public class ShadowDetector : MonoBehaviour {
     public LayerMask obstaclesLayers = -1;
     [Tooltip("Maximum detector brightness to trigger the stealth mode")]
     //Once the brightness goes down to this level, the character is considered stealthed.
-    public float shadedBright = 0.7f;
+    public float shadedBright = 1.1f;
     [Tooltip("Response frequency")]
     //Maybe the delay between reporting light level
     public float sensorDelay = 1f;
@@ -69,7 +69,7 @@ public class ShadowDetector : MonoBehaviour {
 	void Update () {
 
         if (autoMaxShadowBright) {
-            maxShadowBright = useAmbientIntensity ? 2 : 1;
+            maxShadowBright = useAmbientIntensity ? 10 : 1;
         }
 
         if (v_croutineReady)

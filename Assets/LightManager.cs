@@ -14,7 +14,7 @@ public class LightManager : MonoBehaviour
     [SerializeField]
     GameObject bGraphics;
     private float increasePerSecond = 10f;
-    private float decreasePerSecond = 0.5f;
+    private float decreasePerSecond = 2.0f;
     [SerializeField]
     float maxCharge = 100f;
     [SerializeField]
@@ -27,7 +27,7 @@ public class LightManager : MonoBehaviour
     float chargePerTick = 4f;
 
 
-   public void HandleCharge(Charger c) //Recieves a charger from LightBallConbtroller and manipulates the player's current charge and the charger's chrge
+   public void HandleCharge(Charger c) //Recieves a charger from LightBallController and manipulates the player's current charge and the charger's chrge
     {
         //Debug.Log("HandleCharge()");
         if (currentCharge < maxCharge)
@@ -38,7 +38,7 @@ public class LightManager : MonoBehaviour
                  currentCharge += (chargePerTick * Time.deltaTime);
                 //c.mat.SetColor("_EmissionColor", new Color(25.68894f, 18.1571f, 1.479468f, 1.0f) * 0);
              }
-             else//if the charge's charge is less than what we take per tick, take everything it's got left
+             else//if the charger's charge is less than what we take per tick, take everything it's got left
              {
                 currentCharge += c.Charge;
                 c.Charge = 0f;
@@ -62,7 +62,7 @@ public class LightManager : MonoBehaviour
     }
 
 
-    void DecreaseLight()
+    public void DecreaseLight()
     {
         currentCharge -= (decreasePerSecond * Time.deltaTime);
         lightGauge.value = currentCharge;
