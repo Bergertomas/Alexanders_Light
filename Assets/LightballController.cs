@@ -8,7 +8,7 @@ public class LightballController : MonoBehaviour
     public float ballspeed = 8f;
     float light;
     bool isControlled;
-    bool isAmp;
+    public bool isAmp;
     public bool isCharging;
     bool isCalled;
     bool turretMode;
@@ -34,6 +34,7 @@ public class LightballController : MonoBehaviour
             }
         }
     }
+
     //void RecognizeChargable()
     //{
     //    //var forward = transform.TransformDirection(Vector3.forward);
@@ -50,13 +51,6 @@ public class LightballController : MonoBehaviour
     //    }
     //    //yield return null;
     //}
-
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
     // Update is called once per frame
     void Update()

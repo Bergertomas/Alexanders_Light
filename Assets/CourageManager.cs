@@ -23,6 +23,8 @@ public class CourageManager : MonoBehaviour
     [SerializeField]
     float waitUntilBallArrives = 0.5f;
 
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -37,11 +39,14 @@ public class CourageManager : MonoBehaviour
 
     void IncreaseCourage()
     {
-        currentHealth += (increasePerSecond * Time.deltaTime);
-        courageGauge.value = currentHealth;
-        lm.DecreaseLight();
-        Debug.Log(courageGauge.value);
-        return;
+        if (lm.CurrentCharge > 0f)
+        {
+            currentHealth += (increasePerSecond * Time.deltaTime);
+            courageGauge.value = currentHealth;
+            lm.DecreaseLight();
+            Debug.Log(courageGauge.value);
+            return;
+        }
     }
 
 

@@ -85,6 +85,14 @@ public class PlayerController : MonoBehaviour
         {
             lbc.isCharging = false;
         }
+        if (Input.GetButton("Amplify"))
+        {
+            lbc.isAmp = true;
+        }
+        else if (Input.GetButtonUp("Amplify"))
+        {
+            lbc.isAmp = false;
+        }
 
         lbc.transform.Translate(bmove);
         //Debug.Log("Input X is " + bx + " and input Y is " + by);
