@@ -5,11 +5,14 @@ using UnityEngine.UI;
 
 public class CourageManager : MonoBehaviour
 {
-
+    [SerializeField]
+    ShadowDetector sd;
     [SerializeField]
     Slider courageGauge;
     [SerializeField]
     PlayerController pControl;
+    [SerializeField]
+    LightManager lm;
     private float increasePerSecond = 7f;
     [SerializeField]
     float maxHealth = 100f;
@@ -20,9 +23,12 @@ public class CourageManager : MonoBehaviour
     [SerializeField]
     float waitUntilBallArrives = 0.5f;
 
+
+
     // Start is called before the first frame update
     void Start()
     {
+        lm = GetComponent<LightManager>();
         courageGauge.minValue = minHealth;
         courageGauge.maxValue = maxHealth;
         //courageGauge.value = courageGauge.maxValue;
@@ -33,27 +39,39 @@ public class CourageManager : MonoBehaviour
 
     void IncreaseCourage()
     {
-        currentHealth += (increasePerSecond * Time.deltaTime);
-        //courageGauge.value += (increasePerSecond * Time.deltaTime);
-        courageGauge.value = currentHealth;
-        Debug.Log(courageGauge.value);
-        return;
+        if (lm.CurrentCharge > 0f)
+        {
+            currentHealth += (increasePerSecond * Time.deltaTime);
+            courageGauge.value = currentHealth;
+            lm.DecreaseLight();
+            Debug.Log(courageGauge.value);
+            return;
+        }
     }
 
 
     void DecreaseCourage()
     {
+        currentHealth -= (increasePerSecond * Time.deltaTime);
+        courageGauge.value = currentHealth;
+        Debug.Log(courageGauge.value);
+        return;
         // TODO: GetFear should raycast sphere (in update) and find whether the player is around an enemy / spooky shadows / in darkness.
-        // TODO: Find out how to use events for this shit
+        // TODO: Do we need events for this? if so, figure it out
     }
 
-
-    // TODO: Understand why health keeps on increasing after hasCalledBoL turns False.
     private void FixedUpdate()
     {
+        //If the player summoned the ball to his side to heal courage, do it
         if (pControl.hasCalledBoL == true)
         {
             Invoke("IncreaseCourage", waitUntilBallArrives);
+        }
+
+        //If the player is in enough darkness, start decreasing courage
+        if (sd.hidden)
+        {
+            DecreaseCourage();
         }
     }
 
@@ -64,7 +82,11 @@ public class CourageManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //If the player is in enough darkness
+        if (sd.hidden)
+        {
 
+        }
     }
 
 }
