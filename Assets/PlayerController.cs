@@ -24,6 +24,7 @@ public class PlayerController : MonoBehaviour
     public LightballController lbc;
     public GameObject ballAnchor;
     private float ballAnchorZ;
+    public Transform balloflight;
 
     // TODO: SET UP CAMERA SCRIPT WHICH WILL MAKE THE CAMERA ZOOM A LITTLE OUT WHILE BOL IS FAR AWAY (ORI)
 
@@ -32,13 +33,15 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         //ChangeAnchorPosition();
+
+        //Physics.IgnoreCollision(balloflight.GetComponent<Collider>(), GetComponent<Collider>(),true);
     }
     private void ChangeAnchorPosition()
     {
-
+        return;
        //ballAnchor.transform.position = Random.insideUnitSphere * 2;
-        Vector3 newPos = new Vector3(Random.Range(-2f, 2f), Random.Range(-2f, 2f), 0f);
-       ballAnchor.transform.position = this.transform.position+newPos;
+        Vector3 newPos = new Vector3(Random.Range(-3f, 3f), Random.Range(0f, 2f), 0f);
+        ballAnchor.transform.localPosition = /*this.transform.position+*/newPos;
         Invoke("ChangeAnchorPosition", 5.5f);
        //ballAnchor.transform.position = new Vector3(ballAnchor.transform.position.x, ballAnchor.transform.position.y,ballAnchorZ);
     }
@@ -130,5 +133,8 @@ public class PlayerController : MonoBehaviour
         isGrounded = true;
     }
 
-
+   /* private void Interact()
+    {
+        Physics.OverlapBox(this.transform.position,)
+    }*/
 }

@@ -56,6 +56,8 @@ public class LightManager : MonoBehaviour
     float emissionLerpSteps = 5f;
     [SerializeField]
     float defaultHaloLightIntensity = 1f;
+    [SerializeField]
+    float reduceChargeWhenAmped = 3f;
 
     public void HandleCharge(Charger c) //Recieves a charger from LightBallController and manipulates the player's current charge and the charger's chrge
     {
@@ -80,7 +82,8 @@ public class LightManager : MonoBehaviour
     {
         if (bControl.isAmp == true)
         {
-            if (BoLHaloLight.range < maxAmp-0.01f)
+            DecreaseLight();
+            if (BoLHaloLight.range < maxAmp-0.01f && currentCharge > 0)
             {
                 //BoLHaloLight.range += (steps * Time.deltaTime);
                 //BoLHaloLight.intensity += (steps * Time.deltaTime);

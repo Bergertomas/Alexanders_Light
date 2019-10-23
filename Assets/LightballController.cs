@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+//public 
 public class LightballController : MonoBehaviour
 {
 
@@ -10,11 +12,11 @@ public class LightballController : MonoBehaviour
     bool isControlled;
     public bool isAmp;
     public bool isCharging;
+
     bool isCalled;
     bool turretMode;
     [SerializeField]
     private LightManager lm;
-
 
     [SerializeField]
     public Transform targetSpot;

@@ -64,10 +64,12 @@
   <ItemGroup>
     <Compile Include="Assets\Charger.cs" />
     <Compile Include="Assets\CourageManager.cs" />
+    <Compile Include="Assets\Interactable.cs" />
     <Compile Include="Assets\LightballController.cs" />
     <Compile Include="Assets\LightManager.cs" />
     <Compile Include="Assets\MasterController.cs" />
     <Compile Include="Assets\PlayerController.cs" />
+    <Compile Include="Assets\PushInteractable.cs" />
     <Compile Include="Assets\Scripts\ShadowDetector.cs" />
     <Compile Include="Assets\Scripts\ShadowDetectorChecker.cs" />
     <Compile Include="Assets\Scripts\SimpleCameraController.cs" />

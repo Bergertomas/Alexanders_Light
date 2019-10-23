@@ -18,7 +18,7 @@ public class MasterController : MonoBehaviour
     public void ResetGame()
     {
         Debug.Log("GAy mover!!!!!");
-        SceneManager.LoadScene("DevScene");
+        SceneManager.LoadScene("DevScene 1");
         
     }
     //game
