@@ -80,7 +80,7 @@ public class LightManager : MonoBehaviour
 
     void Amplify()
     {
-        if (bControl.isAmp == true)
+        if (bControl.State==LightBallStates.Amplify)
         {
             DecreaseLight();
             if (BoLHaloLight.range < maxAmp-0.01f && currentCharge > 0)
@@ -94,7 +94,7 @@ public class LightManager : MonoBehaviour
                 BoLMat.SetColor("_EmissionColor", new Color(newEmission, newEmission, newEmission, 1.0f));
             }
         }
-        else if (bControl.isAmp == false)
+        else// if (bControl.isAmp == false)
         {
             if (BoLHaloLight.range > defaultAmp+0.01f)
             {
@@ -114,7 +114,7 @@ public class LightManager : MonoBehaviour
     {
         lightGauge.value = currentCharge;
         //float emissionIntensity = ((currentCharge / maxCharge) * (maxEmission - minEmission)) + minEmission;
-        if (!bControl.isAmp)
+        if (bControl.State != LightBallStates.Amplify)
         {
             float emissionIntensity = Utilities.MapRange(currentCharge, maxCharge, minEmission, maxEmission);
             float newEmission = Mathf.Lerp(BoLMat.GetColor("_EmissionColor").r, emissionIntensity, emissionLerpSteps * Time.deltaTime);

@@ -19,7 +19,6 @@ public class Charger : MonoBehaviour
       //  mat = this.GetComponent<MeshRenderer>().material;
     }
 
-    // Update is called once per frame
     void Update()
     {
         lum.intensity = (maxIntensity * (Charge/maxCharge));

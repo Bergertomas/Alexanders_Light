@@ -3,30 +3,32 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-//public 
-public class LightballController : MonoBehaviour
+public enum LightBallStates
 {
-
-    public float ballspeed = 8f;
+    None,Charge,Amplify,Heal
+}
+public class LightballController : MonoBehaviour
+{ 
     float light;
     bool isControlled;
-    public bool isAmp;
-    public bool isCharging;
+    public LightBallStates State = LightBallStates.None;
+    /*public bool isAmp;
+    public bool isCharging;*/
 
-    bool isCalled;
+    //bool isCalled;
     bool turretMode;
     [SerializeField]
     private LightManager lm;
 
-    [SerializeField]
     public Transform targetSpot;
-    [SerializeField] public float moveSpeed;
-
+    public float ControlledSpeed = 6f;
+    public float IdleMovementSpeed=4f;
+     public float HealMovementSpeed=8f;
 
     private void OnTriggerStay(Collider other)
     {
         Debug.Log("OnTriggerStay()");
-        if (isCharging==true)//We want to allow charging only when isCharging is true (which happens when PlayerController does (Input.GetButton("Charge"))
+        if (State == LightBallStates.Charge)//We want to allow charging only when isCharging is true (which happens when PlayerController does (Input.GetButton("Charge"))
         {
             var c = other.gameObject.GetComponent<Charger>();
             if (c != null)

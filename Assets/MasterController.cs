@@ -9,21 +9,15 @@ public class MasterController : MonoBehaviour
     CourageManager cm;
     event Action GameOver;
 
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         cm = GetComponent<CourageManager>();
         cm.CourageDepleted += ResetGame;
     }
-    public void ResetGame()
+    private void ResetGame()
     {
         Debug.Log("GAy mover!!!!!");
         SceneManager.LoadScene("DevScene 1");
         
-    }
-    //game
-    // Update is called once per frame
-    void Update()
-    {
     }
 }
