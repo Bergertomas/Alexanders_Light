@@ -6,6 +6,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     Rigidbody rigidbody;
     [SerializeField]
+    GameObject physicalCollider;
+    [SerializeField]
     float speed = 3.0f;
     float crawlSpeed;
     float climbSpeed;
@@ -31,15 +33,15 @@ public class PlayerController : MonoBehaviour
     {
         //ChangeAnchorPosition();
     }
-    //private void ChangeAnchorPosition()
-    //{
+    private void ChangeAnchorPosition()
+    {
 
-    //    //ballAnchor.transform.position = Random.insideUnitSphere * 2;
-    //    Vector3 newPos = new Vector3(Random.Range(-2f, 2f), Random.Range(-2f, 2f), 0f);
-    //    ballAnchor.transform.position = this.transform.position+newPos;
-    //    Invoke("ChangeAnchorPosition", 5.5f);
-    //    //ballAnchor.transform.position = new Vector3(ballAnchor.transform.position.x, ballAnchor.transform.position.y,ballAnchorZ);
-    //}
+       //ballAnchor.transform.position = Random.insideUnitSphere * 2;
+        Vector3 newPos = new Vector3(Random.Range(-2f, 2f), Random.Range(-2f, 2f), 0f);
+       ballAnchor.transform.position = this.transform.position+newPos;
+        Invoke("ChangeAnchorPosition", 5.5f);
+       //ballAnchor.transform.position = new Vector3(ballAnchor.transform.position.x, ballAnchor.transform.position.y,ballAnchorZ);
+    }
     void Update()
     {
         // Movement
@@ -93,6 +95,24 @@ public class PlayerController : MonoBehaviour
         {
             lbc.isAmp = false;
         }
+        if (Input.GetButtonDown("Crawl"))
+        {
+            crawling = !crawling;
+        }
+        if (crawling)
+        {
+            Debug.Log("CRAWRLINw!");
+            physicalCollider.transform.localScale =new Vector3(1f,0.5f,1f);
+
+        }
+        else
+        {
+            physicalCollider.transform.localScale = new Vector3(1f, 1f, 1f);
+        }
+       /* else if (Input.GetButtonUp("Crawl"))
+        {
+            crawling = true;
+        }*/
 
         lbc.transform.Translate(bmove);
         //Debug.Log("Input X is " + bx + " and input Y is " + by);

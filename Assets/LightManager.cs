@@ -57,10 +57,6 @@ public class LightManager : MonoBehaviour
     [SerializeField]
     float defaultHaloLightIntensity = 1f;
 
-
-
-
-
     public void HandleCharge(Charger c) //Recieves a charger from LightBallController and manipulates the player's current charge and the charger's chrge
     {
         //Debug.Log("HandleCharge()");
@@ -79,7 +75,6 @@ public class LightManager : MonoBehaviour
             }
         }
     }
-
 
     void Amplify()
     {
@@ -110,7 +105,6 @@ public class LightManager : MonoBehaviour
         }
     }
 
-
     //TODO: Block ability to amplify if not enough charge;
     //TODO: Amplifying should discharge BoL.
     void Update()
@@ -134,9 +128,6 @@ public class LightManager : MonoBehaviour
         Amplify();
     }
 
-
-
-
     // Start is called before the first frame update
     void Start()
     {
@@ -146,21 +137,17 @@ public class LightManager : MonoBehaviour
         lightGauge.value = currentCharge;
     }
 
-
     void IncreaseLight()
     {
         currentCharge += (increasePerSecond * Time.deltaTime);
         lightGauge.value = currentCharge;
     }
 
-
     public void DecreaseLight()
     {
         currentCharge -= (decreasePerSecond * Time.deltaTime);
         lightGauge.value = currentCharge;
     }
-
-
 }
 
 
