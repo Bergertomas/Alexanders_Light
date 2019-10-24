@@ -13,6 +13,14 @@ public class PlayerController : MonoBehaviour
     GameObject physicalCollider;
     [SerializeField]
     private float walkSpeed = 3.5f;
+    private const float BASICALLY_ZERO = 0.0001f;
+    [SerializeField]
+    private float AccelarationPerSecond = 0.5f;
+    [SerializeField]
+    private float deaccelerationPerSecond = 0.5f;
+    private float currentHorizontalSpeed = 0f;
+    private float currentRightSpeed = 0f;
+    private float currentLeftSpeed = 0f;
     float crawlSpeed;
     float climbSpeed;
     private bool isGrounded;
@@ -84,14 +92,81 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         // Movement
-        var x = Input.GetAxis("Horizontal") * walkSpeed * Time.deltaTime;
-        var move = new Vector3(x, 0);
+        float xInput = Input.GetAxisRaw("Horizontal") ;
+        /*{
+            currentHorizontalSpeed += xInput;
+        }*/
+        if (xInput > 0)
+        {
+            if(Mathf.Abs(currentRightSpeed) +( xInput * AccelarationPerSecond * Time.deltaTime)<walkSpeed)
+            {
+                currentRightSpeed += xInput * AccelarationPerSecond * Time.deltaTime;
+            }
+            else
+            {
+                currentRightSpeed = walkSpeed;
+            }  
+        }
+        else if(currentRightSpeed!=0)
+        {
+           /* if (Mathf.Abs(currentRightSpeed) < BASICALLY_ZERO)
+            {
+                currentHorizontalSpeed = 0;
+            }
+            else */
+            {
+                if(Mathf.Abs(currentRightSpeed)- (deaccelerationPerSecond * Time.deltaTime) > 0)
+                {
+                    currentRightSpeed -= (currentRightSpeed / Mathf.Abs(currentRightSpeed)) * deaccelerationPerSecond * Time.deltaTime;
+                }
+                else 
+                {
+                    currentRightSpeed = 0;
+                }
+            }
+        }
+        if(xInput < 0)
+        {
+            if (Mathf.Abs(currentLeftSpeed) + (xInput * AccelarationPerSecond * Time.deltaTime) < walkSpeed)
+            {
+                currentLeftSpeed += xInput * AccelarationPerSecond * Time.deltaTime;
+            }
+            else
+            {
+                currentLeftSpeed = -walkSpeed;
+            }
+        }
+        else if (currentLeftSpeed != 0)
+        {
+            /* if (Mathf.Abs(currentRightSpeed) < BASICALLY_ZERO)
+             {
+                 currentHorizontalSpeed = 0;
+             }
+             else */
+            {
+                if (Mathf.Abs(currentLeftSpeed) - (deaccelerationPerSecond * Time.deltaTime) > 0)
+                {
+                    currentLeftSpeed -= (currentLeftSpeed / Mathf.Abs(currentLeftSpeed)) * deaccelerationPerSecond * Time.deltaTime;
+                }
+                else
+                {
+                    currentLeftSpeed = 0;
+                }
+            }
+        }
+        currentHorizontalSpeed = currentLeftSpeed + currentRightSpeed;
+        /*if (Mathf.Abs(currentHorizontalSpeed) > walkSpeed&& currentHorizontalSpeed!=0)
+        {
+            currentHorizontalSpeed = walkSpeed * (Mathf.Abs(currentHorizontalSpeed) / currentHorizontalSpeed);
+        }*/
+        //Debug.Log("Horizontal X: " + Input.GetAxis("Horizontal"));
+        var move = new Vector3(currentHorizontalSpeed * Time.deltaTime, 0,0);
         transform.Translate(move);
-        Debug.Log("X=" + x);
-        if(x!=0)
+        //Debug.Log("X=" + xInput);
+        if(xInput!=0)
         {
             isMoving = true;
-            if (x < 0)
+            if (xInput < 0)
             {
                 if(currentDirection != Directions.LEFT)
                 {
@@ -112,8 +187,31 @@ public class PlayerController : MonoBehaviour
         else
         {
             isMoving = false;
-        }
+            /*if (currentHorizontalSpeed != 0)
+            {
+                if (Mathf.Abs(currentHorizontalSpeed) < BASICALLY_ZERO)
+                {
+                    currentHorizontalSpeed = 0;
+                }
+                if (currentHorizontalSpeed < 0)
+                {
+                    currentHorizontalSpeed += deaccelerationPerSecond*Time.deltaTime;
+                    if (currentHorizontalSpeed > 0)
+                    {
+                        currentHorizontalSpeed = 0;
+                    }
+                }
+                else if (currentHorizontalSpeed > 0)
+                {
+                    currentHorizontalSpeed -= deaccelerationPerSecond * Time.deltaTime;
+                    if (currentHorizontalSpeed < 0)
+                    {
+                        currentHorizontalSpeed = 0;
+                    }
+                }
+            }*/
 
+        }
 
         if(isGrounded)
         {
