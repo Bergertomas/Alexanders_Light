@@ -4,15 +4,11 @@ using UnityEngine;
 
 public class PushInteractable : Interactable
 {
-
+    /*[SerializeField]
+    private GameObject button;*/
     public override void Interact()
     {
         base.Interact();
-    }
-    // Start is called before the first frame update
-    void Start()
-    {
-        
     }
 
     // Update is called once per frame
@@ -20,7 +16,6 @@ public class PushInteractable : Interactable
     {
 
     }
-
     /*void ApplyForce()
     {
         var rend = GetComponent<Renderer>();

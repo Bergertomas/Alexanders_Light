@@ -59,6 +59,26 @@ public class LightManager : MonoBehaviour
     [SerializeField]
     float reduceChargeWhenAmped = 3f;
 
+
+    public static LightManager Instance;
+
+    private void Awake()
+    {
+
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Debug.Log("Tried to create another world.");
+            Destroy(this);
+        }
+    }
+    /* private void Awake()
+     {
+
+     }*/
     public void HandleCharge(Charger c) //Recieves a charger from LightBallController and manipulates the player's current charge and the charger's chrge
     {
         //Debug.Log("HandleCharge()");
@@ -82,7 +102,7 @@ public class LightManager : MonoBehaviour
     {
         if (bControl.State==LightBallStates.Amplify)
         {
-            DecreaseLight();
+            //DecreaseLight();
             if (BoLHaloLight.range < maxAmp-0.01f && currentCharge > 0)
             {
                 //BoLHaloLight.range += (steps * Time.deltaTime);
@@ -146,10 +166,11 @@ public class LightManager : MonoBehaviour
         lightGauge.value = currentCharge;
     }
 
-    public void DecreaseLight()
+    public float DecreaseLight()
     {
         currentCharge -= (decreasePerSecond * Time.deltaTime);
         lightGauge.value = currentCharge;
+        return (decreasePerSecond * Time.deltaTime);
     }
 }
 

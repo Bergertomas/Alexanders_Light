@@ -13,6 +13,9 @@ public class PlayerController : MonoBehaviour
     GameObject physicalCollider;
     [SerializeField]
     private float walkSpeed = 3.5f;
+    private float originalWalkSpeed = 3.5f;
+    [SerializeField]
+    private float crawlSpeed = 2f;
     private const float BASICALLY_ZERO = 0.0001f;
     [SerializeField]
     private float AccelarationPerSecond = 0.5f;
@@ -21,7 +24,6 @@ public class PlayerController : MonoBehaviour
     private float currentHorizontalSpeed = 0f;
     private float currentRightSpeed = 0f;
     private float currentLeftSpeed = 0f;
-    float crawlSpeed;
     float climbSpeed;
     private bool isGrounded;
     [SerializeField]
@@ -291,12 +293,13 @@ public class PlayerController : MonoBehaviour
         }
         if (crawling)
         {
-            Debug.Log("CRAWRLINw!");
+            walkSpeed = crawlSpeed;
             physicalCollider.transform.localScale =new Vector3(1f,0.5f,1f);
 
         }
         else
         {
+            walkSpeed = originalWalkSpeed;
             physicalCollider.transform.localScale = new Vector3(1f, 1f, 1f);
         }
 

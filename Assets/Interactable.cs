@@ -7,6 +7,7 @@ public class Interactable : MonoBehaviour
 {
     public bool DidInteract = false;
     public UnityEvent OnInteract;
+    public UnityEvent OnPlayerEnter;
     public virtual void Interact()
     {
         OnInteract.Invoke();
@@ -15,8 +16,16 @@ public class Interactable : MonoBehaviour
     {
         if (other.tag == "Player" && Input.GetButtonDown("Interact"))
         {
-            Debug.Log("OnTriggerStayInteract");
             Interact();
+        }
+    }
+    private void OnTriggerEnter(Collider other)
+    {
+        Debug.Log("OnTriggerEnter Interactabe");
+        if (other.tag == "Player")
+        {
+            Debug.Log("other.tag == Player Interactabe");
+            OnPlayerEnter.Invoke();
         }
     }
 }
