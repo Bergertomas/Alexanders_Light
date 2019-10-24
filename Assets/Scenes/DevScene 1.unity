@@ -164,7 +164,7 @@ GameObject:
   - component: {fileID: 25877726}
   - component: {fileID: 25877725}
   - component: {fileID: 25877724}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -293,7 +293,7 @@ GameObject:
   - component: {fileID: 282840811}
   - component: {fileID: 282840816}
   - component: {fileID: 282840812}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Main Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
@@ -370,13 +370,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 282840810}
-  m_LocalRotation: {x: 0.17364816, y: 0, z: 0, w: 0.9848078}
-  m_LocalPosition: {x: 0, y: 2.36, z: -12.25}
+  m_LocalRotation: {x: 0.080752455, y: -0, z: -0, w: 0.9967342}
+  m_LocalPosition: {x: 0, y: 1.29, z: -12.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 555660055}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 20, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 9.264001, y: 0, z: 0}
 --- !u!114 &282840816
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -448,7 +448,7 @@ GameObject:
   - component: {fileID: 300265594}
   - component: {fileID: 300265593}
   - component: {fileID: 300265595}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: BoL
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -812,7 +812,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 534668934}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: BallAnchor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -849,7 +849,7 @@ GameObject:
   - component: {fileID: 555660057}
   - component: {fileID: 555660056}
   - component: {fileID: 555660051}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -900,10 +900,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigidbody: {fileID: 555660050}
   physicalCollider: {fileID: 981497564}
-  speed: 4
-  hasCalledBoL: 0
+  walkSpeed: 3.5
   jumpHeight: 8
   artificialGravity: -0.3
+  hasCalledBoL: 0
   lbc: {fileID: 300265593}
   ballAnchor: {fileID: 534668933}
   balloflight: {fileID: 300265594}
@@ -1712,9 +1712,9 @@ Light:
   m_Enabled: 1
   serializedVersion: 9
   m_Type: 2
-  m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
+  m_Color: {r: 0.5377358, g: 0.39346525, b: 0, a: 1}
   m_Intensity: 19.9
-  m_Range: 10
+  m_Range: 4.92
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
@@ -1750,15 +1750,16 @@ Light:
   m_RenderMode: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 55
   m_RenderingLayerMask: 1
-  m_Lightmapping: 1
+  m_Lightmapping: 4
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_BoundingSphereOverride: {x: 3.299184e+9, y: -1.0734547e+23, z: -8.0764073e-10,
+    w: 4e-45}
   m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
@@ -1772,7 +1773,7 @@ GameObject:
   m_Component:
   - component: {fileID: 981497565}
   - component: {fileID: 981497566}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Colliders
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2586,7 +2587,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1408415657}
   - component: {fileID: 1408415658}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: HaloLight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3743,8 +3744,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1663334303}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 68.39, y: 5.5, z: 0}
-  m_LocalScale: {x: 20.85574, y: 6.145237, z: 8.156113}
+  m_LocalPosition: {x: 68.39, y: 5.5, z: 0.47}
+  m_LocalScale: {x: 20.85574, y: 6.145237, z: 4.5285187}
   m_Children: []
   m_Father: {fileID: 1883821796}
   m_RootOrder: 6
@@ -4049,7 +4050,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2001495511}
   - component: {fileID: 2001495512}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: AreaLight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4180,7 +4181,7 @@ GameObject:
   - component: {fileID: 2066555017}
   - component: {fileID: 2066555015}
   - component: {fileID: 2066555016}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: BoLGraphics
   m_TagString: Untagged
   m_Icon: {fileID: 0}

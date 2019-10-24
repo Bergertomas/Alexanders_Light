@@ -4,11 +4,12 @@ using UnityEngine;
 
 public class PushInteractable : Interactable
 {
-
     public override void Interact()
     {
         base.Interact();
+        DidInteract = true;
     }
+
     // Start is called before the first frame update
     void Start()
     {

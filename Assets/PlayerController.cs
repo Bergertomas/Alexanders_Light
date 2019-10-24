@@ -13,13 +13,14 @@ public class PlayerController : MonoBehaviour
     GameObject physicalCollider;
     [SerializeField]
     private float walkSpeed = 3.5f;
-    float crawlSpeed;
+    private float originalWalkSpeed = 3.5f;
+    float crawlSpeed = 1f;
     float climbSpeed;
     private bool isGrounded;
     [SerializeField]
     float jumpHeight = 2f;
     [SerializeField]
-    float artificialGravity = -0.666f;
+    float artificialGravity = -0.3f;
     bool crawling;
     float courage;
     bool isAlive;
@@ -62,6 +63,7 @@ public class PlayerController : MonoBehaviour
 
     private void ChangeAnchorPosition()
     {
+        return;
         for (int i = 0; i < 8; i++)
         {
             Vector3 newPos = new Vector3
@@ -87,7 +89,7 @@ public class PlayerController : MonoBehaviour
         var x = Input.GetAxis("Horizontal") * walkSpeed * Time.deltaTime;
         var move = new Vector3(x, 0);
         transform.Translate(move);
-        Debug.Log("X=" + x);
+        //Debug.Log("X=" + x);
         if(x!=0)
         {
             isMoving = true;
@@ -126,7 +128,8 @@ public class PlayerController : MonoBehaviour
 
         //Vector3 ballAnchorStep = Vector3.Lerp(ballAnchor.transform.localPosition, ballAnchorDestination, Time.deltaTime * ballAnchorSpeed);
         //if (Vector3.Distance(Vector3.zero, ballAnchorStep) < ballAnchorMinDistanceFromPlayer)
-        ballAnchor.transform.localPosition = Vector3.Lerp(ballAnchor.transform.localPosition, ballAnchorDestination, Time.deltaTime * ballAnchorSpeed);
+        //TODO: WHAT IS THIS LINE YOU GUYS? LOL 
+        //ballAnchor.transform.localPosition = Vector3.Lerp(ballAnchor.transform.localPosition, ballAnchorDestination, Time.deltaTime * ballAnchorSpeed);
 
         var bx = Input.GetAxis("BallHorizontal") * lbc.ControlledSpeed * Time.deltaTime;
         var by = Input.GetAxis("BallVertical") * lbc.ControlledSpeed * Time.deltaTime;
@@ -193,12 +196,13 @@ public class PlayerController : MonoBehaviour
         }
         if (crawling)
         {
-            Debug.Log("CRAWRLINw!");
+            walkSpeed = crawlSpeed;
             physicalCollider.transform.localScale =new Vector3(1f,0.5f,1f);
 
         }
         else
         {
+            walkSpeed = originalWalkSpeed;
             physicalCollider.transform.localScale = new Vector3(1f, 1f, 1f);
         }
 
