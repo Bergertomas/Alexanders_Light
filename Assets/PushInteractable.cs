@@ -4,14 +4,11 @@ using UnityEngine;
 
 public class PushInteractable : Interactable
 {
-    /*[SerializeField]
-    private GameObject button;*/
     public override void Interact()
     {
         base.Interact();
     }
 
-    // Update is called once per frame
     void Update()
     {
 

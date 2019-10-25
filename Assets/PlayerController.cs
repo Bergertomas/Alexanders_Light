@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
     GameObject physicalCollider;
     [SerializeField]
     private float walkSpeed = 3.5f;
+    [SerializeField]
     private float originalWalkSpeed = 3.5f;
     [SerializeField]
     private float crawlSpeed = 2f;
@@ -34,6 +35,7 @@ public class PlayerController : MonoBehaviour
     float courage;
     bool isAlive;
     private bool isMoving = false;
+    private bool jumped = false;
     private Directions currentDirection = Directions.RIGHT;//the direction the player's currently facing
     public bool hasCalledBoL;
 
@@ -162,8 +164,8 @@ public class PlayerController : MonoBehaviour
             currentHorizontalSpeed = walkSpeed * (Mathf.Abs(currentHorizontalSpeed) / currentHorizontalSpeed);
         }*/
         //Debug.Log("Horizontal X: " + Input.GetAxis("Horizontal"));
-        var move = new Vector3(currentHorizontalSpeed * Time.deltaTime, 0,0);
-        transform.Translate(move);
+       /* var move = new Vector3(currentHorizontalSpeed * Time.deltaTime, 0,0);
+        transform.Translate(move);*/
         //Debug.Log("X=" + xInput);
         if(xInput!=0)
         {
@@ -219,8 +221,8 @@ public class PlayerController : MonoBehaviour
         {
             if (Input.GetButtonDown("Jump"))
             {
-                rigidbody.AddForce(new Vector3(0, jumpHeight, 0), ForceMode.Impulse);
-                isGrounded = false;
+                jumped = true;
+
             }
         }
 
@@ -307,10 +309,20 @@ public class PlayerController : MonoBehaviour
     }
     private void FixedUpdate()
     {
+        if (jumped)
+        {
+            rigidbody.AddForce(new Vector3(0, jumpHeight, 0), ForceMode.Impulse);
+            isGrounded = false;
+            jumped = false;
+        }
+
         if (!isGrounded)
         {
             rigidbody.AddForce(new Vector3(0, artificialGravity, 0), ForceMode.Impulse);
         }
+        var move = new Vector3(currentHorizontalSpeed * Time.deltaTime, 0,0);
+        rigidbody.MovePosition(transform.position + move);
+        //rigidbody.velocity = move;
     }
 
     public void OnCollisionEnter(Collision collision)

@@ -8,17 +8,23 @@ public class TutorialButtonDetector : MonoBehaviour
     private string buttonName;
     [SerializeField]
     private GameObject buttonGraphics;
+    [SerializeField]
+    private bool DisappearOncePlayerClickedInMyCollider = true;
     void Start()
     {
         buttonGraphics.SetActive(false);
     }
 
-    void Update()
+    /*void Update()
     {
         if (Input.GetButton(buttonName))
         {
             this.gameObject.SetActive(false);
         }
+    }*/
+    public void Disappear()
+    {
+        this.gameObject.SetActive(false);
     }
     private void OnTriggerEnter(Collider other)
     {
@@ -26,5 +32,16 @@ public class TutorialButtonDetector : MonoBehaviour
         {
             buttonGraphics.SetActive(true);
         }
+    }
+    private void OnTriggerStay(Collider other)
+    {
+        if (DisappearOncePlayerClickedInMyCollider)
+        {
+            if (other.tag == "Player" && Input.GetButtonDown(buttonName))
+            {
+                Disappear();
+            }
+        }
+
     }
 }
