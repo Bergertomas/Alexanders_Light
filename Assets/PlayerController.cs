@@ -5,6 +5,10 @@ public enum Directions
 {
     LEFT = -1, RIGHT = 1,
 }
+public enum PlayerStates
+{
+    None,Idle,Crawl,Drag,
+}
 public class PlayerController : MonoBehaviour
 {
     [SerializeField]
@@ -31,12 +35,13 @@ public class PlayerController : MonoBehaviour
     float jumpHeight = 2f;
     [SerializeField]
     float artificialGravity = -0.666f;
-    bool crawling;
+    //bool crawling;
     float courage;
     bool isAlive;
     private bool isMoving = false;
     private bool jumped = false;
     private Directions currentDirection = Directions.RIGHT;//the direction the player's currently facing
+    private PlayerStates state = PlayerStates.None;
     public bool hasCalledBoL;
 
     public LightballController lbc;
@@ -46,6 +51,7 @@ public class PlayerController : MonoBehaviour
     private Vector3 ballAnchorDestination;
     //private float ballAnchorZ;
     public Transform balloflight;
+    private DragInteractable draggedObject = null;
 
     [SerializeField]
     private float anchorForward = 3f;
@@ -262,9 +268,18 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetButtonDown("Crawl"))
         {
-            crawling = !crawling;
+            // crawling = !crawling; )-;
+            if (state == PlayerStates.Crawl)
+            {
+                state = PlayerStates.None;
+            }
+            else
+            {
+                draggedObject = null;
+                state = PlayerStates.Crawl;
+            }
         }
-        if (crawling)
+        if (state == PlayerStates.Crawl||state==PlayerStates.Drag)
         {
             walkSpeed = crawlSpeed;
             physicalCollider.transform.localScale = new Vector3(1f, 0.5f, 1f);
@@ -285,6 +300,8 @@ public class PlayerController : MonoBehaviour
             rigidbody.AddForce(new Vector3(0, jumpHeight, 0), ForceMode.Impulse);
             isGrounded = false;
             jumped = false;
+            state = PlayerStates.None;
+            draggedObject = null;
         }
 
         if (!isGrounded)
@@ -294,8 +311,24 @@ public class PlayerController : MonoBehaviour
         var move = new Vector3(currentHorizontalSpeed * Time.deltaTime, 0, 0);
         rigidbody.MovePosition(transform.position + move);
         //rigidbody.velocity = move;
+        if (state == PlayerStates.Drag)// && draggedObject != null)
+        {
+            if (draggedObject != null)
+            {
+                //Drag
+                draggedObject.rigidbody.MovePosition(transform.position);
+            }
+            else
+            {
+                state = PlayerStates.None;
+            }
+        }
     }
-
+    public void Grab(DragInteractable grabbed)
+    {
+        draggedObject = grabbed;
+        state = PlayerStates.Drag;
+    }
     public void OnCollisionEnter(Collision collision)
     {
         isGrounded = true;

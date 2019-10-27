@@ -8,15 +8,15 @@ public class Interactable : MonoBehaviour
     public bool DidInteract = false;
     public UnityEvent OnInteract;
     public UnityEvent OnPlayerEnter;
-    public virtual void Interact()
+    public virtual void Interact(PlayerController player)
     {
         OnInteract.Invoke();
     }
     private void OnTriggerStay(Collider other)
     {
-        if (other.tag == "Player" && Input.GetButtonDown("Interact"))
+        if (other.GetComponent<PlayerController>() && Input.GetButtonDown("Interact"))
         {
-            Interact();
+            Interact(other.GetComponent<PlayerController>());
         }
     }
     private void OnTriggerEnter(Collider other)
