@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 public enum Directions
 {
-    LEFT=-1,RIGHT=1,
+    LEFT = -1, RIGHT = 1,
 }
 public class PlayerController : MonoBehaviour
 {
@@ -48,7 +48,7 @@ public class PlayerController : MonoBehaviour
     public Transform balloflight;
 
     [SerializeField]
-    private float anchorForward =3f;
+    private float anchorForward = 3f;
     [SerializeField]
     private float anchorBackward = 0f;
     [SerializeField]
@@ -60,15 +60,17 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float ballAnchorLeadDistance = 1.5f;
     [SerializeField]
+    private float anchorOutWard = 2f;
+    [SerializeField]
     private float ballAnchorSpeed = 2f;
     #endregion
-    
+
     // TODO: SET UP CAMERA SCRIPT WHICH WILL MAKE THE CAMERA ZOOM A LITTLE OUT WHILE BOL IS FAR AWAY (ORI)
 
 
     void Start()
     {
-       ChangeAnchorPosition();
+        ChangeAnchorPosition();
         //Physics.IgnoreCollision(balloflight.GetComponent<Collider>(), GetComponent<Collider>(),true);
     }
 
@@ -78,58 +80,51 @@ public class PlayerController : MonoBehaviour
         {
             Vector3 newPos = new Vector3
               (Random.Range(anchorBackward * (float)currentDirection, anchorForward * (float)currentDirection),
-               Random.Range(anchorDownward, anchorUpward), 0f);
+               Random.Range(anchorDownward, anchorUpward), 
+               (lbc.IsPushed ? anchorOutWard : 0f));
             if (isMoving)
             {
-                newPos+=new Vector3(ballAnchorLeadDistance*(float)currentDirection,0,0);
+                newPos += new Vector3(ballAnchorLeadDistance * (float)currentDirection, 0, 0);
             }
-            if (Vector3.Distance(Vector3.zero, newPos)> ballAnchorMinDistanceFromPlayer)
+            if (Vector3.Distance(Vector3.zero, newPos) > ballAnchorMinDistanceFromPlayer)
             {
                 ballAnchorDestination = newPos;
                 break;
             }
             //Try again if the randomised position aint far enough from the player..
         }
-        Invoke("ChangeAnchorPosition", Random.Range(0.7f,5f));
-       //ballAnchor.transform.position = new Vector3(ballAnchor.transform.position.x, ballAnchor.transform.position.y,ballAnchorZ);
+        Invoke("ChangeAnchorPosition", Random.Range(0.7f, 5f));
+        //ballAnchor.transform.position = new Vector3(ballAnchor.transform.position.x, ballAnchor.transform.position.y,ballAnchorZ);
     }
     void Update()
     {
         // Movement
-        float xInput = Input.GetAxisRaw("Horizontal") ;
-        /*{
-            currentHorizontalSpeed += xInput;
-        }*/
+        float xInput = Input.GetAxisRaw("Horizontal");
+
+        #region Controlling current speed:
         if (xInput > 0)
         {
-            if(Mathf.Abs(currentRightSpeed) +( xInput * AccelarationPerSecond * Time.deltaTime)<walkSpeed)
+            if (Mathf.Abs(currentRightSpeed) + (xInput * AccelarationPerSecond * Time.deltaTime) < walkSpeed)
             {
                 currentRightSpeed += xInput * AccelarationPerSecond * Time.deltaTime;
             }
             else
             {
                 currentRightSpeed = walkSpeed;
-            }  
+            }
         }
-        else if(currentRightSpeed!=0)
+        else if (currentRightSpeed != 0)
         {
-           /* if (Mathf.Abs(currentRightSpeed) < BASICALLY_ZERO)
-            {
-                currentHorizontalSpeed = 0;
-            }
-            else */
-            {
-                if(Mathf.Abs(currentRightSpeed)- (deaccelerationPerSecond * Time.deltaTime) > 0)
-                {
-                    currentRightSpeed -= (currentRightSpeed / Mathf.Abs(currentRightSpeed)) * deaccelerationPerSecond * Time.deltaTime;
-                }
-                else 
-                {
-                    currentRightSpeed = 0;
-                }
-            }
+             if (Mathf.Abs(currentRightSpeed) - (deaccelerationPerSecond * Time.deltaTime) > 0)
+             {
+                  currentRightSpeed -= (currentRightSpeed / Mathf.Abs(currentRightSpeed)) * deaccelerationPerSecond * Time.deltaTime;
+             }
+             else
+             {
+                  currentRightSpeed = 0;
+             }
         }
-        if(xInput < 0)
+        if (xInput < 0)
         {
             if (Mathf.Abs(currentLeftSpeed) + (xInput * AccelarationPerSecond * Time.deltaTime) < walkSpeed)
             {
@@ -142,21 +137,14 @@ public class PlayerController : MonoBehaviour
         }
         else if (currentLeftSpeed != 0)
         {
-            /* if (Mathf.Abs(currentRightSpeed) < BASICALLY_ZERO)
+             if (Mathf.Abs(currentLeftSpeed) - (deaccelerationPerSecond * Time.deltaTime) > 0)
              {
-                 currentHorizontalSpeed = 0;
+                 currentLeftSpeed -= (currentLeftSpeed / Mathf.Abs(currentLeftSpeed)) * deaccelerationPerSecond * Time.deltaTime;
              }
-             else */
-            {
-                if (Mathf.Abs(currentLeftSpeed) - (deaccelerationPerSecond * Time.deltaTime) > 0)
-                {
-                    currentLeftSpeed -= (currentLeftSpeed / Mathf.Abs(currentLeftSpeed)) * deaccelerationPerSecond * Time.deltaTime;
-                }
-                else
-                {
-                    currentLeftSpeed = 0;
-                }
-            }
+             else
+             {
+                 currentLeftSpeed = 0;
+             }
         }
         currentHorizontalSpeed = currentLeftSpeed + currentRightSpeed;
         /*if (Mathf.Abs(currentHorizontalSpeed) > walkSpeed&& currentHorizontalSpeed!=0)
@@ -164,20 +152,17 @@ public class PlayerController : MonoBehaviour
             currentHorizontalSpeed = walkSpeed * (Mathf.Abs(currentHorizontalSpeed) / currentHorizontalSpeed);
         }*/
         //Debug.Log("Horizontal X: " + Input.GetAxis("Horizontal"));
-       /* var move = new Vector3(currentHorizontalSpeed * Time.deltaTime, 0,0);
-        transform.Translate(move);*/
-        //Debug.Log("X=" + xInput);
-        if(xInput!=0)
+#endregion
+        if (xInput != 0)
         {
             isMoving = true;
             if (xInput < 0)
             {
-                if(currentDirection != Directions.LEFT)
+                if (currentDirection != Directions.LEFT)
                 {
                     ChangeAnchorPosition();
                     currentDirection = Directions.LEFT;
                 }
-
             }
             else
             {
@@ -191,38 +176,14 @@ public class PlayerController : MonoBehaviour
         else
         {
             isMoving = false;
-            /*if (currentHorizontalSpeed != 0)
-            {
-                if (Mathf.Abs(currentHorizontalSpeed) < BASICALLY_ZERO)
-                {
-                    currentHorizontalSpeed = 0;
-                }
-                if (currentHorizontalSpeed < 0)
-                {
-                    currentHorizontalSpeed += deaccelerationPerSecond*Time.deltaTime;
-                    if (currentHorizontalSpeed > 0)
-                    {
-                        currentHorizontalSpeed = 0;
-                    }
-                }
-                else if (currentHorizontalSpeed > 0)
-                {
-                    currentHorizontalSpeed -= deaccelerationPerSecond * Time.deltaTime;
-                    if (currentHorizontalSpeed < 0)
-                    {
-                        currentHorizontalSpeed = 0;
-                    }
-                }
-            }*/
-
         }
 
-        if(isGrounded)
+        if (isGrounded)
         {
             if (Input.GetButtonDown("Jump"))
             {
                 jumped = true;
-
+                //Jumpin' is handled in FixedUpdate since it deals with physics.
             }
         }
 
@@ -238,23 +199,23 @@ public class PlayerController : MonoBehaviour
             //State can be changed only if it is currently set to None.
             if (Input.GetButton("Heal"))
             {
-                    lbc.State = LightBallStates.Heal;
+                lbc.State = LightBallStates.Heal;
                 //hasCalledBoL = true;
             }
             else if (Input.GetButton("Charge"))
             {
                 // lbc.isCharging = true;
-                    lbc.State = LightBallStates.Charge;
+                lbc.State = LightBallStates.Charge;
             }
             else if (Input.GetButton("Amplify"))
             {
                 // lbc.isAmp = true;
-                    lbc.State = LightBallStates.Amplify;
+                lbc.State = LightBallStates.Amplify;
             }
 
             if (bmove.magnitude < 0.01f)//if (Input.GetAxisRaw("BallHorizontal") == 0.0f && Input.GetAxisRaw("BallVertical") == 0.0f)
             {
-                lbc.transform.position = Vector2.Lerp(lbc.transform.position, lbc.targetSpot.position, Time.deltaTime * lbc.IdleMovementSpeed);
+                lbc.transform.position = Vector3.Lerp(lbc.transform.position, lbc.targetSpot.position, Time.deltaTime * lbc.IdleMovementSpeed);
             }
         }
         else
@@ -287,6 +248,16 @@ public class PlayerController : MonoBehaviour
             }
         }
         hasCalledBoL = (lbc.State == LightBallStates.Heal);
+        if (lbc.IsPushed)//Forcing the anchor to its appropriate Z
+        {
+            ballAnchor.transform.position += new Vector3(0, 0, (-ballAnchor.transform.position.z) - anchorOutWard);
+            // (Z should become anchorOutWard) BUG:it becomes a different number for some reason..
+        }
+        else
+        {
+            ballAnchor.transform.position += new Vector3(0, 0, (-ballAnchor.transform.position.z));
+            // (Z should become 0)
+        }
         lbc.transform.Translate(bmove);
 
         if (Input.GetButtonDown("Crawl"))
@@ -296,7 +267,7 @@ public class PlayerController : MonoBehaviour
         if (crawling)
         {
             walkSpeed = crawlSpeed;
-            physicalCollider.transform.localScale =new Vector3(1f,0.5f,1f);
+            physicalCollider.transform.localScale = new Vector3(1f, 0.5f, 1f);
 
         }
         else
@@ -318,9 +289,9 @@ public class PlayerController : MonoBehaviour
 
         if (!isGrounded)
         {
-            rigidbody.AddForce(new Vector3(0, artificialGravity, 0), ForceMode.Impulse);
+             rigidbody.AddForce(new Vector3(0, artificialGravity, 0), ForceMode.Impulse);
         }
-        var move = new Vector3(currentHorizontalSpeed * Time.deltaTime, 0,0);
+        var move = new Vector3(currentHorizontalSpeed * Time.deltaTime, 0, 0);
         rigidbody.MovePosition(transform.position + move);
         //rigidbody.velocity = move;
     }
@@ -330,8 +301,8 @@ public class PlayerController : MonoBehaviour
         isGrounded = true;
     }
 
-   /* private void Interact()
-    {
-        Physics.OverlapBox(this.transform.position,)
-    }*/
+    /* private void Interact()
+     {
+         Physics.OverlapBox(this.transform.position,)
+     }*/
 }

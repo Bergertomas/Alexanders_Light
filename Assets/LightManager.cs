@@ -75,10 +75,7 @@ public class LightManager : MonoBehaviour
             Destroy(this);
         }
     }
-    /* private void Awake()
-     {
 
-     }*/
     public void HandleCharge(Charger c) //Recieves a charger from LightBallController and manipulates the player's current charge and the charger's chrge
     {
         //Debug.Log("HandleCharge()");
@@ -151,7 +148,6 @@ public class LightManager : MonoBehaviour
         Amplify();
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         currentCharge = 50f;
