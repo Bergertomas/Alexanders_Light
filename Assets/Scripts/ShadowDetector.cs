@@ -69,7 +69,7 @@ public class ShadowDetector : MonoBehaviour {
 	void Update () {
 
         if (autoMaxShadowBright) {
-            maxShadowBright = useAmbientIntensity ? 10 : 1;
+            maxShadowBright = useAmbientIntensity ? 1000 : 1;
         }
 
         if (v_croutineReady)

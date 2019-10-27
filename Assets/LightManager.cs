@@ -56,10 +56,25 @@ public class LightManager : MonoBehaviour
     float emissionLerpSteps = 5f;
     [SerializeField]
     float defaultHaloLightIntensity = 1f;
+    [SerializeField]
+    float reduceChargeWhenAmped = 3f;
 
 
+    public static LightManager Instance;
 
+    private void Awake()
+    {
 
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Debug.Log("Tried to create another world.");
+            Destroy(this);
+        }
+    }
 
     public void HandleCharge(Charger c) //Recieves a charger from LightBallController and manipulates the player's current charge and the charger's chrge
     {
@@ -80,12 +95,12 @@ public class LightManager : MonoBehaviour
         }
     }
 
-
     void Amplify()
     {
-        if (bControl.isAmp == true)
+        if (bControl.State==LightBallStates.Amplify)
         {
-            if (BoLHaloLight.range < maxAmp-0.01f)
+            //DecreaseLight();
+            if (BoLHaloLight.range < maxAmp-0.01f && currentCharge > 0)
             {
                 //BoLHaloLight.range += (steps * Time.deltaTime);
                 //BoLHaloLight.intensity += (steps * Time.deltaTime);
@@ -96,7 +111,7 @@ public class LightManager : MonoBehaviour
                 BoLMat.SetColor("_EmissionColor", new Color(newEmission, newEmission, newEmission, 1.0f));
             }
         }
-        else if (bControl.isAmp == false)
+        else// if (bControl.isAmp == false)
         {
             if (BoLHaloLight.range > defaultAmp+0.01f)
             {
@@ -110,14 +125,13 @@ public class LightManager : MonoBehaviour
         }
     }
 
-
     //TODO: Block ability to amplify if not enough charge;
     //TODO: Amplifying should discharge BoL.
     void Update()
     {
         lightGauge.value = currentCharge;
         //float emissionIntensity = ((currentCharge / maxCharge) * (maxEmission - minEmission)) + minEmission;
-        if (!bControl.isAmp)
+        if (bControl.State != LightBallStates.Amplify)
         {
             float emissionIntensity = Utilities.MapRange(currentCharge, maxCharge, minEmission, maxEmission);
             float newEmission = Mathf.Lerp(BoLMat.GetColor("_EmissionColor").r, emissionIntensity, emissionLerpSteps * Time.deltaTime);
@@ -134,10 +148,6 @@ public class LightManager : MonoBehaviour
         Amplify();
     }
 
-
-
-
-    // Start is called before the first frame update
     void Start()
     {
         currentCharge = 50f;
@@ -146,21 +156,18 @@ public class LightManager : MonoBehaviour
         lightGauge.value = currentCharge;
     }
 
-
     void IncreaseLight()
     {
         currentCharge += (increasePerSecond * Time.deltaTime);
         lightGauge.value = currentCharge;
     }
 
-
-    public void DecreaseLight()
+    public float DecreaseLight()
     {
         currentCharge -= (decreasePerSecond * Time.deltaTime);
         lightGauge.value = currentCharge;
+        return (decreasePerSecond * Time.deltaTime);
     }
-
-
 }
 
 

@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,7 +24,7 @@ public class CourageManager : MonoBehaviour
     [SerializeField]
     float waitUntilBallArrives = 0.5f;
 
-
+    public event Action CourageDepleted;
 
     // Start is called before the first frame update
     void Start()
@@ -37,6 +38,11 @@ public class CourageManager : MonoBehaviour
     }
 
 
+ /*   private void  ()
+    {
+        }
+        */
+
     void IncreaseCourage()
     {
         if (lm.CurrentCharge > 0f)
@@ -49,15 +55,19 @@ public class CourageManager : MonoBehaviour
         }
     }
 
+    /*public void CourageDepleted()
+    {
 
+    }*/
     void DecreaseCourage()
     {
         currentHealth -= (increasePerSecond * Time.deltaTime);
         courageGauge.value = currentHealth;
         Debug.Log(courageGauge.value);
-        return;
-        // TODO: GetFear should raycast sphere (in update) and find whether the player is around an enemy / spooky shadows / in darkness.
-        // TODO: Do we need events for this? if so, figure it out
+        if (currentHealth <= 0f)
+        {
+            CourageDepleted();
+        }
     }
 
     private void FixedUpdate()
