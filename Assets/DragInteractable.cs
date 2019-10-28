@@ -12,7 +12,8 @@ public class DragInteractable : Interactable
     }
     public override void Interact(PlayerController player)
     {
-        base.Interact(player);
+        //base.Interact(player);
         player.Grab(this);
+        //Vector3.MoveTowards(this.transform.position, player.transform.position, 1f);
     }
 }

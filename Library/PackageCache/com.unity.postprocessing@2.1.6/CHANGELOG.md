@@ -4,6 +4,19 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.1.6] - 2019-04-11
+
+### Fixed
+- Post-processing would crash if "Managed Stripping Level" was set to Medium or High.
+- Serialization warnings on build.
+- Removed unwanted garbage collection.
+
+## [2.1.5] - 2019-03-25
+
+### Fixed
+- LDR Color grading in gamma mode no longer produces banding artifacts on Mali GPUs on OpenGL ES2.
+- Gamma mode no longer darken the screen with LWRP.
+
 ## [2.1.4] - 2019-02-27
 
 ### Fixed

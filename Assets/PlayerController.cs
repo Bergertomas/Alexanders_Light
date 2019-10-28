@@ -328,6 +328,7 @@ public class PlayerController : MonoBehaviour
     {
         draggedObject = grabbed;
         state = PlayerStates.Drag;
+        Debug.Log(state);
     }
     public void OnCollisionEnter(Collision collision)
     {

@@ -1199,6 +1199,7 @@ GameObject:
   - component: {fileID: 329530438}
   - component: {fileID: 329530442}
   - component: {fileID: 329530443}
+  - component: {fileID: 329530444}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -1273,7 +1274,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 329530437}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 35.536186, y: 2.83, z: 0}
+  m_LocalPosition: {x: 36.38, y: 2.83, z: 0}
   m_LocalScale: {x: 1, y: 2.7981, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1309,6 +1310,55 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lookoutRadius: 3
   moveSpeed: 2
+  minMoveX: 1
+  maxMoveX: 5
+--- !u!114 &329530444
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 329530437}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 504f7ad1f1700b8439b56a054126c9bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  WhenInteracting:
+    m_PersistentCalls:
+      m_Calls: []
+  OnInteract:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 329530437}
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnInteractionExit:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDeath:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 329530437}
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  life: 5
 --- !u!1 &383341565
 GameObject:
   m_ObjectHideFlags: 0
@@ -1582,7 +1632,7 @@ Rigidbody:
   m_Drag: 0
   m_AngularDrag: 0
   m_UseGravity: 1
-  m_IsKinematic: 1
+  m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 120
   m_CollisionDetection: 1
@@ -11892,7 +11942,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 836153356}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 23.53, y: 3.21, z: 0}
+  m_LocalPosition: {x: 26.12, y: 3.21, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -12278,7 +12328,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 4e-45}
+  m_BoundingSphereOverride: {x: 1.5e-44, y: 0, z: 1.25, w: 0}
   m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
@@ -14136,7 +14186,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 7.000001, z: 7.000001, w: -8.000001}
+  m_BoundingSphereOverride: {x: 1.51e-43, y: 0.2265625, z: 0.265625, w: 0.01171875}
   m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
@@ -14726,6 +14776,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lookoutRadius: 3
   moveSpeed: 2
+  minMoveX: 1
+  maxMoveX: 5
 --- !u!1 &1645962147
 GameObject:
   m_ObjectHideFlags: 0
