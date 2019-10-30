@@ -22,6 +22,8 @@ public class ShadowEnemyController : MonoBehaviour
     private string bolPusher = "BOLPusher";
     private string wall = "Wall";
     private string physicalObject = "PhysicalObject";
+    private bool reachedEdge = false;
+    private float timerToTurn = 1.5f;
 
 
 
@@ -65,6 +67,7 @@ public class ShadowEnemyController : MonoBehaviour
         if (collision.gameObject.tag == bolPusher
             || collision.gameObject.tag == wall || collision.gameObject.tag == physicalObject)
         {
+            reachedEdge = true;
             direction = -direction;
         }
     }
@@ -86,11 +89,22 @@ public class ShadowEnemyController : MonoBehaviour
             // moving left
             if (this.transform.position.x > minMoveX)
             {
+                if (reachedEdge)
+                {
+                    if (timerToTurn > 0)
+                    {
+                        timerToTurn -= Time.deltaTime;
+                        return;
+                    }
+                    timerToTurn = 1.5f;
+                }
+                reachedEdge = false;
                 this.transform.position = new Vector3(this.transform.position.x - (moveSpeed * Time.deltaTime), this.transform.position.y);
                 //this.transform.position = new Vector3(minMoveX, transform.position.y) * Time.deltaTime;
             }
             else
             {
+                reachedEdge = true;
                 direction = -direction;
             }
         }
@@ -100,12 +114,23 @@ public class ShadowEnemyController : MonoBehaviour
             
             if(this.transform.position.x < maxMoveX)
             {
+                if (reachedEdge)
+                {
+                    if (timerToTurn > 0)
+                    {
+                        timerToTurn -= Time.deltaTime;
+                        return;
+                    }
+                    timerToTurn = 1.5f;
+                }
+                reachedEdge = false;
                 this.transform.position = new Vector3(this.transform.position.x + (moveSpeed * Time.deltaTime), this.transform.position.y);
                 //this.rigidbody.MovePosition(new Vector3(maxMoveX, rigidbody.transform.position.y));
                 //this.transform.position = new Vector3(maxMoveX, transform.position.y) * Time.deltaTime;
             }
             else
             {
+                reachedEdge = true;
                 direction = -direction;
             }
         } 
