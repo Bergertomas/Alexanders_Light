@@ -1295,7 +1295,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 108
-  m_CollisionDetection: 1
+  m_CollisionDetection: 0
 --- !u!114 &329530443
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1311,7 +1311,9 @@ MonoBehaviour:
   lookoutRadius: 3
   moveSpeed: 2
   minMoveX: 1
+  origMinMove: 1
   maxMoveX: 5
+  origMaxMove: 5
 --- !u!114 &329530444
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6599,6 +6601,7 @@ MonoBehaviour:
   minHealth: 0
   currentHealth: 50
   waitUntilBallArrives: 0.5
+  secondsToWaitBeforeDarkness: 5
 --- !u!4 &672546026
 Transform:
   m_ObjectHideFlags: 0
@@ -12328,7 +12331,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 1.5e-44, y: 0, z: 1.25, w: 0}
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 4e-45}
   m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
@@ -14186,7 +14189,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 1.51e-43, y: 0.2265625, z: 0.265625, w: 0.01171875}
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
@@ -14777,7 +14780,9 @@ MonoBehaviour:
   lookoutRadius: 3
   moveSpeed: 2
   minMoveX: 1
+  origMinMove: 1
   maxMoveX: 5
+  origMaxMove: 5
 --- !u!1 &1645962147
 GameObject:
   m_ObjectHideFlags: 0
