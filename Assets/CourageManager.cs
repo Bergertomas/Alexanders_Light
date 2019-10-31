@@ -23,6 +23,11 @@ public class CourageManager : MonoBehaviour
     float currentHealth = 50f;
     [SerializeField]
     float waitUntilBallArrives = 0.5f;
+    [SerializeField]
+    float secondsToWaitBeforeDarkness = 2f;
+    private float timer = 0f;
+    private float timerMax = 0f;
+    private bool hasWaited = false;
 
     public event Action CourageDepleted;
 
@@ -38,10 +43,10 @@ public class CourageManager : MonoBehaviour
     }
 
 
- /*   private void  ()
-    {
-        }
-        */
+    /*   private void  ()
+       {
+           }
+           */
 
     void IncreaseCourage()
     {
@@ -70,6 +75,21 @@ public class CourageManager : MonoBehaviour
         }
     }
 
+    
+    private bool Waited(float seconds)
+    {
+        timerMax = seconds;
+        timer += Time.deltaTime;
+        if (timer >= timerMax)
+        {
+            timerMax = 0f;
+            timer = 0f;
+            return true;
+        }
+
+        return false;
+    }
+
     private void FixedUpdate()
     {
         //If the player summoned the ball to his side to heal courage, do it
@@ -81,22 +101,37 @@ public class CourageManager : MonoBehaviour
         //If the player is in enough darkness, start decreasing courage
         if (sd.hidden)
         {
-            DecreaseCourage();
+            if (hasWaited == false)
+            {
+                hasWaited = Waited(secondsToWaitBeforeDarkness);
+            }
+            else if (hasWaited == true)
+            {
+                DecreaseCourage();
+            }
+            //DecreaseCourage();
+        }
+
+        else if (!sd.hidden)
+        {
+            hasWaited = false;
         }
     }
+        
+}
 
 
 
 
 
     // Update is called once per frame
-    void Update()
-    {
-        //If the player is in enough darkness
-        if (sd.hidden)
-        {
+//    void Update()
+//    {
+//        //If the player is in enough darkness
+//        if (sd.hidden)
+//        {
 
-        }
-    }
+//        }
+//    }
 
-}
+//}

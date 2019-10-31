@@ -8,15 +8,15 @@ public class Interactable : MonoBehaviour
     public bool DidInteract = false;
     public UnityEvent OnInteract;
     public UnityEvent OnPlayerEnter;
-    public virtual void Interact()
+    public virtual void Interact(PlayerController player)
     {
         OnInteract.Invoke();
     }
     private void OnTriggerStay(Collider other)
     {
-        if (other.tag == "Player" && Input.GetButtonDown("Interact"))
+        if (other.GetComponent<PlayerController>() && Input.GetButtonDown("Interact"))
         {
-            Interact();
+            Interact(other.GetComponent<PlayerController>());
         }
     }
     private void OnTriggerEnter(Collider other)
@@ -25,7 +25,9 @@ public class Interactable : MonoBehaviour
         if (other.tag == "Player")
         {
             Debug.Log("other.tag == Player Interactabe");
-            OnPlayerEnter.Invoke();
+            //Vector3 intractablePosition = new Vector3(this.transform.x, this.transform.position.y)
+            //OnPlayerEnter.Invoke();
+            //Vector3.MoveTowards(this.transform.position, other.attachedRigidbody.transform.position, 1f);
         }
     }
 }
