@@ -25,7 +25,9 @@ public class Interactable : MonoBehaviour
         if (other.tag == "Player")
         {
             Debug.Log("other.tag == Player Interactabe");
-            OnPlayerEnter.Invoke();
+            //Vector3 intractablePosition = new Vector3(this.transform.x, this.transform.position.y)
+            //OnPlayerEnter.Invoke();
+            //Vector3.MoveTowards(this.transform.position, other.attachedRigidbody.transform.position, 1f);
         }
     }
 }
