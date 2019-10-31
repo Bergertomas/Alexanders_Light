@@ -21,3 +21,17 @@
         }
     }
 }*/
+
+
+/*if (state == PlayerStates.Drag)// && draggedObject != null)
+{
+    if (draggedObject != null)
+    {
+        //Drag
+        //draggedObject.RB.MovePosition(transform.position);
+    }
+    else
+    {
+        state = PlayerStates.None;
+    }
+}*/

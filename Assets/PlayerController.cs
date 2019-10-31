@@ -1,9 +1,14 @@
-﻿using System.Collections;
+﻿//using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 public enum Directions
 {
     LEFT = -1, RIGHT = 1,
+}
+public enum PlayerStates
+{
+    None,Idle,Crawl,Drag,
 }
 public class PlayerController : MonoBehaviour
 {
@@ -17,7 +22,6 @@ public class PlayerController : MonoBehaviour
     private float originalWalkSpeed = 3.5f;
     [SerializeField]
     private float crawlSpeed = 2f;
-    private const float BASICALLY_ZERO = 0.0001f;
     [SerializeField]
     private float AccelarationPerSecond = 0.5f;
     [SerializeField]
@@ -25,27 +29,34 @@ public class PlayerController : MonoBehaviour
     private float currentHorizontalSpeed = 0f;
     private float currentRightSpeed = 0f;
     private float currentLeftSpeed = 0f;
-    float climbSpeed;
+    private float climbSpeed;
     private bool isGrounded;
     [SerializeField]
     float jumpHeight = 2f;
     [SerializeField]
     float artificialGravity = -0.666f;
-    bool crawling;
+    private DragInteractable draggedObject = null;
+    //private DragInteractable previousDraggedObject = null;
+    [SerializeField]
+    private float interactionDistance = 1f;
+    //bool crawling;
     float courage;
     bool isAlive;
     private bool isMoving = false;
     private bool jumped = false;
+    private float originalLocalScaleX;
     private Directions currentDirection = Directions.RIGHT;//the direction the player's currently facing
-    public bool hasCalledBoL;
+    private PlayerStates state = PlayerStates.None;
 
+    public bool hasCalledBoL;
     public LightballController lbc;
     #region Ball Anchor:
     [Header("Ball Anchor")]
     public GameObject ballAnchor;
     private Vector3 ballAnchorDestination;
     //private float ballAnchorZ;
-    public Transform balloflight;
+    //public Transform balloflight;
+
 
     [SerializeField]
     private float anchorForward = 3f;
@@ -67,9 +78,9 @@ public class PlayerController : MonoBehaviour
 
     // TODO: SET UP CAMERA SCRIPT WHICH WILL MAKE THE CAMERA ZOOM A LITTLE OUT WHILE BOL IS FAR AWAY (ORI)
 
-
     void Start()
     {
+        originalLocalScaleX = transform.localScale.x;
         ChangeAnchorPosition();
         //Physics.IgnoreCollision(balloflight.GetComponent<Collider>(), GetComponent<Collider>(),true);
     }
@@ -185,6 +196,11 @@ public class PlayerController : MonoBehaviour
                 jumped = true;
                 //Jumpin' is handled in FixedUpdate since it deals with physics.
             }
+            else if (Input.GetButtonDown("Interact"))
+            {
+                //ReleaseDraggedObject();
+                Interact();//Hmmm I suppose we can't interact midair
+            }
         }
 
         //Vector3 ballAnchorStep = Vector3.Lerp(ballAnchor.transform.localPosition, ballAnchorDestination, Time.deltaTime * ballAnchorSpeed);
@@ -262,12 +278,21 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetButtonDown("Crawl"))
         {
-            crawling = !crawling;
+            // crawling = !crawling; )-;
+            if (state == PlayerStates.Crawl)
+            {
+                state = PlayerStates.None;
+            }
+            else
+            {
+                ReleaseDraggedObject();
+                state = PlayerStates.Crawl;
+            }
         }
-        if (crawling)
+        if (state == PlayerStates.Crawl||state==PlayerStates.Drag)
         {
             walkSpeed = crawlSpeed;
-            physicalCollider.transform.localScale = new Vector3(1f, 0.5f, 1f);
+            physicalCollider.transform.localScale = new Vector3(1f, 0.5f, 1f);//should the player get horter when he drags?
 
         }
         else
@@ -280,11 +305,16 @@ public class PlayerController : MonoBehaviour
     }
     private void FixedUpdate()
     {
+        //Draw player so that it looks look he's looking at the appropriate direction
+        transform.localScale = new Vector3
+            (originalLocalScaleX * (float)currentDirection, transform.localScale.y, transform.localScale.z);
+
         if (jumped)
         {
             rigidbody.AddForce(new Vector3(0, jumpHeight, 0), ForceMode.Impulse);
             isGrounded = false;
             jumped = false;
+            ReleaseDraggedObject();
         }
 
         if (!isGrounded)
@@ -294,6 +324,35 @@ public class PlayerController : MonoBehaviour
         var move = new Vector3(currentHorizontalSpeed * Time.deltaTime, 0, 0);
         rigidbody.MovePosition(transform.position + move);
         //rigidbody.velocity = move;
+
+    }
+    public void Grab(DragInteractable grabbed, DragInteractable previousDragged)
+    {
+        if (grabbed!=previousDragged)
+        {
+            draggedObject = grabbed;
+            draggedObject.FixedJoint.connectedBody = rigidbody;
+            state = PlayerStates.Drag;
+           // return true;
+        }
+       /* else
+        {
+            previousDraggedObject = null;
+        }*/
+        //return false;
+    }
+
+    private void ReleaseDraggedObject()
+    {
+        if (draggedObject != null)
+        {
+            draggedObject.FixedJoint.connectedBody = null;
+            //previousDraggedObject = draggedObject;
+            draggedObject = null;
+            state = PlayerStates.None;
+           // return true;
+        }
+       // return false;
     }
 
     public void OnCollisionEnter(Collision collision)
@@ -301,8 +360,23 @@ public class PlayerController : MonoBehaviour
         isGrounded = true;
     }
 
-    /* private void Interact()
+     private void Interact()
      {
-         Physics.OverlapBox(this.transform.position,)
-     }*/
+        DragInteractable currentDraggedObject = draggedObject;
+        ReleaseDraggedObject();
+        RaycastHit interactionHit;
+        Physics.Raycast(this.transform.position, Vector3.right * (float)currentDirection,out interactionHit,interactionDistance );
+        if (interactionHit.collider != null)
+        {
+            GameObject hitObject = interactionHit.collider.gameObject;
+            if (hitObject.GetComponent<Interactable>())
+            {
+                hitObject.GetComponent<Interactable>().Interact();
+            }
+            if (hitObject.GetComponent<DragInteractable>())
+            {
+                Grab(hitObject.GetComponent<DragInteractable>(), currentDraggedObject);
+            }
+        }
+     }
 }

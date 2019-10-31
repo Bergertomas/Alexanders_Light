@@ -65,6 +65,7 @@
     <Compile Include="Assets\BallInteractable.cs" />
     <Compile Include="Assets\Charger.cs" />
     <Compile Include="Assets\CourageManager.cs" />
+    <Compile Include="Assets\DragInteractable.cs" />
     <Compile Include="Assets\Fantasy Forest Environment\Scripts\TexturePan.cs" />
     <Compile Include="Assets\InactiveOnAwake.cs" />
     <Compile Include="Assets\Interactable.cs" />
@@ -117,6 +118,7 @@
     <Compile Include="Assets\ShadowDetector\Standard Assets\Utility\TimedObjectDestructor.cs" />
     <Compile Include="Assets\ShadowDetector\Standard Assets\Utility\WaypointCircuit.cs" />
     <Compile Include="Assets\ShadowDetector\Standard Assets\Utility\WaypointProgressTracker.cs" />
+    <Compile Include="Assets\ShadowEnemyController.cs" />
     <Compile Include="Assets\Tutorial_Info\Scripts\Readme.cs" />
     <Compile Include="Assets\TutorialButtonDetector.cs" />
     <Compile Include="Assets\Unused\BallPusherCollider.cs" />

@@ -4,15 +4,11 @@ using UnityEngine;
 
 public class PushInteractable : Interactable
 {
-    public override void Interact()
+    /*public override void Interact(PlayerController player)
     {
-        base.Interact();
-    }
+        base.Interact(player);
+    }*/
 
-    void Update()
-    {
-
-    }
     /*void ApplyForce()
     {
         var rend = GetComponent<Renderer>();
