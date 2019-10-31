@@ -1273,7 +1273,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 329530437}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 35.536186, y: 2.83, z: 0}
+  m_LocalPosition: {x: 42.88, y: 6.31, z: 0}
   m_LocalScale: {x: 1, y: 2.7981, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1582,7 +1582,7 @@ Rigidbody:
   m_Drag: 0
   m_AngularDrag: 0
   m_UseGravity: 1
-  m_IsKinematic: 1
+  m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 120
   m_CollisionDetection: 1
@@ -1621,10 +1621,10 @@ MonoBehaviour:
   deaccelerationPerSecond: 18.48
   jumpHeight: 8
   artificialGravity: -0.3
+  interactionDistance: 0.4
   hasCalledBoL: 0
   lbc: {fileID: 300265593}
   ballAnchor: {fileID: 534668933}
-  balloflight: {fileID: 300265594}
   anchorForward: 2.7
   anchorBackward: 0
   anchorUpward: 1.9
@@ -11782,8 +11782,9 @@ GameObject:
   - component: {fileID: 836153359}
   - component: {fileID: 836153358}
   - component: {fileID: 836153357}
+  - component: {fileID: 836153363}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: DraggeableCube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11824,7 +11825,8 @@ MonoBehaviour:
   OnPlayerEnter:
     m_PersistentCalls:
       m_Calls: []
-  rigidbody: {fileID: 0}
+  RB: {fileID: 0}
+  FixedJoint: {fileID: 0}
 --- !u!65 &836153359
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -11892,12 +11894,26 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 836153356}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 23.53, y: 3.21, z: 0}
+  m_LocalPosition: {x: 33.17, y: 2.43, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 16
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!138 &836153363
+FixedJoint:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 836153356}
+  m_ConnectedBody: {fileID: 0}
+  m_BreakForce: Infinity
+  m_BreakTorque: Infinity
+  m_EnableCollision: 1
+  m_EnablePreprocessing: 1
+  m_MassScale: 1
+  m_ConnectedMassScale: 1
 --- !u!1001 &850303652
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14136,7 +14152,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 7.000001, z: 7.000001, w: -8.000001}
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
