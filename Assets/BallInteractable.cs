@@ -43,7 +43,7 @@ public class BallInteractable : MonoBehaviour
     }
     private void OnTriggerStay(Collider other)
     {
-        if (!isDead&&other.GetComponent<LightballController>()&& other.GetComponent<LightballController>().State==LightBallStates.Amplify)
+        if (!isDead && other.GetComponent<LightballController>() && other.GetComponent<LightballController>().State==LightBallStates.Amplify)
         {
             beingInteractedWith = true;
         }

@@ -210,7 +210,7 @@ public class PlayerController : MonoBehaviour
         var bx = Input.GetAxis("BallHorizontal") * lbc.ControlledSpeed * Time.deltaTime;
         var by = Input.GetAxis("BallVertical") * lbc.ControlledSpeed * Time.deltaTime;
         var bmove = new Vector2(bx, by);
-        if (lbc.State == LightBallStates.None)
+        if (lbc.State == LightBallStates.None || lbc.State == LightBallStates.Amplify)
         {
             //State can be changed only if it is currently set to None.
             if (Input.GetButton("Heal"))
@@ -229,7 +229,7 @@ public class PlayerController : MonoBehaviour
                 lbc.State = LightBallStates.Amplify;
             }
 
-            if (bmove.magnitude < 0.01f)//if (Input.GetAxisRaw("BallHorizontal") == 0.0f && Input.GetAxisRaw("BallVertical") == 0.0f)
+            if (bmove.magnitude < 0.01f && lbc.State != LightBallStates.Amplify)//if (Input.GetAxisRaw("BallHorizontal") == 0.0f && Input.GetAxisRaw("BallVertical") == 0.0f)
             {
                 lbc.transform.position = Vector3.Lerp(lbc.transform.position, lbc.targetSpot.position, Time.deltaTime * lbc.IdleMovementSpeed);
             }
@@ -255,12 +255,15 @@ public class PlayerController : MonoBehaviour
                     lbc.State = LightBallStates.None;
                 }
             }
-            else if (lbc.State == LightBallStates.Amplify)
+            
+        }
+
+        if (lbc.State == LightBallStates.Amplify)
+        {
+            if (!Input.GetButton("Amplify"))
             {
-                if (!Input.GetButton("Amplify"))
-                {
-                    lbc.State = LightBallStates.None;
-                }
+                lbc.State = LightBallStates.None;
+                Debug.Log("No longer amplifying");
             }
         }
         hasCalledBoL = (lbc.State == LightBallStates.Heal);
