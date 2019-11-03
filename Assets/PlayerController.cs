@@ -44,7 +44,9 @@ public class PlayerController : MonoBehaviour
     bool isAlive;
     private bool isMoving = false;
     private bool jumped = false;
-    private float originalLocalScaleX;
+   // private float originalLocalScaleX;
+    [SerializeField]
+    private GameObject graphics;
     private Directions currentDirection = Directions.RIGHT;//the direction the player's currently facing
     private PlayerStates state = PlayerStates.None;
 
@@ -80,7 +82,7 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        originalLocalScaleX = transform.localScale.x;
+       // originalLocalScaleX = transform.localScale.x;
         ChangeAnchorPosition();
         //Physics.IgnoreCollision(balloflight.GetComponent<Collider>(), GetComponent<Collider>(),true);
     }
@@ -309,13 +311,13 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         //Draw player so that it looks look he's looking at the appropriate direction
-        transform.localScale = new Vector3
-            (originalLocalScaleX * (float)currentDirection, transform.localScale.y, transform.localScale.z);
+       graphics.transform.localScale = new Vector3
+            (1 * (float)currentDirection,1, 1);
 
         if (jumped)
         {
             rigidbody.AddForce(new Vector3(0, jumpHeight, 0), ForceMode.Impulse);
-            isGrounded = false;
+            //isGrounded = false;
             jumped = false;
             ReleaseDraggedObject();
         }
@@ -324,6 +326,11 @@ public class PlayerController : MonoBehaviour
         {
              rigidbody.AddForce(new Vector3(0, artificialGravity, 0), ForceMode.Impulse);
         }
+        //check for feet collisions:
+        RaycastHit footHit;
+        Physics.Raycast(this.transform.position, Vector3.down, out footHit, 0.7f);
+        isGrounded = (footHit.collider != null);// && footHit.collider.gameObject.tag != "Player" && !footHit.collider.isTrigger);
+
         var move = new Vector3(currentHorizontalSpeed * Time.deltaTime, 0, 0);
         rigidbody.MovePosition(transform.position + move);
         //rigidbody.velocity = move;
@@ -356,11 +363,6 @@ public class PlayerController : MonoBehaviour
            // return true;
         }
        // return false;
-    }
-
-    public void OnCollisionEnter(Collision collision)
-    {
-        isGrounded = true;
     }
 
      private void Interact()
