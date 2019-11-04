@@ -26,7 +26,14 @@ public class PlayerController : MonoBehaviour
     private float AccelarationPerSecond = 0.5f;
     [SerializeField]
     private float deaccelerationPerSecond = 0.5f;
-    private float currentHorizontalSpeed = 0f;
+    public float currentHorizontalSpeed = 0f;
+    public float CameraXOffset = 0f;
+    [SerializeField]
+    private float CameraXOffsetWhenRunning = 5f;
+    [SerializeField]
+    private float CameraXOffsetMovingSpeed = 1f;
+    [SerializeField]
+    private float CameraXOffsetStandingSpeed = 1f;
     private float currentRightSpeed = 0f;
     private float currentLeftSpeed = 0f;
     private float climbSpeed;
@@ -125,6 +132,15 @@ public class PlayerController : MonoBehaviour
             {
                 currentRightSpeed = walkSpeed;
             }
+
+            if (CameraXOffset < CameraXOffsetWhenRunning)
+            {
+                CameraXOffset += CameraXOffsetMovingSpeed * Time.deltaTime;
+            }
+            else
+            {
+                CameraXOffset = CameraXOffsetWhenRunning;
+            }
         }
         else if (currentRightSpeed != 0)
         {
@@ -146,6 +162,15 @@ public class PlayerController : MonoBehaviour
             else
             {
                 currentLeftSpeed = -walkSpeed;
+            }
+
+            if (CameraXOffset > -CameraXOffsetWhenRunning)
+            {
+                CameraXOffset -= CameraXOffsetMovingSpeed * Time.deltaTime;
+            }
+            else
+            {
+                CameraXOffset = -CameraXOffsetWhenRunning;
             }
         }
         else if (currentLeftSpeed != 0)
@@ -188,7 +213,21 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
+            //Debug.Log("Not Moving");
             isMoving = false;
+            if (CameraXOffset != 0)
+            {
+                if ((Mathf.Abs(CameraXOffset) - ((CameraXOffset / Mathf.Abs(CameraXOffset)) * CameraXOffsetStandingSpeed * Time.deltaTime)) >0)
+                {
+                    CameraXOffset -= (CameraXOffset / Mathf.Abs(CameraXOffset)) * CameraXOffsetStandingSpeed * Time.deltaTime;
+                }
+                else
+                {
+                    CameraXOffset = 0;
+                }
+                
+            }
+
         }
 
         if (isGrounded)

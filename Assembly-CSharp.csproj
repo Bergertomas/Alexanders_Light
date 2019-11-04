@@ -63,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\BallInteractable.cs" />
+    <Compile Include="Assets\CameraController.cs" />
     <Compile Include="Assets\Charger.cs" />
     <Compile Include="Assets\CourageManager.cs" />
     <Compile Include="Assets\DragInteractable.cs" />
