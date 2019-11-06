@@ -8,7 +8,7 @@ public enum Directions
 }
 public enum PlayerStates
 {
-    None,Idle,Crawl,Drag,
+    None, Idle, Crawl, Drag, Climb,
 }
 public class PlayerController : MonoBehaviour
 {
@@ -37,6 +37,8 @@ public class PlayerController : MonoBehaviour
     private float currentRightSpeed = 0f;
     private float currentLeftSpeed = 0f;
     private float climbSpeed;
+    [SerializeField]
+    bool canClimb = false;
     private bool isGrounded;
     [SerializeField]
     float jumpHeight = 2f;
@@ -51,7 +53,7 @@ public class PlayerController : MonoBehaviour
     bool isAlive;
     private bool isMoving = false;
     private bool jumped = false;
-   // private float originalLocalScaleX;
+    // private float originalLocalScaleX;
     [SerializeField]
     private GameObject graphics;
     private Directions currentDirection = Directions.RIGHT;//the direction the player's currently facing
@@ -89,7 +91,7 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-       // originalLocalScaleX = transform.localScale.x;
+        // originalLocalScaleX = transform.localScale.x;
         ChangeAnchorPosition();
         //Physics.IgnoreCollision(balloflight.GetComponent<Collider>(), GetComponent<Collider>(),true);
     }
@@ -100,7 +102,7 @@ public class PlayerController : MonoBehaviour
         {
             Vector3 newPos = new Vector3
               (Random.Range(anchorBackward * (float)currentDirection, anchorForward * (float)currentDirection),
-               Random.Range(anchorDownward, anchorUpward), 
+               Random.Range(anchorDownward, anchorUpward),
                (lbc.IsPushed ? anchorOutWard : 0f));
             if (isMoving)
             {
@@ -144,14 +146,14 @@ public class PlayerController : MonoBehaviour
         }
         else if (currentRightSpeed != 0)
         {
-             if (Mathf.Abs(currentRightSpeed) - (deaccelerationPerSecond * Time.deltaTime) > 0)
-             {
-                  currentRightSpeed -= (currentRightSpeed / Mathf.Abs(currentRightSpeed)) * deaccelerationPerSecond * Time.deltaTime;
-             }
-             else
-             {
-                  currentRightSpeed = 0;
-             }
+            if (Mathf.Abs(currentRightSpeed) - (deaccelerationPerSecond * Time.deltaTime) > 0)
+            {
+                currentRightSpeed -= (currentRightSpeed / Mathf.Abs(currentRightSpeed)) * deaccelerationPerSecond * Time.deltaTime;
+            }
+            else
+            {
+                currentRightSpeed = 0;
+            }
         }
         if (xInput < 0)
         {
@@ -175,14 +177,14 @@ public class PlayerController : MonoBehaviour
         }
         else if (currentLeftSpeed != 0)
         {
-             if (Mathf.Abs(currentLeftSpeed) - (deaccelerationPerSecond * Time.deltaTime) > 0)
-             {
-                 currentLeftSpeed -= (currentLeftSpeed / Mathf.Abs(currentLeftSpeed)) * deaccelerationPerSecond * Time.deltaTime;
-             }
-             else
-             {
-                 currentLeftSpeed = 0;
-             }
+            if (Mathf.Abs(currentLeftSpeed) - (deaccelerationPerSecond * Time.deltaTime) > 0)
+            {
+                currentLeftSpeed -= (currentLeftSpeed / Mathf.Abs(currentLeftSpeed)) * deaccelerationPerSecond * Time.deltaTime;
+            }
+            else
+            {
+                currentLeftSpeed = 0;
+            }
         }
         currentHorizontalSpeed = currentLeftSpeed + currentRightSpeed;
         /*if (Mathf.Abs(currentHorizontalSpeed) > walkSpeed&& currentHorizontalSpeed!=0)
@@ -190,7 +192,7 @@ public class PlayerController : MonoBehaviour
             currentHorizontalSpeed = walkSpeed * (Mathf.Abs(currentHorizontalSpeed) / currentHorizontalSpeed);
         }*/
         //Debug.Log("Horizontal X: " + Input.GetAxis("Horizontal"));
-#endregion
+        #endregion
         if (xInput != 0)
         {
             isMoving = true;
@@ -217,7 +219,7 @@ public class PlayerController : MonoBehaviour
             isMoving = false;
             if (CameraXOffset != 0)
             {
-                if ((Mathf.Abs(CameraXOffset) - ((CameraXOffset / Mathf.Abs(CameraXOffset)) * CameraXOffsetStandingSpeed * Time.deltaTime)) >0)
+                if ((Mathf.Abs(CameraXOffset) - ((CameraXOffset / Mathf.Abs(CameraXOffset)) * CameraXOffsetStandingSpeed * Time.deltaTime)) > 0)
                 {
                     CameraXOffset -= (CameraXOffset / Mathf.Abs(CameraXOffset)) * CameraXOffsetStandingSpeed * Time.deltaTime;
                 }
@@ -225,7 +227,7 @@ public class PlayerController : MonoBehaviour
                 {
                     CameraXOffset = 0;
                 }
-                
+
             }
 
         }
@@ -244,9 +246,44 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+        //if the player isnt doing idle ot moving normallny and he is near a ladder, he can climb
+        if (state == PlayerStates.Climb)
+        {
+            float yInput = Input.GetAxisRaw("Vertical");
+            if (yInput != 0)
+            {
+                rigidbody.useGravity = false;
+                artificialGravity = 0f;
+                isMoving = true;
+                var moveY = yInput * climbSpeed * Time.deltaTime;
+                var moveClimb = new Vector2(0, moveY);
+                transform.Translate(moveClimb * Time.deltaTime * climbSpeed);
+            }
+            else
+            {
+                isMoving = false;
+            }
+        }
+        else
+        {
+            rigidbody.useGravity = true;
+            artificialGravity = -0.3f;
+        }
+
+        if (state == PlayerStates.Climb)
+        {
+            rigidbody.useGravity = false;
+            artificialGravity = 0f;
+        }
+        else
+        {
+            rigidbody.useGravity = true;
+            artificialGravity = -0.3f;
+        }
+
         //Vector3 ballAnchorStep = Vector3.Lerp(ballAnchor.transform.localPosition, ballAnchorDestination, Time.deltaTime * ballAnchorSpeed);
         //if (Vector3.Distance(Vector3.zero, ballAnchorStep) < ballAnchorMinDistanceFromPlayer)
-        ballAnchor.transform.localPosition = Vector3.Lerp(ballAnchor.transform.localPosition, ballAnchorDestination, Time.deltaTime * ballAnchorSpeed);
+            ballAnchor.transform.localPosition = Vector3.Lerp(ballAnchor.transform.localPosition, ballAnchorDestination, Time.deltaTime * ballAnchorSpeed);
 
         var bx = Input.GetAxis("BallHorizontal") * lbc.ControlledSpeed * Time.deltaTime;
         var by = Input.GetAxis("BallVertical") * lbc.ControlledSpeed * Time.deltaTime;
@@ -296,7 +333,7 @@ public class PlayerController : MonoBehaviour
                     lbc.State = LightBallStates.None;
                 }
             }
-            
+
         }
 
         if (lbc.State == LightBallStates.Amplify)
@@ -333,7 +370,7 @@ public class PlayerController : MonoBehaviour
                 state = PlayerStates.Crawl;
             }
         }
-        if (state == PlayerStates.Crawl||state==PlayerStates.Drag)
+        if (state == PlayerStates.Crawl || state == PlayerStates.Drag)
         {
             walkSpeed = crawlSpeed;
             physicalCollider.transform.localScale = new Vector3(1f, 0.5f, 1f);//should the player get horter when he drags?
@@ -350,8 +387,8 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         //Draw player so that it looks look he's looking at the appropriate direction
-       graphics.transform.localScale = new Vector3
-            (1 * (float)currentDirection,1, 1);
+        graphics.transform.localScale = new Vector3
+             (1 * (float)currentDirection, 1, 1);
 
         if (jumped)
         {
@@ -363,7 +400,7 @@ public class PlayerController : MonoBehaviour
 
         if (!isGrounded)
         {
-             rigidbody.AddForce(new Vector3(0, artificialGravity, 0), ForceMode.Impulse);
+            rigidbody.AddForce(new Vector3(0, artificialGravity, 0), ForceMode.Impulse);
         }
         //check for feet collisions:
         RaycastHit footHit;
@@ -377,20 +414,19 @@ public class PlayerController : MonoBehaviour
     }
     public void Grab(DragInteractable grabbed, DragInteractable previousDragged)
     {
-        if (grabbed!=previousDragged)
+        if (grabbed != previousDragged)
         {
             draggedObject = grabbed;
             draggedObject.FixedJoint.connectedBody = rigidbody;
             state = PlayerStates.Drag;
-           // return true;
+            // return true;
         }
-       /* else
-        {
-            previousDraggedObject = null;
-        }*/
+        /* else
+         {
+             previousDraggedObject = null;
+         }*/
         //return false;
     }
-
     private void ReleaseDraggedObject()
     {
         if (draggedObject != null)
@@ -399,17 +435,16 @@ public class PlayerController : MonoBehaviour
             //previousDraggedObject = draggedObject;
             draggedObject = null;
             state = PlayerStates.None;
-           // return true;
+            // return true;
         }
-       // return false;
+        // return false;
     }
-
-     private void Interact()
-     {
+    private void Interact()
+    {
         DragInteractable currentDraggedObject = draggedObject;
         ReleaseDraggedObject();
         RaycastHit interactionHit;
-        Physics.Raycast(this.transform.position, Vector3.right * (float)currentDirection,out interactionHit,interactionDistance );
+        Physics.Raycast(this.transform.position, Vector3.right * (float)currentDirection, out interactionHit, interactionDistance);
         if (interactionHit.collider != null)
         {
             GameObject hitObject = interactionHit.collider.gameObject;
@@ -422,5 +457,19 @@ public class PlayerController : MonoBehaviour
                 Grab(hitObject.GetComponent<DragInteractable>(), currentDraggedObject);
             }
         }
-     }
+    }
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "Ladder")
+        {
+            state = PlayerStates.Climb;
+        }
+    }
+    void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.tag == "Ladder")
+        {
+            state = PlayerStates.None;
+        }
+    }
 }
