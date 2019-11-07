@@ -28,7 +28,7 @@ public class CameraController : MonoBehaviour
     }
 
     [SerializeField]
-    private PlayerController player;
+    private AlexanderController player;
     private List<CameraRapist> rapists = new List<CameraRapist>();
 
     public static CameraController Instance;

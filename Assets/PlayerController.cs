@@ -417,7 +417,7 @@ public class PlayerController : MonoBehaviour
         if (grabbed != previousDragged)
         {
             draggedObject = grabbed;
-            draggedObject.FixedJoint.connectedBody = rigidbody;
+           // draggedObject.FixedJoint.connectedBody = rigidbody;
             state = PlayerStates.Drag;
             // return true;
         }
@@ -431,7 +431,7 @@ public class PlayerController : MonoBehaviour
     {
         if (draggedObject != null)
         {
-            draggedObject.FixedJoint.connectedBody = null;
+           // draggedObject.FixedJoint.connectedBody = null;
             //previousDraggedObject = draggedObject;
             draggedObject = null;
             state = PlayerStates.None;
