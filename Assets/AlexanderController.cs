@@ -70,6 +70,7 @@ public class AlexanderController : MonoBehaviour
     private float currentRightSpeed = 0f;
     private float currentLeftSpeed = 0f;
     private float climbSpeed;
+    bool canClimb = false;
     // private bool isGrounded;
     /*[SerializeField]
     float jumpHeight = 2f;
@@ -394,15 +395,17 @@ public class AlexanderController : MonoBehaviour
             }*/
         }
 
-        if (state == PlayerStates.Climb)
+        //If the player is in a ladder
+        if (canClimb == true)
         {
             float yInput = Input.GetAxisRaw("Vertical");
+            //move up/down
             if (yInput != 0)
             {
-                rigidbody.useGravity = false;
-                currentVelocity.y = 0f;
+                state = PlayerStates.Climb;
+                currentVelocity.y = yInput;
                 isMoving = true;
-                var moveY = yInput * climbSpeed * Time.deltaTime;
+                var moveY = currentVelocity.y * climbSpeed * Time.deltaTime;
                 var moveClimb = new Vector2(0, moveY);
                 transform.Translate(moveClimb * Time.deltaTime * climbSpeed);
             }
@@ -411,21 +414,10 @@ public class AlexanderController : MonoBehaviour
                 isMoving = false;
             }
         }
-        else
-        {
-            //rigidbody.useGravity = true;
-            //currentVelocity.y = -0.3f;
-        }
 
-        if (state == PlayerStates.Climb)
+        if (state == PlayerStates.Climb && Input.GetAxisRaw("Vertical") == 0)
         {
-            //rigidbody.useGravity = false;
-            //currentVelocity.y = 0f;
-        }
-        else
-        {
-            //rigidbody.useGravity = true;
-            //currentVelocity.y = -0.3f;
+            currentVelocity.y = 0f;
         }
 
         currentVelocity.x = currentHorizontalSpeed;
@@ -620,14 +612,17 @@ public class AlexanderController : MonoBehaviour
     {
         if (other.gameObject.tag == "Ladder")
         {
-            state = PlayerStates.Climb;
+            canClimb = true;
         }
     }
     void OnTriggerExit(Collider other)
     {
         if (other.gameObject.tag == "Ladder")
         {
-            state = PlayerStates.None;
+            canClimb = false;
+            if (state == PlayerStates.Climb)
+                state = PlayerStates.None;
         }
     }
+
 }
