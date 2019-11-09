@@ -3228,6 +3228,26 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: 14.9
       objectReference: {fileID: 0}
+    - target: {fileID: 691455887430624027, guid: 464224881ebd946418f9763fd3b38fd7,
+        type: 3}
+      propertyPath: timeToGetBored
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 691455887430624027, guid: 464224881ebd946418f9763fd3b38fd7,
+        type: 3}
+      propertyPath: CameraXOffsetStandingSpeed
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 691455887430624027, guid: 464224881ebd946418f9763fd3b38fd7,
+        type: 3}
+      propertyPath: CameraXOffsetWhenRunning
+      value: 2.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 691455887430624027, guid: 464224881ebd946418f9763fd3b38fd7,
+        type: 3}
+      propertyPath: CameraXOffsetMovingSpeed
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 464224881ebd946418f9763fd3b38fd7, type: 3}
 --- !u!1 &1301671238
