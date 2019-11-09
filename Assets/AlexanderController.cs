@@ -82,6 +82,10 @@ public class AlexanderController : MonoBehaviour
     float courage;
     bool isAlive;
     private bool isMoving = false;
+    private bool isBored = false;
+    [SerializeField]
+    private float timeToGetBored = 10f;
+    private float timeWithoutAction = 0f;
     //private bool jumped = false;
     // private float originalLocalScaleX;
     [SerializeField]
@@ -226,6 +230,7 @@ public class AlexanderController : MonoBehaviour
     }
     void Update()
     {
+        bool didSomething = false;
         //Draw player so that it looks look he's looking at the appropriate direction
         graphics.transform.localScale = new Vector3(1 * (float)currentDirection, 1, 1);
         #region New collision system 
@@ -236,16 +241,19 @@ public class AlexanderController : MonoBehaviour
             {
                 if (Input.GetButtonDown("Jump"))
                 {
+                    didSomething = true;
                     ReleaseDraggedObject();
                     currentVelocity.y = jumpForce;
                 }
                 else if (Input.GetButtonDown("Interact"))
                 {
                     //ReleaseDraggedObject();
+                    didSomething = true;
                     Interact();//Hmmm I suppose we can't interact midair
                 }
                 else if (Input.GetButtonDown("Crawl"))
                 {
+                    didSomething = true;
                     // crawling = !crawling; )-;
                     if (state == PlayerStates.Crawl)
                     {
@@ -290,14 +298,14 @@ public class AlexanderController : MonoBehaviour
                 currentRightSpeed = walkSpeed;
             }
 
-            if (CameraXOffset < CameraXOffsetWhenRunning)
+           /* if (CameraXOffset < CameraXOffsetWhenRunning)
             {
                 CameraXOffset += CameraXOffsetMovingSpeed * Time.deltaTime;
             }
             else
             {
                 CameraXOffset = CameraXOffsetWhenRunning;
-            }
+            }*/
         }
         else if (currentRightSpeed != 0)
         {
@@ -321,14 +329,14 @@ public class AlexanderController : MonoBehaviour
                 currentLeftSpeed = -walkSpeed;
             }
 
-            if (CameraXOffset > -CameraXOffsetWhenRunning)
+           /* if (CameraXOffset > -CameraXOffsetWhenRunning)
             {
                 CameraXOffset -= CameraXOffsetMovingSpeed * Time.deltaTime;
             }
             else
             {
                 CameraXOffset = -CameraXOffsetWhenRunning;
-            }
+            }*/
         }
         else if (currentLeftSpeed != 0)
         {
@@ -351,6 +359,7 @@ public class AlexanderController : MonoBehaviour
         if (xInput != 0)
         {
             isMoving = true;
+            didSomething = true;
             if (xInput < 0)
             {
                 if (currentDirection != Directions.LEFT)
@@ -372,7 +381,7 @@ public class AlexanderController : MonoBehaviour
         {
             //Debug.Log("Not Moving");
             isMoving = false;
-            if (CameraXOffset != 0 && currentHorizontalSpeed == 0)
+           /* if (CameraXOffset != 0 && currentHorizontalSpeed == 0)
             {
                 if ((Mathf.Abs(CameraXOffset) - ((CameraXOffset / Mathf.Abs(CameraXOffset)) * CameraXOffsetStandingSpeed * Time.deltaTime)) > 0)
                 {
@@ -382,7 +391,7 @@ public class AlexanderController : MonoBehaviour
                 {
                     CameraXOffset = 0;
                 }
-            }
+            }*/
         }
 
         if (state == PlayerStates.Climb)
@@ -422,6 +431,56 @@ public class AlexanderController : MonoBehaviour
         currentVelocity.x = currentHorizontalSpeed;
         Move(currentVelocity * Time.deltaTime);
         #endregion
+        if (!isBored)
+        {
+            if (CameraXOffset != CameraXOffsetWhenRunning * (float)currentDirection)
+            {
+                //if (Mathf.Abs(CameraXOffset) + CameraXOffsetMovingSpeed * Time.deltaTime< CameraXOffsetWhenRunning)
+                //if (CameraXOffset + ((float)currentDirection) * (CameraXOffsetMovingSpeed * Time.deltaTime) < CameraXOffsetWhenRunning)
+               
+                 CameraXOffset +=((float)currentDirection) * (CameraXOffsetMovingSpeed * Time.deltaTime);
+                 if((currentDirection==Directions.RIGHT&&CameraXOffset> CameraXOffsetWhenRunning)||
+                    (currentDirection == Directions.LEFT && CameraXOffset < -CameraXOffsetWhenRunning))//Ugly math..
+                 {
+                      CameraXOffset = CameraXOffsetWhenRunning * (float)currentDirection;
+                 }
+               
+                /*else
+                {
+                    CameraXOffset = CameraXOffsetWhenRunning * (float)currentDirection;
+                }*/
+            }
+           /* 
+            else*/
+            {
+                
+            }
+        }
+        else if(CameraXOffset!=0)
+        {
+            if ((Mathf.Abs(CameraXOffset)- (CameraXOffsetStandingSpeed * Time.deltaTime))>0)
+            {
+                CameraXOffset -=(Mathf.Abs(CameraXOffset) /CameraXOffset)* CameraXOffsetStandingSpeed * Time.deltaTime;
+            }
+            else
+            {
+                CameraXOffset = 0;
+            }
+        }
+
+        if (!didSomething)
+        {
+            timeWithoutAction += Time.deltaTime;
+            if (timeWithoutAction > timeToGetBored)
+            {
+                isBored = true;
+            }
+        }
+        else
+        {
+            isBored = false;
+            timeWithoutAction = 0f;
+        }
         //Vector3 ballAnchorStep = Vector3.Lerp(ballAnchor.transform.localPosition, ballAnchorDestination, Time.deltaTime * ballAnchorSpeed);
         //if (Vector3.Distance(Vector3.zero, ballAnchorStep) < ballAnchorMinDistanceFromPlayer)
         ballAnchor.transform.localPosition = Vector3.Lerp(ballAnchor.transform.localPosition, ballAnchorDestination, Time.deltaTime * ballAnchorSpeed);
