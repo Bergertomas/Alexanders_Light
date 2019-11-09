@@ -42,12 +42,6 @@ public class CourageManager : MonoBehaviour
         //StartCoroutine(IncreaseCourage());
     }
 
-
-    /*   private void  ()
-       {
-           }
-           */
-
     void IncreaseCourage()
     {
         if (lm.CurrentCharge > 0f)
