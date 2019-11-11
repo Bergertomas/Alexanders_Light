@@ -242,6 +242,7 @@ public class AlexanderController : MonoBehaviour
             {
                 if (Input.GetButtonDown("Jump"))
                 {
+                    state = PlayerStates.None;
                     didSomething = true;
                     ReleaseDraggedObject();
                     currentVelocity.y = jumpForce;
@@ -259,6 +260,10 @@ public class AlexanderController : MonoBehaviour
                     if (state == PlayerStates.Crawl)
                     {
                         state = PlayerStates.None;
+                        if(collisionInfo.Below)
+                        {
+                            transform.Translate(0, 0.5f, 0);
+                        }
                     }
                     else
                     {
@@ -274,6 +279,7 @@ public class AlexanderController : MonoBehaviour
             if (state == PlayerStates.Crawl)
             {
                 physicalColliderObject.transform.localScale = new Vector3(1f, 0.5f, 1f);
+               // physicalCollider.bounds.min.y += 1;
             }
             walkSpeed = crawlSpeed;
             //should the player get horter when he drags?
@@ -281,7 +287,7 @@ public class AlexanderController : MonoBehaviour
         else
         {
             walkSpeed = originalWalkSpeed;
-            physicalColliderObject.transform.localScale = new Vector3(1f, 1f, 1f);
+            physicalColliderObject.transform.localScale = new Vector3(1f, 1f, 1f);      
         }
         currentVelocity.y += ((currentVelocity.y > 0) ? ascendinGravity : descendinGravity) * Time.deltaTime;
 
