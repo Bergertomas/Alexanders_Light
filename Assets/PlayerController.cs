@@ -8,7 +8,7 @@ public enum Directions
 }
 public enum PlayerStates
 {
-    None,Idle,Crawl,Drag,
+    None, Idle, Crawl, Drag, Climb,
 }
 public class PlayerController : MonoBehaviour
 {
@@ -26,10 +26,19 @@ public class PlayerController : MonoBehaviour
     private float AccelarationPerSecond = 0.5f;
     [SerializeField]
     private float deaccelerationPerSecond = 0.5f;
-    private float currentHorizontalSpeed = 0f;
+    public float currentHorizontalSpeed = 0f;
+    public float CameraXOffset = 0f;
+    [SerializeField]
+    private float CameraXOffsetWhenRunning = 5f;
+    [SerializeField]
+    private float CameraXOffsetMovingSpeed = 1f;
+    [SerializeField]
+    private float CameraXOffsetStandingSpeed = 1f;
     private float currentRightSpeed = 0f;
     private float currentLeftSpeed = 0f;
     private float climbSpeed;
+    [SerializeField]
+    bool canClimb = false;
     private bool isGrounded;
     [SerializeField]
     float jumpHeight = 2f;
@@ -44,7 +53,9 @@ public class PlayerController : MonoBehaviour
     bool isAlive;
     private bool isMoving = false;
     private bool jumped = false;
-    private float originalLocalScaleX;
+    // private float originalLocalScaleX;
+    [SerializeField]
+    private GameObject graphics;
     private Directions currentDirection = Directions.RIGHT;//the direction the player's currently facing
     private PlayerStates state = PlayerStates.None;
 
@@ -80,7 +91,7 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        originalLocalScaleX = transform.localScale.x;
+        // originalLocalScaleX = transform.localScale.x;
         ChangeAnchorPosition();
         //Physics.IgnoreCollision(balloflight.GetComponent<Collider>(), GetComponent<Collider>(),true);
     }
@@ -91,7 +102,7 @@ public class PlayerController : MonoBehaviour
         {
             Vector3 newPos = new Vector3
               (Random.Range(anchorBackward * (float)currentDirection, anchorForward * (float)currentDirection),
-               Random.Range(anchorDownward, anchorUpward), 
+               Random.Range(anchorDownward, anchorUpward),
                (lbc.IsPushed ? anchorOutWard : 0f));
             if (isMoving)
             {
@@ -123,17 +134,26 @@ public class PlayerController : MonoBehaviour
             {
                 currentRightSpeed = walkSpeed;
             }
+
+            if (CameraXOffset < CameraXOffsetWhenRunning)
+            {
+                CameraXOffset += CameraXOffsetMovingSpeed * Time.deltaTime;
+            }
+            else
+            {
+                CameraXOffset = CameraXOffsetWhenRunning;
+            }
         }
         else if (currentRightSpeed != 0)
         {
-             if (Mathf.Abs(currentRightSpeed) - (deaccelerationPerSecond * Time.deltaTime) > 0)
-             {
-                  currentRightSpeed -= (currentRightSpeed / Mathf.Abs(currentRightSpeed)) * deaccelerationPerSecond * Time.deltaTime;
-             }
-             else
-             {
-                  currentRightSpeed = 0;
-             }
+            if (Mathf.Abs(currentRightSpeed) - (deaccelerationPerSecond * Time.deltaTime) > 0)
+            {
+                currentRightSpeed -= (currentRightSpeed / Mathf.Abs(currentRightSpeed)) * deaccelerationPerSecond * Time.deltaTime;
+            }
+            else
+            {
+                currentRightSpeed = 0;
+            }
         }
         if (xInput < 0)
         {
@@ -145,17 +165,26 @@ public class PlayerController : MonoBehaviour
             {
                 currentLeftSpeed = -walkSpeed;
             }
+
+            if (CameraXOffset > -CameraXOffsetWhenRunning)
+            {
+                CameraXOffset -= CameraXOffsetMovingSpeed * Time.deltaTime;
+            }
+            else
+            {
+                CameraXOffset = -CameraXOffsetWhenRunning;
+            }
         }
         else if (currentLeftSpeed != 0)
         {
-             if (Mathf.Abs(currentLeftSpeed) - (deaccelerationPerSecond * Time.deltaTime) > 0)
-             {
-                 currentLeftSpeed -= (currentLeftSpeed / Mathf.Abs(currentLeftSpeed)) * deaccelerationPerSecond * Time.deltaTime;
-             }
-             else
-             {
-                 currentLeftSpeed = 0;
-             }
+            if (Mathf.Abs(currentLeftSpeed) - (deaccelerationPerSecond * Time.deltaTime) > 0)
+            {
+                currentLeftSpeed -= (currentLeftSpeed / Mathf.Abs(currentLeftSpeed)) * deaccelerationPerSecond * Time.deltaTime;
+            }
+            else
+            {
+                currentLeftSpeed = 0;
+            }
         }
         currentHorizontalSpeed = currentLeftSpeed + currentRightSpeed;
         /*if (Mathf.Abs(currentHorizontalSpeed) > walkSpeed&& currentHorizontalSpeed!=0)
@@ -163,7 +192,7 @@ public class PlayerController : MonoBehaviour
             currentHorizontalSpeed = walkSpeed * (Mathf.Abs(currentHorizontalSpeed) / currentHorizontalSpeed);
         }*/
         //Debug.Log("Horizontal X: " + Input.GetAxis("Horizontal"));
-#endregion
+        #endregion
         if (xInput != 0)
         {
             isMoving = true;
@@ -186,7 +215,21 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
+            //Debug.Log("Not Moving");
             isMoving = false;
+            if (CameraXOffset != 0)
+            {
+                if ((Mathf.Abs(CameraXOffset) - ((CameraXOffset / Mathf.Abs(CameraXOffset)) * CameraXOffsetStandingSpeed * Time.deltaTime)) > 0)
+                {
+                    CameraXOffset -= (CameraXOffset / Mathf.Abs(CameraXOffset)) * CameraXOffsetStandingSpeed * Time.deltaTime;
+                }
+                else
+                {
+                    CameraXOffset = 0;
+                }
+
+            }
+
         }
 
         if (isGrounded)
@@ -203,14 +246,49 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+        //if the player isnt doing idle ot moving normallny and he is near a ladder, he can climb
+        if (state == PlayerStates.Climb)
+        {
+            float yInput = Input.GetAxisRaw("Vertical");
+            if (yInput != 0)
+            {
+                rigidbody.useGravity = false;
+                artificialGravity = 0f;
+                isMoving = true;
+                var moveY = yInput * climbSpeed * Time.deltaTime;
+                var moveClimb = new Vector2(0, moveY);
+                transform.Translate(moveClimb * Time.deltaTime * climbSpeed);
+            }
+            else
+            {
+                isMoving = false;
+            }
+        }
+        else
+        {
+            rigidbody.useGravity = true;
+            artificialGravity = -0.3f;
+        }
+
+        if (state == PlayerStates.Climb)
+        {
+            rigidbody.useGravity = false;
+            artificialGravity = 0f;
+        }
+        else
+        {
+            rigidbody.useGravity = true;
+            artificialGravity = -0.3f;
+        }
+
         //Vector3 ballAnchorStep = Vector3.Lerp(ballAnchor.transform.localPosition, ballAnchorDestination, Time.deltaTime * ballAnchorSpeed);
         //if (Vector3.Distance(Vector3.zero, ballAnchorStep) < ballAnchorMinDistanceFromPlayer)
-        ballAnchor.transform.localPosition = Vector3.Lerp(ballAnchor.transform.localPosition, ballAnchorDestination, Time.deltaTime * ballAnchorSpeed);
+            ballAnchor.transform.localPosition = Vector3.Lerp(ballAnchor.transform.localPosition, ballAnchorDestination, Time.deltaTime * ballAnchorSpeed);
 
         var bx = Input.GetAxis("BallHorizontal") * lbc.ControlledSpeed * Time.deltaTime;
         var by = Input.GetAxis("BallVertical") * lbc.ControlledSpeed * Time.deltaTime;
         var bmove = new Vector2(bx, by);
-        if (lbc.State == LightBallStates.None)
+        if (lbc.State == LightBallStates.None || lbc.State == LightBallStates.Amplify)
         {
             //State can be changed only if it is currently set to None.
             if (Input.GetButton("Heal"))
@@ -229,7 +307,7 @@ public class PlayerController : MonoBehaviour
                 lbc.State = LightBallStates.Amplify;
             }
 
-            if (bmove.magnitude < 0.01f)//if (Input.GetAxisRaw("BallHorizontal") == 0.0f && Input.GetAxisRaw("BallVertical") == 0.0f)
+            if (bmove.magnitude < 0.01f && lbc.State != LightBallStates.Amplify)//if (Input.GetAxisRaw("BallHorizontal") == 0.0f && Input.GetAxisRaw("BallVertical") == 0.0f)
             {
                 lbc.transform.position = Vector3.Lerp(lbc.transform.position, lbc.targetSpot.position, Time.deltaTime * lbc.IdleMovementSpeed);
             }
@@ -255,12 +333,15 @@ public class PlayerController : MonoBehaviour
                     lbc.State = LightBallStates.None;
                 }
             }
-            else if (lbc.State == LightBallStates.Amplify)
+
+        }
+
+        if (lbc.State == LightBallStates.Amplify)
+        {
+            if (!Input.GetButton("Amplify"))
             {
-                if (!Input.GetButton("Amplify"))
-                {
-                    lbc.State = LightBallStates.None;
-                }
+                lbc.State = LightBallStates.None;
+                Debug.Log("No longer amplifying");
             }
         }
         hasCalledBoL = (lbc.State == LightBallStates.Heal);
@@ -289,7 +370,7 @@ public class PlayerController : MonoBehaviour
                 state = PlayerStates.Crawl;
             }
         }
-        if (state == PlayerStates.Crawl||state==PlayerStates.Drag)
+        if (state == PlayerStates.Crawl || state == PlayerStates.Drag)
         {
             walkSpeed = crawlSpeed;
             physicalCollider.transform.localScale = new Vector3(1f, 0.5f, 1f);//should the player get horter when he drags?
@@ -306,21 +387,26 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         //Draw player so that it looks look he's looking at the appropriate direction
-        transform.localScale = new Vector3
-            (originalLocalScaleX * (float)currentDirection, transform.localScale.y, transform.localScale.z);
+        graphics.transform.localScale = new Vector3
+             (1 * (float)currentDirection, 1, 1);
 
         if (jumped)
         {
             rigidbody.AddForce(new Vector3(0, jumpHeight, 0), ForceMode.Impulse);
-            isGrounded = false;
+            //isGrounded = false;
             jumped = false;
             ReleaseDraggedObject();
         }
 
         if (!isGrounded)
         {
-             rigidbody.AddForce(new Vector3(0, artificialGravity, 0), ForceMode.Impulse);
+            rigidbody.AddForce(new Vector3(0, artificialGravity, 0), ForceMode.Impulse);
         }
+        //check for feet collisions:
+        RaycastHit footHit;
+        Physics.Raycast(this.transform.position, Vector3.down, out footHit, 0.7f);
+        isGrounded = (footHit.collider != null);// && footHit.collider.gameObject.tag != "Player" && !footHit.collider.isTrigger);
+
         var move = new Vector3(currentHorizontalSpeed * Time.deltaTime, 0, 0);
         rigidbody.MovePosition(transform.position + move);
         //rigidbody.velocity = move;
@@ -328,44 +414,37 @@ public class PlayerController : MonoBehaviour
     }
     public void Grab(DragInteractable grabbed, DragInteractable previousDragged)
     {
-        if (grabbed!=previousDragged)
+        if (grabbed != previousDragged)
         {
             draggedObject = grabbed;
-            draggedObject.FixedJoint.connectedBody = rigidbody;
+           // draggedObject.FixedJoint.connectedBody = rigidbody;
             state = PlayerStates.Drag;
-           // return true;
+            // return true;
         }
-       /* else
-        {
-            previousDraggedObject = null;
-        }*/
+        /* else
+         {
+             previousDraggedObject = null;
+         }*/
         //return false;
     }
-
     private void ReleaseDraggedObject()
     {
         if (draggedObject != null)
         {
-            draggedObject.FixedJoint.connectedBody = null;
+           // draggedObject.FixedJoint.connectedBody = null;
             //previousDraggedObject = draggedObject;
             draggedObject = null;
             state = PlayerStates.None;
-           // return true;
+            // return true;
         }
-       // return false;
+        // return false;
     }
-
-    public void OnCollisionEnter(Collision collision)
+    private void Interact()
     {
-        isGrounded = true;
-    }
-
-     private void Interact()
-     {
         DragInteractable currentDraggedObject = draggedObject;
         ReleaseDraggedObject();
         RaycastHit interactionHit;
-        Physics.Raycast(this.transform.position, Vector3.right * (float)currentDirection,out interactionHit,interactionDistance );
+        Physics.Raycast(this.transform.position, Vector3.right * (float)currentDirection, out interactionHit, interactionDistance);
         if (interactionHit.collider != null)
         {
             GameObject hitObject = interactionHit.collider.gameObject;
@@ -378,5 +457,19 @@ public class PlayerController : MonoBehaviour
                 Grab(hitObject.GetComponent<DragInteractable>(), currentDraggedObject);
             }
         }
-     }
+    }
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "Ladder")
+        {
+            state = PlayerStates.Climb;
+        }
+    }
+    void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.tag == "Ladder")
+        {
+            state = PlayerStates.None;
+        }
+    }
 }

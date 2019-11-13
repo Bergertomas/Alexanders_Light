@@ -3,19 +3,27 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-[RequireComponent(typeof(FixedJoint))]
+[RequireComponent(typeof(Collider))]
+//[RequireComponent(typeof(FixedJoint))]
 public class DragInteractable : Interactable
 {
     public Rigidbody RB;
-    public FixedJoint FixedJoint;
     private void Start()
     {
         RB = this.GetComponent<Rigidbody>();
-        FixedJoint = this.GetComponent<FixedJoint>();
+        MoveToFreeState();
     }
-    /*public override void Interact(PlayerController player)
+    public void MoveToDraggedState()
     {
-        base.Interact(player);
-        //player.Grab(this);
-    }*/
+        //RB.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;
+        RB.isKinematic = true;
+        RB.useGravity = false;
+    }
+    public void MoveToFreeState()
+    {
+        RB.constraints = RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY;
+        //RB.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;// | RigidbodyConstraints.FreezePositionX;
+        RB.isKinematic = false;
+        RB.useGravity = true;
+    }
 }

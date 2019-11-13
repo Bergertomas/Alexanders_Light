@@ -8,7 +8,7 @@ public class LightManager : MonoBehaviour
     [SerializeField]
     Slider lightGauge;
     [SerializeField]
-    PlayerController pControl;
+    AlexanderController pControl;
     [SerializeField]
     public LightballController bControl;
     [SerializeField]

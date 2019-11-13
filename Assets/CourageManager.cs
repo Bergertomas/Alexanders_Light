@@ -11,7 +11,7 @@ public class CourageManager : MonoBehaviour
     [SerializeField]
     Slider courageGauge;
     [SerializeField]
-    PlayerController pControl;
+    AlexanderController pControl;
     [SerializeField]
     LightManager lm;
     private float increasePerSecond = 7f;
@@ -41,12 +41,6 @@ public class CourageManager : MonoBehaviour
         courageGauge.value = currentHealth;
         //StartCoroutine(IncreaseCourage());
     }
-
-
-    /*   private void  ()
-       {
-           }
-           */
 
     void IncreaseCourage()
     {
@@ -119,9 +113,6 @@ public class CourageManager : MonoBehaviour
     }
         
 }
-
-
-
 
 
     // Update is called once per frame

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
+[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(Collider))]
 public class BallInteractable : MonoBehaviour
 {
     //public bool DidInteract = false;
@@ -43,7 +45,7 @@ public class BallInteractable : MonoBehaviour
     }
     private void OnTriggerStay(Collider other)
     {
-        if (!isDead&&other.GetComponent<LightballController>()&& other.GetComponent<LightballController>().State==LightBallStates.Amplify)
+        if (!isDead && other.GetComponent<LightballController>() && other.GetComponent<LightballController>().State==LightBallStates.Amplify)
         {
             beingInteractedWith = true;
         }
