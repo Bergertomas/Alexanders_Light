@@ -18,12 +18,15 @@ public struct CollisionInfo
 {
     public bool Left, Right, Above, Below;
     public bool ClimbingSlope;
+    public bool DescendingSlope;
     public float PreviousSlopeAngle;
     public float CurrentSlopeAngle;
+    public Vector3 VelocityOld;
     public void Clear()
     {
         Left = Right = Above = Below = false;
         ClimbingSlope = false;
+        DescendingSlope = false;
         PreviousSlopeAngle = CurrentSlopeAngle;
         CurrentSlopeAngle = 0;
 
@@ -40,14 +43,15 @@ public class AlexanderController : MonoBehaviour
     [SerializeField]
     Collider physicalCollider;
     [SerializeField]
-    private float maxSlopeAngle = 60f;
+    private float maxClimbSlopeAngle = 60f;
+    private float maxDescendSlopeAngle = 60f;
     private RayCastOrigins rayCastOrigins;
     private CollisionInfo collisionInfo;
     private int horizontalRayCount = 5;
     private int verticalRayCount = 4;
     private float horizontalRaySpacing;
     private float verticalRaySpacing;
-    private const float SKIN_WIDTH = 0.075f;// 0.01f;
+    private const float SKIN_WIDTH = 0.06f;// 0.01f;
     [SerializeField]
     private float ascendinGravity = -18f;
     [SerializeField]
@@ -164,8 +168,13 @@ public class AlexanderController : MonoBehaviour
     private void Move(Vector3 velocity)
     {
         collisionInfo.Clear();
+        collisionInfo.VelocityOld = velocity;
         UpdateRayCastOrigins();//maybe we shouldnt do this every Move()
         CalculateRaySpacing();//maybe we shouldnt do this every Move()
+        if (velocity.y < 0)
+        {
+            DescendSlope(ref velocity);
+        }
         if (velocity.x != 0)
         {
             HorizontalCollisions(ref velocity);
@@ -190,8 +199,13 @@ public class AlexanderController : MonoBehaviour
             if (hit.collider != null)
             {
                 float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
-                if(i==0&&slopeAngle<=maxSlopeAngle)
+                if(i==0&&slopeAngle<=maxClimbSlopeAngle)
                 {
+                    if (collisionInfo.DescendingSlope)
+                    {
+                        collisionInfo.DescendingSlope = false;
+                        velocity= collisionInfo.VelocityOld;
+                    }
                     Debug.Log("Angle:" + slopeAngle);
                     float distanceToSlopeStart = 0;
                     if (slopeAngle != collisionInfo.PreviousSlopeAngle)
@@ -202,7 +216,7 @@ public class AlexanderController : MonoBehaviour
                     ClimbSlope(ref  velocity, slopeAngle);
                     velocity.x += distanceToSlopeStart * XDirection;
                 }
-                if(!collisionInfo.ClimbingSlope|| slopeAngle > maxSlopeAngle)
+                if(!collisionInfo.ClimbingSlope|| slopeAngle > maxClimbSlopeAngle)
                 {
                     velocity.x = (hit.distance - SKIN_WIDTH) * XDirection;
                     rayLength = hit.distance;
@@ -235,6 +249,33 @@ public class AlexanderController : MonoBehaviour
         }
 
     }
+    private void DescendSlope(ref Vector3 velocity)
+    {
+        float XDirection = Mathf.Sign(velocity.x);
+        Vector3 rayOrigin = (XDirection == 1 ? rayCastOrigins.BottomLeft : rayCastOrigins.BottomRight);
+        RaycastHit hit;
+        Physics.Raycast(rayOrigin, -Vector3.up , out hit, Mathf.Infinity, collisionMask);
+        if (hit.collider != null)
+        {
+            float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
+            if (slopeAngle != 0 && slopeAngle <= maxDescendSlopeAngle)
+            {
+                if (Mathf.Sign(hit.normal.x) == XDirection)
+                {
+                    if (hit.distance - SKIN_WIDTH <= Mathf.Tan(slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x))
+                    {
+                        float moveDistance = Mathf.Abs(velocity.x);
+                        float descendVelocityY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * moveDistance;
+                        velocity.y -= descendVelocityY;
+                        collisionInfo.CurrentSlopeAngle = slopeAngle;
+                        collisionInfo.DescendingSlope = true;
+                        collisionInfo.Below = true;
+                    }
+                }
+            }
+
+        }
+    }
     private void VerticalCollisions(ref Vector3 velocity)
     {
         float YDirection = Mathf.Sign(velocity.y);
@@ -256,6 +297,23 @@ public class AlexanderController : MonoBehaviour
                 }
                 collisionInfo.Below = (YDirection == -1);
                 collisionInfo.Above = (YDirection == 1);
+            }
+        }
+        if (collisionInfo.ClimbingSlope)
+        {
+            float XDirection = Mathf.Sign(velocity.x);
+            rayLength = Mathf.Abs(velocity.x) + SKIN_WIDTH;
+            Vector3 rayOrigin = ((XDirection == -1) ? rayCastOrigins.BottomLeft : rayCastOrigins.BottomRight)+ (velocity.y*Vector3.up);
+            RaycastHit hit;
+            Physics.Raycast(rayOrigin, Vector3.right * XDirection, out hit, rayLength, collisionMask);
+            if (hit.collider != null)
+            {
+                float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
+                if (slopeAngle != collisionInfo.CurrentSlopeAngle)
+                {
+                    velocity.x = (hit.distance - SKIN_WIDTH) * XDirection;
+                    collisionInfo.CurrentSlopeAngle = slopeAngle;
+                }
             }
         }
     }
