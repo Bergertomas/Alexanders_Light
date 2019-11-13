@@ -69,6 +69,7 @@
     <Compile Include="Assets\CameraRapist.cs" />
     <Compile Include="Assets\CameraRapistCollider.cs" />
     <Compile Include="Assets\Charger.cs" />
+    <Compile Include="Assets\Collisions.cs" />
     <Compile Include="Assets\CourageManager.cs" />
     <Compile Include="Assets\DragInteractable.cs" />
     <Compile Include="Assets\Fantasy Forest Environment\Scripts\TexturePan.cs" />

@@ -13,6 +13,10 @@ public enum PlayerStates
 public struct RayCastOrigins
 {
     public Vector3 TopLeft, TopRight, BottomLeft, BottomRight;
+    public float HorizontalRaySpacing;
+    public float VerticalRaySpacing;
+    public int HorizontalRayCount;//= 5;
+    public int VerticalRayCount;// = 4;
 }
 public struct CollisionInfo
 {
@@ -47,11 +51,9 @@ public class AlexanderController : MonoBehaviour
     private float maxDescendSlopeAngle = 60f;
     private RayCastOrigins rayCastOrigins;
     private CollisionInfo collisionInfo;
-    private int horizontalRayCount = 5;
-    private int verticalRayCount = 4;
-    private float horizontalRaySpacing;
-    private float verticalRaySpacing;
-    private const float SKIN_WIDTH = 0.06f;// 0.01f;
+
+
+    
     [SerializeField]
     private float ascendinGravity = -18f;
     [SerializeField]
@@ -140,37 +142,49 @@ public class AlexanderController : MonoBehaviour
     void Start()
     {
         // originalLocalScaleX = transform.localScale.x;
+        rayCastOrigins.VerticalRayCount = 5;
+        rayCastOrigins.VerticalRayCount = 4;
         ChangeAnchorPosition();
 
-        UpdateRayCastOrigins();
-        CalculateRaySpacing();
+       Collisions.UpdateRayCastOrigins(physicalCollider,ref rayCastOrigins);
+       Collisions.CalculateRaySpacing(physicalCollider, ref rayCastOrigins);
         //Physics.IgnoreCollision(balloflight.GetComponent<Collider>(), GetComponent<Collider>(),true);
     }
 
-    private void UpdateRayCastOrigins()
+   /* private void UpdateRayCastOrigins()
     {
         Bounds bounds = physicalCollider.bounds;
-        bounds.Expand(SKIN_WIDTH * -2);
+        bounds.Expand(Collisions.SKIN_WIDTH * -2);
         rayCastOrigins.BottomLeft = new Vector2(bounds.min.x, bounds.min.y);
         rayCastOrigins.BottomRight = new Vector2(bounds.max.x, bounds.min.y);
         rayCastOrigins.TopLeft = new Vector2(bounds.min.x, bounds.max.y);
         rayCastOrigins.TopRight = new Vector2(bounds.max.x, bounds.max.y);
     }
-    private void CalculateRaySpacing()
+   /* private void CalculateRaySpacing()
     {
         Bounds bounds = physicalCollider.bounds;
-        bounds.Expand(SKIN_WIDTH * -2);
+        bounds.Expand(Collisions.SKIN_WIDTH * -2);
         horizontalRayCount = Mathf.Clamp(horizontalRayCount, 2, int.MaxValue);
         verticalRayCount = Mathf.Clamp(verticalRayCount, 2, int.MaxValue);
         horizontalRaySpacing = bounds.size.y / (horizontalRayCount - 1);
         verticalRaySpacing = bounds.size.x / (verticalRayCount - 1);
-    }
+    }*/
     private void Move(Vector3 velocity)
     {
         collisionInfo.Clear();
         collisionInfo.VelocityOld = velocity;
-        UpdateRayCastOrigins();//maybe we shouldnt do this every Move()
-        CalculateRaySpacing();//maybe we shouldnt do this every Move()
+        Collisions.UpdateRayCastOrigins(physicalCollider, ref rayCastOrigins);//maybe we shouldnt do this every Move()
+        Collisions.CalculateRaySpacing(physicalCollider,ref rayCastOrigins);//maybe we shouldnt do this every Move()
+        if (draggedObject != null)
+        {
+            Collisions.UpdateRayCastOrigins(draggedObject.Collider, ref draggedObject.RayCastOrigins);
+            Collisions.CalculateRaySpacing(draggedObject.Collider, ref draggedObject.RayCastOrigins);
+            if (velocity.x != 0)
+            {
+                DraggedHorizontalCollisions(ref velocity);
+            }
+            draggedObject.transform.Translate(new Vector3(velocity.x,0,0));
+        }
         if (velocity.y < 0)
         {
             DescendSlope(ref velocity);
@@ -184,15 +198,19 @@ public class AlexanderController : MonoBehaviour
             VerticalCollisions(ref velocity);
         }
         transform.Translate(velocity);
+        if (draggedObject != null)
+        {
+            draggedObject.transform.Translate(new Vector3(0, velocity.y, 0));
+        }
     }
     private void HorizontalCollisions(ref Vector3 velocity)
     {
         float XDirection = Mathf.Sign(velocity.x);
-        float rayLength = Mathf.Abs(velocity.x) + SKIN_WIDTH;
-        for (int i = 0; i < horizontalRayCount; i++)
+        float rayLength = Mathf.Abs(velocity.x) + Collisions.SKIN_WIDTH;
+        for (int i = 0; i < rayCastOrigins.HorizontalRayCount; i++)
         {
             Vector3 rayOrigin = (XDirection == -1) ? rayCastOrigins.BottomLeft : rayCastOrigins.BottomRight;
-            rayOrigin += Vector3.up * (/*velocity.y +why not? */(horizontalRaySpacing * i));
+            rayOrigin += Vector3.up * (/*velocity.y +why not? */(rayCastOrigins.HorizontalRaySpacing * i));
             RaycastHit hit;
             Physics.Raycast(rayOrigin, Vector3.right * XDirection, out hit, rayLength, collisionMask);
             Debug.DrawLine(rayOrigin, rayOrigin + (Vector3.right * XDirection * rayLength), Color.red);
@@ -210,7 +228,7 @@ public class AlexanderController : MonoBehaviour
                     float distanceToSlopeStart = 0;
                     if (slopeAngle != collisionInfo.PreviousSlopeAngle)
                     {
-                        distanceToSlopeStart = hit.distance-SKIN_WIDTH;
+                        distanceToSlopeStart = hit.distance- Collisions.SKIN_WIDTH;
                         velocity.x -= distanceToSlopeStart * XDirection;
                     }
                     ClimbSlope(ref  velocity, slopeAngle);
@@ -218,14 +236,62 @@ public class AlexanderController : MonoBehaviour
                 }
                 if(!collisionInfo.ClimbingSlope|| slopeAngle > maxClimbSlopeAngle)
                 {
-                    velocity.x = (hit.distance - SKIN_WIDTH) * XDirection;
-                    rayLength = hit.distance;
-                    if(collisionInfo.ClimbingSlope)
+                    /*if (hit.collider.gameObject.GetComponent<DragInteractable>()&& hit.collider.gameObject.GetComponent<DragInteractable>() == draggedObject)
                     {
-                        velocity.y = Mathf.Tan(collisionInfo.CurrentSlopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x);
+                       transform.Translate(-SKIN_WIDTH * XDirection) =  ;
+                    }*/
+                    //else
+                    {
+                        velocity.x = (hit.distance - Collisions.SKIN_WIDTH) * XDirection;
+                        rayLength = hit.distance;
+                        if (collisionInfo.ClimbingSlope)
+                        {
+                            velocity.y = Mathf.Tan(collisionInfo.CurrentSlopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x);
+                        }
                     }
+
                     collisionInfo.Left = (XDirection == -1);
                     collisionInfo.Right = (XDirection == 1);
+                }
+
+            }
+        }
+    }
+    private void DraggedHorizontalCollisions(ref Vector3 velocity)//One should merge this with HorizontalCollisions..
+    {
+        float XDirection = Mathf.Sign(velocity.x);
+        float rayLength = Mathf.Abs(velocity.x) + Collisions.SKIN_WIDTH;
+        for (int i = 0; i < draggedObject.RayCastOrigins.HorizontalRayCount; i++)
+        {
+            Vector3 rayOrigin = (XDirection == -1) ? draggedObject.RayCastOrigins.BottomLeft : draggedObject.RayCastOrigins.BottomRight;
+            rayOrigin += Vector3.up * (/*velocity.y +why not? */(draggedObject.RayCastOrigins.HorizontalRaySpacing * i));
+            RaycastHit hit;
+            Physics.Raycast(rayOrigin, Vector3.right * XDirection, out hit, rayLength, collisionMask);
+            Debug.DrawLine(rayOrigin, rayOrigin + (Vector3.right * XDirection * rayLength), Color.red);
+            if (hit.collider != null)
+            {
+               /* float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
+                if (i == 0 && slopeAngle <= maxClimbSlopeAngle)
+                {
+                    if (collisionInfo.DescendingSlope)
+                    {
+                        collisionInfo.DescendingSlope = false;
+                        velocity = collisionInfo.VelocityOld;
+                    }
+                    Debug.Log("Angle:" + slopeAngle);
+                    float distanceToSlopeStart = 0;
+                    if (slopeAngle != collisionInfo.PreviousSlopeAngle)
+                    {
+                        distanceToSlopeStart = hit.distance - Collisions.SKIN_WIDTH;
+                        velocity.x -= distanceToSlopeStart * XDirection;
+                    }
+                    ClimbSlope(ref velocity, slopeAngle);
+                    velocity.x += distanceToSlopeStart * XDirection;
+                }*/
+                //if (!collisionInfo.ClimbingSlope || slopeAngle > maxClimbSlopeAngle)
+                {
+                    velocity.x = (hit.distance - Collisions.SKIN_WIDTH) * XDirection;
+                    rayLength = hit.distance;
                 }
 
             }
@@ -262,7 +328,7 @@ public class AlexanderController : MonoBehaviour
             {
                 if (Mathf.Sign(hit.normal.x) == XDirection)
                 {
-                    if (hit.distance - SKIN_WIDTH <= Mathf.Tan(slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x))
+                    if (hit.distance - Collisions.SKIN_WIDTH <= Mathf.Tan(slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x))
                     {
                         float moveDistance = Mathf.Abs(velocity.x);
                         float descendVelocityY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * moveDistance;
@@ -279,17 +345,17 @@ public class AlexanderController : MonoBehaviour
     private void VerticalCollisions(ref Vector3 velocity)
     {
         float YDirection = Mathf.Sign(velocity.y);
-        float rayLength = Mathf.Abs(velocity.y) + SKIN_WIDTH;
-        for (int i = 0; i < verticalRayCount; i++)
+        float rayLength = Mathf.Abs(velocity.y) + Collisions.SKIN_WIDTH;
+        for (int i = 0; i < rayCastOrigins.VerticalRayCount; i++)
         {
             Vector3 rayOrigin = (YDirection == -1) ? rayCastOrigins.BottomLeft : rayCastOrigins.TopLeft;
-            rayOrigin += Vector3.right * (velocity.x + (verticalRaySpacing * i));
+            rayOrigin += Vector3.right * (velocity.x + (rayCastOrigins.VerticalRaySpacing * i));
             RaycastHit hit;
             Physics.Raycast(rayOrigin, Vector3.up * YDirection, out hit, rayLength, collisionMask);
             Debug.DrawLine(rayOrigin, rayOrigin + (Vector3.up * YDirection * rayLength), Color.red);
             if (hit.collider != null)
             {
-                velocity.y = (hit.distance - SKIN_WIDTH) * YDirection;
+                velocity.y = (hit.distance - Collisions.SKIN_WIDTH) * YDirection;
                 rayLength = hit.distance;
                 if (collisionInfo.ClimbingSlope)
                 {
@@ -302,7 +368,7 @@ public class AlexanderController : MonoBehaviour
         if (collisionInfo.ClimbingSlope)
         {
             float XDirection = Mathf.Sign(velocity.x);
-            rayLength = Mathf.Abs(velocity.x) + SKIN_WIDTH;
+            rayLength = Mathf.Abs(velocity.x) + Collisions.SKIN_WIDTH;
             Vector3 rayOrigin = ((XDirection == -1) ? rayCastOrigins.BottomLeft : rayCastOrigins.BottomRight)+ (velocity.y*Vector3.up);
             RaycastHit hit;
             Physics.Raycast(rayOrigin, Vector3.right * XDirection, out hit, rayLength, collisionMask);
@@ -311,7 +377,7 @@ public class AlexanderController : MonoBehaviour
                 float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
                 if (slopeAngle != collisionInfo.CurrentSlopeAngle)
                 {
-                    velocity.x = (hit.distance - SKIN_WIDTH) * XDirection;
+                    velocity.x = (hit.distance - Collisions.SKIN_WIDTH) * XDirection;
                     collisionInfo.CurrentSlopeAngle = slopeAngle;
                 }
             }
@@ -681,7 +747,7 @@ public class AlexanderController : MonoBehaviour
         {
             draggedObject = grabbed;
             draggedObject.MoveToDraggedState();
-            draggedObject.transform.parent = this.gameObject.transform;
+            //draggedObject.transform.parent = this.gameObject.transform;
             //Joint joint= draggedObject.gameObject.AddComponent<FixedJoint>();
             //joint.connectedBody = rigidbody;
             state = PlayerStates.Drag;
@@ -696,7 +762,7 @@ public class AlexanderController : MonoBehaviour
              {
                  Destroy(draggedObject.gameObject.GetComponent<FixedJoint>());
              }*/
-            draggedObject.transform.parent = null;
+            //draggedObject.transform.parent = null;
             draggedObject.MoveToFreeState();
             draggedObject = null;
             state = PlayerStates.None;

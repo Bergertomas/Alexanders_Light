@@ -8,14 +8,19 @@ using UnityEngine;
 public class DragInteractable : Interactable
 {
     public Rigidbody RB;
+    public RayCastOrigins RayCastOrigins;
+    public Collider Collider;
     private void Start()
     {
+        RayCastOrigins.VerticalRayCount = 5;
+        RayCastOrigins.VerticalRayCount = 4;
         RB = this.GetComponent<Rigidbody>();
+        Collider= this.GetComponent<Collider>();
         MoveToFreeState();
     }
     public void MoveToDraggedState()
     {
-        //RB.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;
+        RB.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;
         RB.isKinematic = true;
         RB.useGravity = false;
     }
