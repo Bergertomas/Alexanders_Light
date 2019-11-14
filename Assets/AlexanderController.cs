@@ -735,7 +735,7 @@ public class AlexanderController : MonoBehaviour
             }
         }
         hasCalledBoL = (lbc.State == LightBallStates.Heal);
-        if (lbc.IsPushed)//Forcing the anchor to its appropriate Z
+        if (false && lbc.IsPushed)//Forcing the anchor to its appropriate Z
         {
             ballAnchor.transform.position += new Vector3(0, 0, (-ballAnchor.transform.position.z) - anchorOutWard);
             // (Z should become anchorOutWard) BUG:it becomes a different number for some reason..
