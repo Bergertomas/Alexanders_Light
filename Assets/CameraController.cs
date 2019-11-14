@@ -45,6 +45,10 @@ public class CameraController : MonoBehaviour
             Destroy(this);
         }
     }
+    private void Start()
+    {
+        player = FindObjectOfType<AlexanderController>();
+    }
 
     public void AddRapist(CameraRapist rapist)
     {

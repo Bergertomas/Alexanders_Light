@@ -7,8 +7,8 @@ public class LightManager : MonoBehaviour
 {
     [SerializeField]
     Slider lightGauge;
-    [SerializeField]
-    AlexanderController pControl;
+    /*[SerializeField]
+    AlexanderController pControl;*/
     [SerializeField]
     public LightballController bControl;
     [SerializeField]
@@ -150,6 +150,7 @@ public class LightManager : MonoBehaviour
 
     void Start()
     {
+        bControl =  FindObjectOfType<LightballController>();
         currentCharge = 50f;
         lightGauge.minValue = minCharge;
         lightGauge.maxValue = maxCharge;

@@ -39,6 +39,8 @@ public struct CollisionInfo
 public class AlexanderController : MonoBehaviour
 {
     [SerializeField]
+    Animator anim;
+    [SerializeField]
     Rigidbody rigidbody;
     [SerializeField]
     GameObject physicalColliderObject;
@@ -409,15 +411,18 @@ public class AlexanderController : MonoBehaviour
     {
         bool didSomething = false;
         //Draw player so that it looks look he's looking at the appropriate direction
-        graphics.transform.localScale = new Vector3(1 * (float)currentDirection, 1, 1);
+        //graphics.transform.localScale = new Vector3(1 * (float)currentDirection, 1, 1);
+        anim.SetBool("crawling", (state==PlayerStates.Crawl));
         #region New collision system 
         if (collisionInfo.Above || collisionInfo.Below)
         {
+            anim.SetBool("midair", false);
             currentVelocity.y = 0;
             if (collisionInfo.Below)
             {
                 if (Input.GetButtonDown("Jump"))
                 {
+                    anim.SetBool("midair", true);
                     state = PlayerStates.None;
                     didSomething = true;
                     ReleaseDraggedObject();
@@ -431,6 +436,7 @@ public class AlexanderController : MonoBehaviour
                 }
                 else if (Input.GetButtonDown("Crawl"))
                 {
+
                     didSomething = true;
                     // crawling = !crawling; )-;
                     if (state == PlayerStates.Crawl)
@@ -454,7 +460,7 @@ public class AlexanderController : MonoBehaviour
         {
             if (state == PlayerStates.Crawl)
             {
-                physicalColliderObject.transform.localScale = new Vector3(1f, 0.5f, 1f);
+               // physicalColliderObject.transform.localScale = new Vector3(1f, 0.5f, 1f);
                // physicalCollider.bounds.min.y += 1;
             }
             walkSpeed = crawlSpeed;
@@ -463,7 +469,7 @@ public class AlexanderController : MonoBehaviour
         else
         {
             walkSpeed = originalWalkSpeed;
-            physicalColliderObject.transform.localScale = new Vector3(1f, 1f, 1f);      
+           // physicalColliderObject.transform.localScale = new Vector3(1f, 1f, 1f);      
         }
         currentVelocity.y += ((currentVelocity.y > 0) ? ascendinGravity : descendinGravity) * Time.deltaTime;
 
@@ -541,12 +547,14 @@ public class AlexanderController : MonoBehaviour
         #endregion
         if (xInput != 0)
         {
+            anim.SetBool("walking", true);
             isMoving = true;
             didSomething = true;
             if (xInput < 0)
             {
                 if (currentDirection != Directions.LEFT)
                 {
+                    graphics.transform.eulerAngles = new Vector3(0, 270, 0);
                     ChangeAnchorPosition();
                     currentDirection = Directions.LEFT;
                 }
@@ -555,6 +563,7 @@ public class AlexanderController : MonoBehaviour
             {
                 if (currentDirection != Directions.RIGHT)
                 {
+                    graphics.transform.eulerAngles = new Vector3(0, 90, 0);
                     ChangeAnchorPosition();
                     currentDirection = Directions.RIGHT;
                 }
@@ -562,6 +571,7 @@ public class AlexanderController : MonoBehaviour
         }
         else
         {
+            anim.SetBool("walking", false);
             //Debug.Log("Not Moving");
             isMoving = false;
            /* if (CameraXOffset != 0 && currentHorizontalSpeed == 0)
@@ -684,7 +694,7 @@ public class AlexanderController : MonoBehaviour
 
             if (bmove.magnitude < 0.01f && lbc.State != LightBallStates.Amplify)//if (Input.GetAxisRaw("BallHorizontal") == 0.0f && Input.GetAxisRaw("BallVertical") == 0.0f)
             {
-                lbc.transform.position = Vector3.Lerp(lbc.transform.position, lbc.targetSpot.position, Time.deltaTime * lbc.IdleMovementSpeed);
+                lbc.transform.position = Vector3.Lerp(lbc.transform.position, ballAnchor.transform.position, Time.deltaTime * lbc.IdleMovementSpeed);
             }
             if (Input.GetButton("DragBOL"))//Moving with the mouse
             {
@@ -772,12 +782,16 @@ public class AlexanderController : MonoBehaviour
 
     private void Interact()
     {
+        Debug.Log("Interact");
         DragInteractable currentDraggedObject = draggedObject;
         ReleaseDraggedObject();
         RaycastHit interactionHit;
-        Physics.Raycast(this.transform.position, Vector3.right * (float)currentDirection, out interactionHit, interactionDistance);
+        Vector3 rayOrigin = physicalCollider.transform.position+new Vector3(0,0.5f,0);
+        Physics.Raycast(rayOrigin,Vector3.right * (float)currentDirection, out interactionHit, interactionDistance,collisionMask);//TODO-send more than one ray
+        Debug.DrawLine(rayOrigin, rayOrigin + (Vector3.right * (float)currentDirection * interactionDistance), Color.yellow,0.5f    );
         if (interactionHit.collider != null)
         {
+            Debug.Log("interactionHit.collider != null");
             GameObject hitObject = interactionHit.collider.gameObject;
             if (hitObject.GetComponent<Interactable>())
             {

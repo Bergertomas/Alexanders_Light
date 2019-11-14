@@ -35,6 +35,8 @@ public class CourageManager : MonoBehaviour
     void Start()
     {
         lm = GetComponent<LightManager>();
+        pControl = FindObjectOfType<AlexanderController>();
+        sd = FindObjectOfType<ShadowDetector>();
         courageGauge.minValue = minHealth;
         courageGauge.maxValue = maxHealth;
         //courageGauge.value = courageGauge.maxValue;
@@ -62,7 +64,7 @@ public class CourageManager : MonoBehaviour
     {
         currentHealth -= (increasePerSecond * Time.deltaTime);
         courageGauge.value = currentHealth;
-        Debug.Log(courageGauge.value);
+        //Debug.Log(courageGauge.value);
         if (currentHealth <= 0f)
         {
             CourageDepleted();
