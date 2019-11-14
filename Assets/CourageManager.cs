@@ -95,22 +95,27 @@ public class CourageManager : MonoBehaviour
         }
 
         //If the player is in enough darkness, start decreasing courage
-        if (sd.hidden)
-        {
-            if (hasWaited == false)
-            {
-                hasWaited = Waited(secondsToWaitBeforeDarkness);
-            }
-            else if (hasWaited == true)
-            {
-                DecreaseCourage();
-            }
-            //DecreaseCourage();
-        }
+        //if (sd.hidden)
+        //{
+        //    if (hasWaited == false)
+        //    {
+        //        hasWaited = Waited(secondsToWaitBeforeDarkness);
+        //    }
+        //    else if (hasWaited == true)
+        //    {
+        //        DecreaseCourage();
+        //    }
+        //    //DecreaseCourage();
+        //}
 
-        else if (!sd.hidden)
+        //else if (!sd.hidden)
+        //{
+        //    hasWaited = false;
+        //}
+
+        if (pControl.isDarknened)
         {
-            hasWaited = false;
+            DecreaseCourage();
         }
     }
         

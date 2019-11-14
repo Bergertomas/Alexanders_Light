@@ -8,6 +8,7 @@ TagManager:
   - BOL
   - BOLPusher
   - Ladder
+  - Evil
   layers:
   - Default
   - TransparentFX

@@ -55,7 +55,7 @@ public class AlexanderController : MonoBehaviour
     private CollisionInfo collisionInfo;
 
 
-    
+
     [SerializeField]
     private float ascendinGravity = -18f;
     [SerializeField]
@@ -101,6 +101,7 @@ public class AlexanderController : MonoBehaviour
     bool isAlive;
     private bool isMoving = false;
     private bool isBored = false;
+    public bool isDarknened;
     [SerializeField]
     private float timeToGetBored = 10f;
     private float timeWithoutAction = 0f;
@@ -112,6 +113,8 @@ public class AlexanderController : MonoBehaviour
     private PlayerStates state = PlayerStates.None;
 
     public bool hasCalledBoL;
+    [SerializeField]
+    private Transform healPoint;
     public LightballController lbc;
     #region Ball Anchor:
     [Header("Ball Anchor")]
@@ -148,35 +151,35 @@ public class AlexanderController : MonoBehaviour
         rayCastOrigins.VerticalRayCount = 4;
         ChangeAnchorPosition();
 
-       Collisions.UpdateRayCastOrigins(physicalCollider,ref rayCastOrigins);
-       Collisions.CalculateRaySpacing(physicalCollider, ref rayCastOrigins);
+        Collisions.UpdateRayCastOrigins(physicalCollider, ref rayCastOrigins);
+        Collisions.CalculateRaySpacing(physicalCollider, ref rayCastOrigins);
         //Physics.IgnoreCollision(balloflight.GetComponent<Collider>(), GetComponent<Collider>(),true);
     }
 
-   /* private void UpdateRayCastOrigins()
-    {
-        Bounds bounds = physicalCollider.bounds;
-        bounds.Expand(Collisions.SKIN_WIDTH * -2);
-        rayCastOrigins.BottomLeft = new Vector2(bounds.min.x, bounds.min.y);
-        rayCastOrigins.BottomRight = new Vector2(bounds.max.x, bounds.min.y);
-        rayCastOrigins.TopLeft = new Vector2(bounds.min.x, bounds.max.y);
-        rayCastOrigins.TopRight = new Vector2(bounds.max.x, bounds.max.y);
-    }
-   /* private void CalculateRaySpacing()
-    {
-        Bounds bounds = physicalCollider.bounds;
-        bounds.Expand(Collisions.SKIN_WIDTH * -2);
-        horizontalRayCount = Mathf.Clamp(horizontalRayCount, 2, int.MaxValue);
-        verticalRayCount = Mathf.Clamp(verticalRayCount, 2, int.MaxValue);
-        horizontalRaySpacing = bounds.size.y / (horizontalRayCount - 1);
-        verticalRaySpacing = bounds.size.x / (verticalRayCount - 1);
-    }*/
+    /* private void UpdateRayCastOrigins()
+     {
+         Bounds bounds = physicalCollider.bounds;
+         bounds.Expand(Collisions.SKIN_WIDTH * -2);
+         rayCastOrigins.BottomLeft = new Vector2(bounds.min.x, bounds.min.y);
+         rayCastOrigins.BottomRight = new Vector2(bounds.max.x, bounds.min.y);
+         rayCastOrigins.TopLeft = new Vector2(bounds.min.x, bounds.max.y);
+         rayCastOrigins.TopRight = new Vector2(bounds.max.x, bounds.max.y);
+     }
+    /* private void CalculateRaySpacing()
+     {
+         Bounds bounds = physicalCollider.bounds;
+         bounds.Expand(Collisions.SKIN_WIDTH * -2);
+         horizontalRayCount = Mathf.Clamp(horizontalRayCount, 2, int.MaxValue);
+         verticalRayCount = Mathf.Clamp(verticalRayCount, 2, int.MaxValue);
+         horizontalRaySpacing = bounds.size.y / (horizontalRayCount - 1);
+         verticalRaySpacing = bounds.size.x / (verticalRayCount - 1);
+     }*/
     private void Move(Vector3 velocity)
     {
         collisionInfo.Clear();
         collisionInfo.VelocityOld = velocity;
         Collisions.UpdateRayCastOrigins(physicalCollider, ref rayCastOrigins);//maybe we shouldnt do this every Move()
-        Collisions.CalculateRaySpacing(physicalCollider,ref rayCastOrigins);//maybe we shouldnt do this every Move()
+        Collisions.CalculateRaySpacing(physicalCollider, ref rayCastOrigins);//maybe we shouldnt do this every Move()
         if (draggedObject != null)
         {
             Collisions.UpdateRayCastOrigins(draggedObject.Collider, ref draggedObject.RayCastOrigins);
@@ -184,8 +187,9 @@ public class AlexanderController : MonoBehaviour
             if (velocity.x != 0)
             {
                 DraggedHorizontalCollisions(ref velocity);
+
             }
-            draggedObject.transform.Translate(new Vector3(velocity.x,0,0));
+            draggedObject.transform.Translate(new Vector3(velocity.x, 0, 0));
         }
         if (velocity.y < 0)
         {
@@ -219,24 +223,24 @@ public class AlexanderController : MonoBehaviour
             if (hit.collider != null)
             {
                 float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
-                if(i==0&&slopeAngle<=maxClimbSlopeAngle)
+                if (i == 0 && slopeAngle <= maxClimbSlopeAngle)
                 {
                     if (collisionInfo.DescendingSlope)
                     {
                         collisionInfo.DescendingSlope = false;
-                        velocity= collisionInfo.VelocityOld;
+                        velocity = collisionInfo.VelocityOld;
                     }
                     Debug.Log("Angle:" + slopeAngle);
                     float distanceToSlopeStart = 0;
                     if (slopeAngle != collisionInfo.PreviousSlopeAngle)
                     {
-                        distanceToSlopeStart = hit.distance- Collisions.SKIN_WIDTH;
+                        distanceToSlopeStart = hit.distance - Collisions.SKIN_WIDTH;
                         velocity.x -= distanceToSlopeStart * XDirection;
                     }
-                    ClimbSlope(ref  velocity, slopeAngle);
+                    ClimbSlope(ref velocity, slopeAngle);
                     velocity.x += distanceToSlopeStart * XDirection;
                 }
-                if(!collisionInfo.ClimbingSlope|| slopeAngle > maxClimbSlopeAngle)
+                if (!collisionInfo.ClimbingSlope || slopeAngle > maxClimbSlopeAngle)
                 {
                     /*if (hit.collider.gameObject.GetComponent<DragInteractable>()&& hit.collider.gameObject.GetComponent<DragInteractable>() == draggedObject)
                     {
@@ -272,24 +276,24 @@ public class AlexanderController : MonoBehaviour
             Debug.DrawLine(rayOrigin, rayOrigin + (Vector3.right * XDirection * rayLength), Color.red);
             if (hit.collider != null)
             {
-               /* float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
-                if (i == 0 && slopeAngle <= maxClimbSlopeAngle)
-                {
-                    if (collisionInfo.DescendingSlope)
-                    {
-                        collisionInfo.DescendingSlope = false;
-                        velocity = collisionInfo.VelocityOld;
-                    }
-                    Debug.Log("Angle:" + slopeAngle);
-                    float distanceToSlopeStart = 0;
-                    if (slopeAngle != collisionInfo.PreviousSlopeAngle)
-                    {
-                        distanceToSlopeStart = hit.distance - Collisions.SKIN_WIDTH;
-                        velocity.x -= distanceToSlopeStart * XDirection;
-                    }
-                    ClimbSlope(ref velocity, slopeAngle);
-                    velocity.x += distanceToSlopeStart * XDirection;
-                }*/
+                /* float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
+                 if (i == 0 && slopeAngle <= maxClimbSlopeAngle)
+                 {
+                     if (collisionInfo.DescendingSlope)
+                     {
+                         collisionInfo.DescendingSlope = false;
+                         velocity = collisionInfo.VelocityOld;
+                     }
+                     Debug.Log("Angle:" + slopeAngle);
+                     float distanceToSlopeStart = 0;
+                     if (slopeAngle != collisionInfo.PreviousSlopeAngle)
+                     {
+                         distanceToSlopeStart = hit.distance - Collisions.SKIN_WIDTH;
+                         velocity.x -= distanceToSlopeStart * XDirection;
+                     }
+                     ClimbSlope(ref velocity, slopeAngle);
+                     velocity.x += distanceToSlopeStart * XDirection;
+                 }*/
                 //if (!collisionInfo.ClimbingSlope || slopeAngle > maxClimbSlopeAngle)
                 {
                     velocity.x = (hit.distance - Collisions.SKIN_WIDTH) * XDirection;
@@ -299,11 +303,11 @@ public class AlexanderController : MonoBehaviour
             }
         }
     }
-    private void ClimbSlope(ref Vector3 velocity,float slopeAngle)//Ori does not understand this one at all
+    private void ClimbSlope(ref Vector3 velocity, float slopeAngle)//Ori does not understand this one at all
     {
-        float moveDistance =Mathf.Abs( velocity.x);
+        float moveDistance = Mathf.Abs(velocity.x);
         float climbVelocityY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * moveDistance;
-        if( velocity.y<= climbVelocityY)
+        if (velocity.y <= climbVelocityY)
         {
             velocity.y = climbVelocityY;
             velocity.x = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * moveDistance * Mathf.Sign(velocity.x);
@@ -322,7 +326,7 @@ public class AlexanderController : MonoBehaviour
         float XDirection = Mathf.Sign(velocity.x);
         Vector3 rayOrigin = (XDirection == 1 ? rayCastOrigins.BottomLeft : rayCastOrigins.BottomRight);
         RaycastHit hit;
-        Physics.Raycast(rayOrigin, -Vector3.up , out hit, Mathf.Infinity, collisionMask);
+        Physics.Raycast(rayOrigin, -Vector3.up, out hit, Mathf.Infinity, collisionMask);
         if (hit.collider != null)
         {
             float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
@@ -371,7 +375,7 @@ public class AlexanderController : MonoBehaviour
         {
             float XDirection = Mathf.Sign(velocity.x);
             rayLength = Mathf.Abs(velocity.x) + Collisions.SKIN_WIDTH;
-            Vector3 rayOrigin = ((XDirection == -1) ? rayCastOrigins.BottomLeft : rayCastOrigins.BottomRight)+ (velocity.y*Vector3.up);
+            Vector3 rayOrigin = ((XDirection == -1) ? rayCastOrigins.BottomLeft : rayCastOrigins.BottomRight) + (velocity.y * Vector3.up);
             RaycastHit hit;
             Physics.Raycast(rayOrigin, Vector3.right * XDirection, out hit, rayLength, collisionMask);
             if (hit.collider != null)
@@ -412,7 +416,8 @@ public class AlexanderController : MonoBehaviour
         bool didSomething = false;
         //Draw player so that it looks look he's looking at the appropriate direction
         //graphics.transform.localScale = new Vector3(1 * (float)currentDirection, 1, 1);
-        anim.SetBool("crawling", (state==PlayerStates.Crawl));
+        anim.SetBool("crawling", (state == PlayerStates.Crawl));
+        anim.SetBool("holding", (state == PlayerStates.Drag));
         #region New collision system 
         if (collisionInfo.Above || collisionInfo.Below)
         {
@@ -442,7 +447,7 @@ public class AlexanderController : MonoBehaviour
                     if (state == PlayerStates.Crawl)
                     {
                         state = PlayerStates.None;
-                        if(collisionInfo.Below)
+                        if (collisionInfo.Below)
                         {
                             transform.Translate(0, 0.5f, 0);
                         }
@@ -460,8 +465,8 @@ public class AlexanderController : MonoBehaviour
         {
             if (state == PlayerStates.Crawl)
             {
-               // physicalColliderObject.transform.localScale = new Vector3(1f, 0.5f, 1f);
-               // physicalCollider.bounds.min.y += 1;
+                // physicalColliderObject.transform.localScale = new Vector3(1f, 0.5f, 1f);
+                // physicalCollider.bounds.min.y += 1;
             }
             walkSpeed = crawlSpeed;
             //should the player get horter when he drags?
@@ -469,7 +474,7 @@ public class AlexanderController : MonoBehaviour
         else
         {
             walkSpeed = originalWalkSpeed;
-           // physicalColliderObject.transform.localScale = new Vector3(1f, 1f, 1f);      
+            // physicalColliderObject.transform.localScale = new Vector3(1f, 1f, 1f);      
         }
         currentVelocity.y += ((currentVelocity.y > 0) ? ascendinGravity : descendinGravity) * Time.deltaTime;
 
@@ -487,14 +492,14 @@ public class AlexanderController : MonoBehaviour
                 currentRightSpeed = walkSpeed;
             }
 
-           /* if (CameraXOffset < CameraXOffsetWhenRunning)
-            {
-                CameraXOffset += CameraXOffsetMovingSpeed * Time.deltaTime;
-            }
-            else
-            {
-                CameraXOffset = CameraXOffsetWhenRunning;
-            }*/
+            /* if (CameraXOffset < CameraXOffsetWhenRunning)
+             {
+                 CameraXOffset += CameraXOffsetMovingSpeed * Time.deltaTime;
+             }
+             else
+             {
+                 CameraXOffset = CameraXOffsetWhenRunning;
+             }*/
         }
         else if (currentRightSpeed != 0)
         {
@@ -518,14 +523,14 @@ public class AlexanderController : MonoBehaviour
                 currentLeftSpeed = -walkSpeed;
             }
 
-           /* if (CameraXOffset > -CameraXOffsetWhenRunning)
-            {
-                CameraXOffset -= CameraXOffsetMovingSpeed * Time.deltaTime;
-            }
-            else
-            {
-                CameraXOffset = -CameraXOffsetWhenRunning;
-            }*/
+            /* if (CameraXOffset > -CameraXOffsetWhenRunning)
+             {
+                 CameraXOffset -= CameraXOffsetMovingSpeed * Time.deltaTime;
+             }
+             else
+             {
+                 CameraXOffset = -CameraXOffsetWhenRunning;
+             }*/
         }
         else if (currentLeftSpeed != 0)
         {
@@ -548,22 +553,34 @@ public class AlexanderController : MonoBehaviour
         if (xInput != 0)
         {
             anim.SetBool("walking", true);
+            if (state == PlayerStates.Drag)
+            {
+                anim.SetBool("pushing", true);
+            }
+
             isMoving = true;
             didSomething = true;
             if (xInput < 0)
             {
-                if (currentDirection != Directions.LEFT)
+                //if (currentDirection != Directions.LEFT)
                 {
-                    graphics.transform.eulerAngles = new Vector3(0, 270, 0);
+                    if (state != PlayerStates.Drag)
+                    {
+                        graphics.transform.eulerAngles = new Vector3(0, 270, 0);
+                    }
                     ChangeAnchorPosition();
                     currentDirection = Directions.LEFT;
                 }
             }
             else
             {
-                if (currentDirection != Directions.RIGHT)
+                //if (currentDirection != Directions.RIGHT)
                 {
-                    graphics.transform.eulerAngles = new Vector3(0, 90, 0);
+                    if (state != PlayerStates.Drag)
+                    {
+                        graphics.transform.eulerAngles = new Vector3(0, 90, 0);
+                    }
+
                     ChangeAnchorPosition();
                     currentDirection = Directions.RIGHT;
                 }
@@ -571,20 +588,22 @@ public class AlexanderController : MonoBehaviour
         }
         else
         {
+
+            anim.SetBool("pushing", false);
             anim.SetBool("walking", false);
             //Debug.Log("Not Moving");
             isMoving = false;
-           /* if (CameraXOffset != 0 && currentHorizontalSpeed == 0)
-            {
-                if ((Mathf.Abs(CameraXOffset) - ((CameraXOffset / Mathf.Abs(CameraXOffset)) * CameraXOffsetStandingSpeed * Time.deltaTime)) > 0)
-                {
-                    CameraXOffset -= (CameraXOffset / Mathf.Abs(CameraXOffset)) * CameraXOffsetStandingSpeed * Time.deltaTime;
-                }
-                else
-                {
-                    CameraXOffset = 0;
-                }
-            }*/
+            /* if (CameraXOffset != 0 && currentHorizontalSpeed == 0)
+             {
+                 if ((Mathf.Abs(CameraXOffset) - ((CameraXOffset / Mathf.Abs(CameraXOffset)) * CameraXOffsetStandingSpeed * Time.deltaTime)) > 0)
+                 {
+                     CameraXOffset -= (CameraXOffset / Mathf.Abs(CameraXOffset)) * CameraXOffsetStandingSpeed * Time.deltaTime;
+                 }
+                 else
+                 {
+                     CameraXOffset = 0;
+                 }
+             }*/
         }
 
         //If the player is in a ladder
@@ -621,30 +640,30 @@ public class AlexanderController : MonoBehaviour
             {
                 //if (Mathf.Abs(CameraXOffset) + CameraXOffsetMovingSpeed * Time.deltaTime< CameraXOffsetWhenRunning)
                 //if (CameraXOffset + ((float)currentDirection) * (CameraXOffsetMovingSpeed * Time.deltaTime) < CameraXOffsetWhenRunning)
-               
-                 CameraXOffset +=((float)currentDirection) * (CameraXOffsetMovingSpeed * Time.deltaTime);
-                 if((currentDirection==Directions.RIGHT&&CameraXOffset> CameraXOffsetWhenRunning)||
-                    (currentDirection == Directions.LEFT && CameraXOffset < -CameraXOffsetWhenRunning))//Ugly math..
-                 {
-                      CameraXOffset = CameraXOffsetWhenRunning * (float)currentDirection;
-                 }
-               
+
+                CameraXOffset += ((float)currentDirection) * (CameraXOffsetMovingSpeed * Time.deltaTime);
+                if ((currentDirection == Directions.RIGHT && CameraXOffset > CameraXOffsetWhenRunning) ||
+                   (currentDirection == Directions.LEFT && CameraXOffset < -CameraXOffsetWhenRunning))//Ugly math..
+                {
+                    CameraXOffset = CameraXOffsetWhenRunning * (float)currentDirection;
+                }
+
                 /*else
                 {
                     CameraXOffset = CameraXOffsetWhenRunning * (float)currentDirection;
                 }*/
             }
-           /* 
-            else*/
+            /* 
+             else*/
             {
-                
+
             }
         }
-        else if(CameraXOffset!=0)
+        else if (CameraXOffset != 0)
         {
-            if ((Mathf.Abs(CameraXOffset)- (CameraXOffsetStandingSpeed * Time.deltaTime))>0)
+            if ((Mathf.Abs(CameraXOffset) - (CameraXOffsetStandingSpeed * Time.deltaTime)) > 0)
             {
-                CameraXOffset -=(Mathf.Abs(CameraXOffset) /CameraXOffset)* CameraXOffsetStandingSpeed * Time.deltaTime;
+                CameraXOffset -= (Mathf.Abs(CameraXOffset) / CameraXOffset) * CameraXOffsetStandingSpeed * Time.deltaTime;
             }
             else
             {
@@ -713,7 +732,7 @@ public class AlexanderController : MonoBehaviour
                 }
                 else
                 {
-                    lbc.transform.position = Vector3.Lerp(lbc.transform.position, this.transform.position, Time.deltaTime * lbc.HealMovementSpeed);
+                    lbc.transform.position = Vector3.Lerp(lbc.transform.position, healPoint.position + new Vector3((float)currentDirection * 0.3f, 0.8f, 0), Time.deltaTime * lbc.HealMovementSpeed);
                 }
             }
             else if (lbc.State == LightBallStates.Charge)
@@ -786,9 +805,9 @@ public class AlexanderController : MonoBehaviour
         DragInteractable currentDraggedObject = draggedObject;
         ReleaseDraggedObject();
         RaycastHit interactionHit;
-        Vector3 rayOrigin = physicalCollider.transform.position+new Vector3(0,0.5f,0);
-        Physics.Raycast(rayOrigin,Vector3.right * (float)currentDirection, out interactionHit, interactionDistance,collisionMask);//TODO-send more than one ray
-        Debug.DrawLine(rayOrigin, rayOrigin + (Vector3.right * (float)currentDirection * interactionDistance), Color.yellow,0.5f    );
+        Vector3 rayOrigin = physicalCollider.transform.position + new Vector3(0, 0.5f, 0);
+        Physics.Raycast(rayOrigin, Vector3.right * (float)currentDirection, out interactionHit, interactionDistance, collisionMask);//TODO-send more than one ray
+        Debug.DrawLine(rayOrigin, rayOrigin + (Vector3.right * (float)currentDirection * interactionDistance), Color.yellow, 0.5f);
         if (interactionHit.collider != null)
         {
             Debug.Log("interactionHit.collider != null");
@@ -810,6 +829,12 @@ public class AlexanderController : MonoBehaviour
         {
             canClimb = true;
         }
+
+        if (other.gameObject.tag == "Evil")
+        {
+            isDarknened = true;
+            //Debug.Log("2spooky4me");
+        }
     }
     void OnTriggerExit(Collider other)
     {
@@ -818,6 +843,11 @@ public class AlexanderController : MonoBehaviour
             canClimb = false;
             if (state == PlayerStates.Climb)
                 state = PlayerStates.None;
+        }
+
+        if (other.gameObject.tag == "Evil")
+        {
+            isDarknened = false;
         }
     }
 

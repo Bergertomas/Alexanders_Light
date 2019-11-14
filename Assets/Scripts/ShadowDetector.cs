@@ -24,7 +24,6 @@ public class ShadowDetector : MonoBehaviour {
     //Maximum detectable light level. anything above it will not be registered
     public float maxShadowBright = 5f;
     [Tooltip("Auto brightness sensor threshold")]
-    //Sets maxShadowBright to 2f automatically even though we changed the number in code (done in first lines of Update). easily disabled in inspector so you can change max light level on the fly. 
     public bool autoMaxShadowBright = true;
     [Tooltip("Consider the ambient intensity from render settings")]
     //???
