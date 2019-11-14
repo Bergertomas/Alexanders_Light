@@ -1,0 +1,11 @@
+# File produced by Open Asset Import Library (http://www.assimp.sf.net)
+# (assimp v3.1.193236683)
+
+newmtl StoneBottom
+kd 0.0941177 0 0
+illum 1
+
+newmtl StoneTop
+kd 0.701961 0.356863 0.0823529
+illum 1
+
