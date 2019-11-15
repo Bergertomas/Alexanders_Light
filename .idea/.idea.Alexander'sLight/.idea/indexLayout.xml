@@ -26,7 +26,6 @@
       <Path>Logs</Path>
       <Path>Objs</Path>
       <Path>Substence Painter</Path>
-      <Path>Temp</Path>
       <Path>obj</Path>
     </explicitExcludes>
   </component>
