@@ -17,7 +17,8 @@ public class CameraController : MonoBehaviour
     private float currentYSpeed = 5f;
     [SerializeField]
     private float yOffsetFromPlayer = 1;
-
+    private float originalFieldOfView;
+    private float currentFieldOfView;
     private void LowerSpeed()
     {
         //if (rapists.Count < 1)
@@ -48,6 +49,7 @@ public class CameraController : MonoBehaviour
     private void Start()
     {
         player = FindObjectOfType<AlexanderController>();
+        originalFieldOfView = Camera.main.fieldOfView;
     }
 
     public void AddRapist(CameraRapist rapist)
@@ -55,6 +57,7 @@ public class CameraController : MonoBehaviour
         if (!rapists.Contains(rapist))
         {
             rapists.Add(rapist);
+            rapist.RapistStrength = 0;
             // LowerSpeed();
         }
         else
@@ -102,7 +105,7 @@ public class CameraController : MonoBehaviour
         {
             float membersX = 0f;
             float membersY = 0f;
-            int numberOfMembers = 0;
+            float numberOfMembers = 0;
             foreach (CameraRapist r in rapists)
             {
                 numberOfMembers += r.PlayerStrength + r.RapistStrength;
@@ -112,6 +115,7 @@ public class CameraController : MonoBehaviour
                 membersY +=
                   (((player.transform.position.y + yOffsetFromPlayer) - this.transform.position.y) * r.PlayerStrength) +
                   ((r.Centre.position.y - this.transform.position.y) * r.RapistStrength);
+                r.RapistUpdate();
             }
             newX += (membersX / (float)numberOfMembers);
             newY += (membersY / (float)numberOfMembers);
@@ -128,5 +132,6 @@ public class CameraController : MonoBehaviour
         newY = (newY * currentYSpeed * Time.deltaTime) + this.transform.position.y;
 
         transform.position = new Vector3(newX, newY, transform.position.z);
+        Camera.main.fieldOfView = originalFieldOfView;
     }
 }
