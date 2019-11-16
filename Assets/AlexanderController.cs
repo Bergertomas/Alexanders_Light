@@ -94,6 +94,8 @@ public class AlexanderController : MonoBehaviour
     [SerializeField]
     float artificialGravity = -0.666f;*/
     private DragInteractable draggedObject = null;
+    private bool dragging = false;
+    private Vector3 movedObjRelative;
     [SerializeField]
     private float interactionDistance = 1f;
     //bool crawling;
@@ -182,6 +184,7 @@ public class AlexanderController : MonoBehaviour
         Collisions.CalculateRaySpacing(physicalCollider, ref rayCastOrigins);//maybe we shouldnt do this every Move()
         if (draggedObject != null)
         {
+            movedObjRelative = draggedObject.gameObject.transform.InverseTransformPoint(transform.position);
             Collisions.UpdateRayCastOrigins(draggedObject.Collider, ref draggedObject.RayCastOrigins);
             Collisions.CalculateRaySpacing(draggedObject.Collider, ref draggedObject.RayCastOrigins);
             if (velocity.x != 0)
@@ -468,6 +471,19 @@ public class AlexanderController : MonoBehaviour
                 // physicalColliderObject.transform.localScale = new Vector3(1f, 0.5f, 1f);
                 // physicalCollider.bounds.min.y += 1;
             }
+            else if (state == PlayerStates.Drag)
+            {
+                if (movedObjRelative.x > 0)
+                {
+                    graphics.transform.localPosition = new Vector3(0.5f, 0, 0);
+                    Debug.Log("moved model to the right");
+                }
+                else
+                {
+                    graphics.transform.localPosition = new Vector3(-0.5f, 0, 0);
+                    Debug.Log("moved model to the left");
+                }
+            }
             walkSpeed = crawlSpeed;
             //should the player get horter when he drags?
         }
@@ -553,34 +569,55 @@ public class AlexanderController : MonoBehaviour
         if (xInput != 0)
         {
             anim.SetBool("walking", true);
-            if (state == PlayerStates.Drag)
-            {
-                anim.SetBool("pushing", true);
-            }
+            //if (state == PlayerStates.Drag)
+            //{
+            //    anim.SetBool("pushing", true);
+            //}
 
             isMoving = true;
             didSomething = true;
-            if (xInput < 0)
+            if (xInput < 0) //character going right
             {
-                //if (currentDirection != Directions.LEFT)
+                if (currentDirection != Directions.LEFT)
                 {
                     if (state != PlayerStates.Drag)
                     {
-                        graphics.transform.eulerAngles = new Vector3(0, 270, 0);
+                        graphics.transform.eulerAngles = new Vector3(0, 270, 0); //character face left
+                    }
+                    else
+                    {                       
+                        if (movedObjRelative.x > 0)
+                        {
+                            anim.SetBool("pushing", true);
+                        }
+                        else
+                        {
+                            anim.SetBool("pushing", false);
+                        }
                     }
                     ChangeAnchorPosition();
                     currentDirection = Directions.LEFT;
                 }
             }
-            else
+            else //character going left
             {
-                //if (currentDirection != Directions.RIGHT)
+                if (currentDirection != Directions.RIGHT)
                 {
                     if (state != PlayerStates.Drag)
                     {
-                        graphics.transform.eulerAngles = new Vector3(0, 90, 0);
+                        graphics.transform.eulerAngles = new Vector3(0, 90, 0); //character face right                       
                     }
-
+                    else
+                    {
+                        if (movedObjRelative.x < 0)
+                        {
+                            anim.SetBool("pushing", true);
+                        }
+                        else
+                        {
+                            anim.SetBool("pushing", false);
+                        }
+                    }
                     ChangeAnchorPosition();
                     currentDirection = Directions.RIGHT;
                 }
@@ -589,7 +626,7 @@ public class AlexanderController : MonoBehaviour
         else
         {
 
-            anim.SetBool("pushing", false);
+            //anim.SetBool("pushing", false);
             anim.SetBool("walking", false);
             //Debug.Log("Not Moving");
             isMoving = false;
@@ -795,6 +832,7 @@ public class AlexanderController : MonoBehaviour
             draggedObject.MoveToFreeState();
             draggedObject = null;
             state = PlayerStates.None;
+            graphics.transform.localPosition = new Vector3(0, 0, 0);
         }
     }
     #endregion
