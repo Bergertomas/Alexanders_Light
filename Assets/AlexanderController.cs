@@ -50,6 +50,7 @@ public class AlexanderController : MonoBehaviour
     Collider physicalCollider;
     [SerializeField]
     private float maxClimbSlopeAngle = 60f;
+    [SerializeField]
     private float maxDescendSlopeAngle = 60f;
     private RayCastOrigins rayCastOrigins;
     private CollisionInfo collisionInfo;

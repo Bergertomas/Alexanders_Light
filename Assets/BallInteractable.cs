@@ -13,7 +13,7 @@ public class BallInteractable : MonoBehaviour
     public UnityEvent OnInteractionExit;
     public UnityEvent OnDeath;
 
-    private bool isDead = false;
+    public bool isDead = false;
     private bool interactedPreviousFrame = false;
     [SerializeField]
     private float life;
@@ -21,7 +21,6 @@ public class BallInteractable : MonoBehaviour
 
     public virtual void Interact()
     {
-
         if (life > 0)
         {
             Debug.Log("Interact Life>0");
@@ -47,6 +46,7 @@ public class BallInteractable : MonoBehaviour
     {
         if (!isDead && other.GetComponent<LightballController>() && other.GetComponent<LightballController>().State==LightBallStates.Amplify)
         {
+            Debug.Log("beingInteractedWith");
             beingInteractedWith = true;
         }
         else
@@ -70,8 +70,4 @@ public class BallInteractable : MonoBehaviour
         }
     }
 
-    private void FixedUpdate()
-    {
-        
-    }
 }

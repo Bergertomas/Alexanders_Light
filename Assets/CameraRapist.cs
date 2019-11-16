@@ -9,7 +9,7 @@ public class CameraRapist : MonoBehaviour
     public float PlayerStrength = 1;
     public float TimeToGetToMaxStrength;
     private float rapistMaxStrength;
-    public float FieldOfView = 90;
+    public float FieldOfViewModifier = 10;
     
     void Start()
     {
