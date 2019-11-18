@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: e4e805a474a19d44ab41275e6736e0b2
+guid: c1896e56101acce46aab44a5e2a27bfb
 ModelImporter:
   serializedVersion: 26
   internalIDToNameTable:
@@ -38,8 +38,8 @@ ModelImporter:
       name: Landing
       takeName: mixamo.com
       internalID: 0
-      firstFrame: 0
-      lastFrame: 86
+      firstFrame: 16
+      lastFrame: 64
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
