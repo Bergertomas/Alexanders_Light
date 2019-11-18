@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
+/*public struct BallInteractableState
+{
+    public bool isDead;
+    public float life;
+}*/
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(Collider))]
 public class BallInteractable : MonoBehaviour
@@ -12,13 +17,48 @@ public class BallInteractable : MonoBehaviour
     public UnityEvent OnInteract;
     public UnityEvent OnInteractionExit;
     public UnityEvent OnDeath;
+    public UnityEvent OnResurrection;
 
     public bool isDead = false;
     private bool interactedPreviousFrame = false;
     [SerializeField]
     private float life;
+    [SerializeField]
+    private float lifeAtStart;
     private bool beingInteractedWith;
 
+    private bool isDeadOnLastCheckPoint;
+    private float lifeOnLastCheckPoint;
+    public virtual void Initialise()
+    {
+        isDead = false;
+        life = lifeAtStart;
+    }
+    private void Start()
+    {
+        MasterController.Instance.CheckPointReached += RecordCurrentState;
+        MasterController.Instance.RevertToPreviousCheckPoint += RevertToPreviousCheckPoint;
+        Initialise();
+    }
+    public void RecordCurrentState(Transform t)
+    {
+        lifeOnLastCheckPoint = life;
+        isDeadOnLastCheckPoint = isDead;
+    }
+    public virtual void RevertToPreviousCheckPoint()
+    {
+       life= lifeOnLastCheckPoint;
+       isDead= isDeadOnLastCheckPoint;
+        beingInteractedWith = false;
+       if (isDead)
+       {
+           // Die();
+       }
+       else
+       {
+           OnResurrection.Invoke();
+       }
+    }
     public virtual void Interact()
     {
         if (life > 0)

@@ -10,13 +10,36 @@ public class DragInteractable : Interactable
     public Rigidbody RB;
     public RayCastOrigins RayCastOrigins;
     public Collider Collider;
-    private void Start()
+
+    private Vector3 positionOnLastCheckPoint;
+    private RigidbodyConstraints constraintsOnLastCheckPoint;
+    private bool useGravityOnLastCheckPoint;
+    private bool isKinematicOnLastCheckPoint;
+
+    internal override void OnStart()
     {
+        base.OnStart();
         RayCastOrigins.VerticalRayCount = 5;
         RayCastOrigins.VerticalRayCount = 4;
         RB = this.GetComponent<Rigidbody>();
-        Collider= this.GetComponent<Collider>();
+        Collider = this.GetComponent<Collider>();
         MoveToFreeState();
+    }
+    public override void RecordCurrentState(Transform t)
+    {
+        base.RecordCurrentState(t);
+        positionOnLastCheckPoint = transform.position;
+        constraintsOnLastCheckPoint = RB.constraints;
+       isKinematicOnLastCheckPoint=  RB.isKinematic;
+       useGravityOnLastCheckPoint= RB.useGravity;
+    }
+    public override void RevertToPreviousCheckPoint()
+    {
+        base.RevertToPreviousCheckPoint();
+        transform.position = positionOnLastCheckPoint;
+        RB.constraints = constraintsOnLastCheckPoint;
+        RB.isKinematic = isKinematicOnLastCheckPoint;
+        RB.useGravity = useGravityOnLastCheckPoint;
     }
     public void MoveToDraggedState()
     {
