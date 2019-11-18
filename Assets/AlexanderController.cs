@@ -33,7 +33,6 @@ public struct CollisionInfo
         DescendingSlope = false;
         PreviousSlopeAngle = CurrentSlopeAngle;
         CurrentSlopeAngle = 0;
-
     }
 }
 public class AlexanderController : MonoBehaviour
@@ -114,6 +113,7 @@ public class AlexanderController : MonoBehaviour
     private GameObject graphics;
     private Directions currentDirection = Directions.RIGHT;//the direction the player's currently facing
     private PlayerStates state = PlayerStates.None;
+    private Vector3 positionAtPreviousCheckPoint;
 
     public bool hasCalledBoL;
     [SerializeField]
@@ -149,6 +149,8 @@ public class AlexanderController : MonoBehaviour
 
     void Start()
     {
+        MasterController.Instance.CheckPointReached += RecordCurrentState;
+        MasterController.Instance.RevertToPreviousCheckPoint += RevertToPreviousCheckPoint;
         // originalLocalScaleX = transform.localScale.x;
         rayCastOrigins.VerticalRayCount = 5;
         rayCastOrigins.VerticalRayCount = 4;
@@ -158,7 +160,15 @@ public class AlexanderController : MonoBehaviour
         Collisions.CalculateRaySpacing(physicalCollider, ref rayCastOrigins);
         //Physics.IgnoreCollision(balloflight.GetComponent<Collider>(), GetComponent<Collider>(),true);
     }
-
+    public void RecordCurrentState(Transform checkPointTransform)
+    {
+        positionAtPreviousCheckPoint = new Vector3
+            (checkPointTransform.position.x, checkPointTransform.position.y,0);//We dont want the checkpoint to tell us what Z to go to
+    }
+    public void RevertToPreviousCheckPoint()
+    {
+        transform.position = positionAtPreviousCheckPoint;
+    }
     /* private void UpdateRayCastOrigins()
      {
          Bounds bounds = physicalCollider.bounds;
@@ -246,7 +256,8 @@ public class AlexanderController : MonoBehaviour
                 }
                 if (!collisionInfo.ClimbingSlope || slopeAngle > maxClimbSlopeAngle)
                 {
-                    /*if (hit.collider.gameObject.GetComponent<DragInteractable>()&& hit.collider.gameObject.GetComponent<DragInteractable>() == draggedObject)
+                    /*if (hit.collider.gameObject.GetComponent<Drag
+                     * ctable>()&& hit.collider.gameObject.GetComponent<DragInteractable>() == draggedObject)
                     {
                        transform.Translate(-SKIN_WIDTH * XDirection) =  ;
                     }*/
