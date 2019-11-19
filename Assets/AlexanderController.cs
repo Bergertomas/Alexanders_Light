@@ -53,7 +53,7 @@ public class AlexanderController : MonoBehaviour
     private float maxDescendSlopeAngle = 60f;
     private RayCastOrigins rayCastOrigins;
     private CollisionInfo collisionInfo;
-
+    private GameObject collisionObject;
 
 
     [SerializeField]
@@ -152,7 +152,7 @@ public class AlexanderController : MonoBehaviour
         MasterController.Instance.CheckPointReached += RecordCurrentState;
         MasterController.Instance.RevertToPreviousCheckPoint += RevertToPreviousCheckPoint;
         // originalLocalScaleX = transform.localScale.x;
-        rayCastOrigins.VerticalRayCount = 5;
+        rayCastOrigins.HorizontalRayCount = 5;
         rayCastOrigins.VerticalRayCount = 4;
         ChangeAnchorPosition();
 
@@ -201,7 +201,6 @@ public class AlexanderController : MonoBehaviour
             if (velocity.x != 0)
             {
                 DraggedHorizontalCollisions(ref velocity);
-
             }
             draggedObject.transform.Translate(new Vector3(velocity.x, 0, 0));
         }
@@ -211,11 +210,26 @@ public class AlexanderController : MonoBehaviour
         }
         if (velocity.x != 0)
         {
-            HorizontalCollisions(ref velocity);
+            collisionObject = HorizontalCollisions(ref velocity);
+            if (collisionObject != null)
+            {
+                if (collisionObject.GetComponent<Collectible>())
+                {
+                    collisionObject.GetComponent<Collectible>().Collect();
+                }
+            }
+;
         }
         if (velocity.y != 0)
         {
-            VerticalCollisions(ref velocity);
+            collisionObject = VerticalCollisions(ref velocity);
+            if (collisionObject != null)
+            {
+                if (collisionObject.GetComponent<Collectible>())
+                {
+                    collisionObject.GetComponent<Collectible>().Collect();
+                }
+            }
         }
         transform.Translate(velocity);
         if (draggedObject != null)
@@ -223,8 +237,9 @@ public class AlexanderController : MonoBehaviour
             draggedObject.transform.Translate(new Vector3(0, velocity.y, 0));
         }
     }
-    private void HorizontalCollisions(ref Vector3 velocity)
+    private GameObject HorizontalCollisions(ref Vector3 velocity)
     {
+        GameObject collisionObject=null;
         float XDirection = Mathf.Sign(velocity.x);
         float rayLength = Mathf.Abs(velocity.x) + Collisions.SKIN_WIDTH;
         for (int i = 0; i < rayCastOrigins.HorizontalRayCount; i++)
@@ -236,6 +251,7 @@ public class AlexanderController : MonoBehaviour
             Debug.DrawLine(rayOrigin, rayOrigin + (Vector3.right * XDirection * rayLength), Color.red);
             if (hit.collider != null)
             {
+                collisionObject= hit.collider.gameObject;
                 float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
                 if (i == 0 && slopeAngle <= maxClimbSlopeAngle)
                 {
@@ -274,9 +290,9 @@ public class AlexanderController : MonoBehaviour
                     collisionInfo.Left = (XDirection == -1);
                     collisionInfo.Right = (XDirection == 1);
                 }
-
             }
         }
+        return collisionObject;
     }
     private void DraggedHorizontalCollisions(ref Vector3 velocity)//One should merge this with HorizontalCollisions..
     {
@@ -363,8 +379,9 @@ public class AlexanderController : MonoBehaviour
 
         }
     }
-    private void VerticalCollisions(ref Vector3 velocity)
+    private GameObject VerticalCollisions(ref Vector3 velocity)
     {
+        GameObject collisionObject = null;
         float YDirection = Mathf.Sign(velocity.y);
         float rayLength = Mathf.Abs(velocity.y) + Collisions.SKIN_WIDTH;
         for (int i = 0; i < rayCastOrigins.VerticalRayCount; i++)
@@ -376,6 +393,7 @@ public class AlexanderController : MonoBehaviour
             Debug.DrawLine(rayOrigin, rayOrigin + (Vector3.up * YDirection * rayLength), Color.red);
             if (hit.collider != null)
             {
+                collisionObject = hit.collider.gameObject;
                 velocity.y = (hit.distance - Collisions.SKIN_WIDTH) * YDirection;
                 rayLength = hit.distance;
                 if (collisionInfo.ClimbingSlope)
@@ -403,6 +421,7 @@ public class AlexanderController : MonoBehaviour
                 }
             }
         }
+        return collisionObject;
     }
     private void ChangeAnchorPosition()
     {
