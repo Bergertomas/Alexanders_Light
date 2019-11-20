@@ -3,10 +3,12 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using GreatArcStudios;
 
 public class MasterController : MonoBehaviour
 {
     CourageManager cm;
+    public PauseManager pm;
     public event Action RevertToPreviousCheckPoint;
     public event CheckPointDelegate CheckPointReached;
 
@@ -29,6 +31,8 @@ public class MasterController : MonoBehaviour
     {
         cm = GetComponent<CourageManager>();
         cm.CourageDepleted += ResetGame;
+        pm.GetComponent<PauseManager>();
+        pm.RestartGame += ResetGame;
         DeathPit[] deathPits= FindObjectsOfType<DeathPit>();
         for (int i = 0; i < deathPits.Length; i++)
         {
