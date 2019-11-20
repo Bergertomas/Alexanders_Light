@@ -86,7 +86,9 @@ public class AlexanderController : MonoBehaviour
     private float CameraXOffsetStandingSpeed = 1f;
     private float currentRightSpeed = 0f;
     private float currentLeftSpeed = 0f;
-    private float climbSpeed;
+    [SerializeField]
+    private float climbSpeed = 5.0f;
+    [SerializeField]
     bool canClimb = false;
     // private bool isGrounded;
     /*[SerializeField]
@@ -681,14 +683,18 @@ public class AlexanderController : MonoBehaviour
             //move up/down
             if (yInput != 0)
             {
+                if (yInput > 0)
+                    anim.SetBool("climbing", true);
+
                 state = PlayerStates.Climb;
+                anim.SetBool("hanging", true);
                 currentVelocity.y = yInput;
                 isMoving = true;
-                var moveY = currentVelocity.y * climbSpeed * Time.deltaTime;
+                var moveY = currentVelocity.y * Time.deltaTime;
                 var moveClimb = new Vector2(0, moveY);
                 transform.Translate(moveClimb * Time.deltaTime * climbSpeed);
             }
-            else
+            else if (xInput != 0)
             {
                 isMoving = false;
             }
@@ -696,6 +702,7 @@ public class AlexanderController : MonoBehaviour
 
         if (state == PlayerStates.Climb && Input.GetAxisRaw("Vertical") == 0)
         {
+            anim.SetBool("climbing", false);
             currentVelocity.y = 0f;
         }
 
@@ -909,6 +916,8 @@ public class AlexanderController : MonoBehaviour
     {
         if (other.gameObject.tag == "Ladder")
         {
+            anim.SetBool("hanging", false);
+            anim.SetBool("climbing", false);
             canClimb = false;
             if (state == PlayerStates.Climb)
                 state = PlayerStates.None;
