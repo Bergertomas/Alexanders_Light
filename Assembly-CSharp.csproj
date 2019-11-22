@@ -82,6 +82,7 @@
     <Compile Include="Assets\Grass And Flowers Pack 1\Example Scene\SimpleTextureDrawing.cs" />
     <Compile Include="Assets\InactiveOnAwake.cs" />
     <Compile Include="Assets\Interactable.cs" />
+    <Compile Include="Assets\KeyCharger.cs" />
     <Compile Include="Assets\KeyInventory.cs" />
     <Compile Include="Assets\KeyItem.cs" />
     <Compile Include="Assets\KillableBallInteractable.cs" />
