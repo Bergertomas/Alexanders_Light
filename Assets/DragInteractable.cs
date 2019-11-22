@@ -20,7 +20,7 @@ public class DragInteractable : Interactable
     {
         base.OnStart();
         RayCastOrigins.VerticalRayCount = 5;
-        RayCastOrigins.VerticalRayCount = 4;
+        RayCastOrigins.HorizontalRayCount = 4;
         RB = this.GetComponent<Rigidbody>();
         Collider = this.GetComponent<Collider>();
         MoveToFreeState();

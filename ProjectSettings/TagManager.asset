@@ -9,6 +9,8 @@ TagManager:
   - BOLPusher
   - Ladder
   - Evil
+  - Key
+  - KeyCharger
   layers:
   - Default
   - TransparentFX

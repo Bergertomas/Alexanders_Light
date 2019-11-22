@@ -63,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\AlexanderController.cs" />
+    <Compile Include="Assets\AmplifiedMovingPlatform.cs" />
     <Compile Include="Assets\BallInteractable.cs" />
     <Compile Include="Assets\CameraController.cs" />
     <Compile Include="Assets\CameraController1.cs" />
@@ -83,6 +84,7 @@
     <Compile Include="Assets\Interactable.cs" />
     <Compile Include="Assets\KeyInventory.cs" />
     <Compile Include="Assets\KeyItem.cs" />
+    <Compile Include="Assets\KillableBallInteractable.cs" />
     <Compile Include="Assets\Ladder.cs" />
     <Compile Include="Assets\LightballController.cs" />
     <Compile Include="Assets\LightManager.cs" />
