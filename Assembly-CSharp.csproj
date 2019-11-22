@@ -87,6 +87,7 @@
     <Compile Include="Assets\LightballController.cs" />
     <Compile Include="Assets\LightManager.cs" />
     <Compile Include="Assets\MasterController.cs" />
+    <Compile Include="Assets\MovingPlatform.cs" />
     <Compile Include="Assets\Pause Menu Assets\Scripts\Pausemenu\PauseManager.cs" />
     <Compile Include="Assets\Pause Menu Assets\Scripts\Pausemenu\SaveSettings.cs" />
     <Compile Include="Assets\Pause Menu Assets\Scripts\Utlities\CoroutineUtlities.cs" />

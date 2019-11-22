@@ -232,6 +232,14 @@ public class AlexanderController : MonoBehaviour
                 {
                     collisionObject.GetComponent<Collectible>().Collect();
                 }
+                else if (collisionObject.GetComponentInParent<MovingPlatform>())
+                {
+                    this.transform.parent = collisionObject.transform.parent;
+                }
+            }
+            else
+            {
+                this.transform.parent = null;
             }
         }
         transform.Translate(velocity);
