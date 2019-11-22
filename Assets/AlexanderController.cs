@@ -114,6 +114,7 @@ public class AlexanderController : MonoBehaviour
     [SerializeField]
     private GameObject graphics;
     private Directions currentDirection = Directions.RIGHT;//the direction the player's currently facing
+    [SerializeField]
     private PlayerStates state = PlayerStates.None;
     private Vector3 positionAtPreviousCheckPoint;
 
@@ -676,8 +677,9 @@ public class AlexanderController : MonoBehaviour
              }*/
         }
 
-        //If the player is in a ladder
-        if (canClimb == true)
+
+        //If the player is in rope distance and midair
+        if (canClimb == true && !collisionInfo.Below)
         {
             float yInput = Input.GetAxisRaw("Vertical");
             //move up/down
@@ -707,6 +709,20 @@ public class AlexanderController : MonoBehaviour
         }
 
         currentVelocity.x = currentHorizontalSpeed;
+
+        if (state == PlayerStates.Climb)
+        {
+            currentVelocity.x = 0;
+
+            if (Input.GetButtonDown("Jump"))
+            {
+                anim.SetBool("midair", true);
+                state = PlayerStates.None;
+                didSomething = true;
+                ReleaseDraggedObject();
+                currentVelocity.y = jumpForce;
+            }
+        }
         Move(currentVelocity * Time.deltaTime);
         #endregion
         if (!isBored)
