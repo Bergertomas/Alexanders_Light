@@ -5,9 +5,10 @@ using UnityEngine.UI;
 
 public class KeyInventory : MonoBehaviour
 {
-    KeyItem collectedKey;
+    KeyCharger targetCharger;
+    KeyItem someKey = null;
     [SerializeField]
-    Dictionary<string, bool> keyBag = new Dictionary<string, bool>();
+    Dictionary<string, KeyItem> keyBag = new Dictionary<string, KeyItem>();
 
     // Start is called before the first frame update
     void Start()
@@ -25,10 +26,20 @@ public class KeyInventory : MonoBehaviour
     {
         if (other.gameObject.tag == "Key")
         {
-            collectedKey = other.gameObject.GetComponent<KeyItem>();
+            Debug.Log("found key");
+            someKey = other.gameObject.GetComponent<KeyItem>();
             Destroy(other.gameObject);
-            keyBag.Add(collectedKey.keyname, collectedKey.keyActive);
-            collectedKey = null;
+            keyBag.Add(someKey.keyname, someKey);
+            Debug.Log(keyBag[someKey.keyname].keyActive);
+            someKey = null;
+        }
+
+        if (other.gameObject.tag == "KeyCharger")
+        {
+            targetCharger = other.gameObject.GetComponent<KeyCharger>();
+            keyBag[targetCharger.chargeableKey].keyActive = true;
+            Debug.Log(keyBag[targetCharger.chargeableKey].keyActive);
+            targetCharger = null;
         }
     }
 }
