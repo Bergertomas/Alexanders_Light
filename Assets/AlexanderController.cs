@@ -725,6 +725,8 @@ public class AlexanderController : MonoBehaviour
             if (Input.GetButtonDown("Jump"))
             {
                 anim.SetBool("midair", true);
+                anim.SetBool("climbing", false);
+                anim.SetBool("hanging", false);
                 state = PlayerStates.None;
                 didSomething = true;
                 ReleaseDraggedObject();
