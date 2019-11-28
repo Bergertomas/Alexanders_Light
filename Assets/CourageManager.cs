@@ -21,6 +21,7 @@ public class CourageManager : MonoBehaviour
     float minHealth = 0f;
     [SerializeField]
     float currentHealth = 50f;
+    private float healthAtPreviousCheckPoint;
     [SerializeField]
     float waitUntilBallArrives = 0.5f;
     [SerializeField]
@@ -34,22 +35,33 @@ public class CourageManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        MasterController.Instance.CheckPointReached += RecordCurrentState;
+        MasterController.Instance.RevertToPreviousCheckPoint += RevertToPreviousCheckPoint;
         lm = GetComponent<LightManager>();
         pControl = FindObjectOfType<AlexanderController>();
         sd = FindObjectOfType<ShadowDetector>();
         courageGauge.minValue = minHealth;
         courageGauge.maxValue = maxHealth;
         //courageGauge.value = courageGauge.maxValue;
-        courageGauge.value = currentHealth;
+        DrawHealthBar();
         //StartCoroutine(IncreaseCourage());
     }
 
+    public void RecordCurrentState(Transform checkPointTransform)
+    {
+        healthAtPreviousCheckPoint = currentHealth;
+    }
+    public void RevertToPreviousCheckPoint()
+    {
+        currentHealth = healthAtPreviousCheckPoint;
+        DrawHealthBar();
+    }
     void IncreaseCourage()
     {
         if (lm.CurrentCharge > 0f)
         {
             currentHealth += (increasePerSecond * Time.deltaTime);
-            courageGauge.value = currentHealth;
+            DrawHealthBar();
             lm.DecreaseLight();
             Debug.Log(courageGauge.value);
             return;
@@ -63,7 +75,8 @@ public class CourageManager : MonoBehaviour
     void DecreaseCourage()
     {
         currentHealth -= (increasePerSecond * Time.deltaTime);
-        courageGauge.value = currentHealth;
+
+        DrawHealthBar();
         //Debug.Log(courageGauge.value);
         if (currentHealth <= 0f)
         {
@@ -71,7 +84,7 @@ public class CourageManager : MonoBehaviour
         }
     }
 
-    
+
     private bool Waited(float seconds)
     {
         timerMax = seconds;
@@ -118,11 +131,16 @@ public class CourageManager : MonoBehaviour
             DecreaseCourage();
         }
     }
-        
+
+
+    private void DrawHealthBar()
+    {
+        courageGauge.value = currentHealth;
+    }
 }
 
 
-    // Update is called once per frame
+// Update is called once per frame
 //    void Update()
 //    {
 //        //If the player is in enough darkness

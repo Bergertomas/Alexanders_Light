@@ -43,13 +43,21 @@ public class LightManager : MonoBehaviour
     [SerializeField]
     float minEmission = 1f;
     [SerializeField]
-    float maxALIntensity = 23f;
+    private float amplifiedEmission = 25f;
     [SerializeField]
-    float minALIntensity = 5f;
+    float maxAreaLightIntensity = 23f;
     [SerializeField]
-    float defaultAmp = 1.5f;
+    float minAreaLightIntensity = 5f;
     [SerializeField]
-    float maxAmp = 4f;
+    private float amplifiedAreaLightIntensity = 30f;
+    [SerializeField]
+    private float amplifiedAreaLightRange = 10f;
+    [SerializeField]
+    private float defaultAreaLightRange = 6f;
+    [SerializeField]
+    private float defaultHaloRange = 1.5f;
+    [SerializeField]
+    private float amplifiedHaloRange = 4f;
     [SerializeField]
     float steps = 2f;
     [SerializeField]
@@ -97,25 +105,29 @@ public class LightManager : MonoBehaviour
 
     void Amplify()
     {
-        if (bControl.State==LightBallStates.Amplify)
+        if (bControl.State == LightBallStates.Amplify)
         {
             //DecreaseLight();
-            if (BoLHaloLight.range < maxAmp-0.01f && currentCharge > 0)
+            if (/*BoLHaloLight.range < amplifiedHaloRange - 0.01f &&*/ currentCharge > 0)
             {
                 //BoLHaloLight.range += (steps * Time.deltaTime);
                 //BoLHaloLight.intensity += (steps * Time.deltaTime);
-                BoLHaloLight.range = Mathf.Lerp(BoLHaloLight.range, maxAmp, steps*Time.deltaTime);
-                BoLHaloLight.intensity = Mathf.Lerp(BoLHaloLight.intensity, maxAmp, steps * Time.deltaTime);
-               // Color newColour = new Color();
-                float newEmission = Mathf.Lerp(BoLMat.GetColor("_EmissionColor").r, 20f, steps * Time.deltaTime); 
+                BoLHaloLight.range = Mathf.Lerp(BoLHaloLight.range, amplifiedHaloRange, steps * Time.deltaTime);
+                //  BoLHaloLight.intensity = Mathf.Lerp(BoLHaloLight.intensity, maxAmp, steps * Time.deltaTime);
+                // Color newColour = new Color();
+                float newEmission = Mathf.Lerp(BoLMat.GetColor("_EmissionColor").r, amplifiedEmission, steps * Time.deltaTime);
                 BoLMat.SetColor("_EmissionColor", new Color(newEmission, newEmission, newEmission, 1.0f));
+                float newIntensity = Mathf.Lerp(BoLAreaLight.intensity, amplifiedAreaLightIntensity, steps * Time.deltaTime);
+                BoLAreaLight.intensity = newIntensity;
+                float newRange = Mathf.Lerp(BoLAreaLight.range, amplifiedAreaLightRange, steps * Time.deltaTime);
+                BoLAreaLight.range = newRange;
             }
         }
         else// if (bControl.isAmp == false)
         {
-            if (BoLHaloLight.range > defaultAmp+0.01f)
+            if (BoLHaloLight.range > defaultHaloLightIntensity + 0.01f)
             {
-                BoLHaloLight.range = Mathf.Lerp(BoLHaloLight.range, defaultAmp, steps * Time.deltaTime);
+                BoLHaloLight.range = Mathf.Lerp(BoLHaloLight.range, defaultHaloLightIntensity, steps * Time.deltaTime);
                 //BoLHaloLight.intensity = Mathf.Lerp(BoLHaloLight.intensity, defaultAmp, steps * Time.deltaTime);
                 //BoLMat.SetColor("_EmissionColor", new Color(0f, 0f, 0f, 1.0f));
                 //BoLHaloLight.range -= (steps * Time.deltaTime);
@@ -137,10 +149,12 @@ public class LightManager : MonoBehaviour
             float newEmission = Mathf.Lerp(BoLMat.GetColor("_EmissionColor").r, emissionIntensity, emissionLerpSteps * Time.deltaTime);
             BoLMat.SetColor("_EmissionColor", new Color(newEmission, newEmission, newEmission, 1.0f));
             //BoLAreaLight.intensity = ((currentCharge / maxCharge) * (maxALIntensity - minALIntensity)) + minALIntensity;
-            float intensity =  Utilities.MapRange(currentCharge, maxCharge, minALIntensity, maxALIntensity);
+            float intensity = Utilities.MapRange(currentCharge, maxCharge, minAreaLightIntensity, maxAreaLightIntensity);
             float newIntensity = Mathf.Lerp(BoLAreaLight.intensity, intensity, emissionLerpSteps * Time.deltaTime);
             BoLAreaLight.intensity = newIntensity;
-            BoLHaloLight.intensity = Mathf.Lerp(BoLHaloLight.intensity, defaultHaloLightIntensity, emissionLerpSteps * Time.deltaTime);
+            float newRange = Mathf.Lerp(BoLAreaLight.range, defaultAreaLightRange, emissionLerpSteps * Time.deltaTime);
+            BoLAreaLight.range = newRange;
+            //BoLHaloLight.intensity = Mathf.Lerp(BoLHaloLight.intensity, defaultHaloLightIntensity, emissionLerpSteps * Time.deltaTime);
         }
 
         // lum.intensity = (maxIntensity * (Charge / maxCharge));
@@ -150,7 +164,7 @@ public class LightManager : MonoBehaviour
 
     void Start()
     {
-        bControl =  FindObjectOfType<LightballController>();
+        bControl = FindObjectOfType<LightballController>();
         currentCharge = 50f;
         lightGauge.minValue = minCharge;
         lightGauge.maxValue = maxCharge;
