@@ -49,8 +49,8 @@ public class DragInteractable : Interactable
     }
     public void MoveToFreeState()
     {
-        RB.constraints = RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY;
-        //RB.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;// | RigidbodyConstraints.FreezePositionX;
+        //RB.constraints = RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY;
+        RB.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;// | RigidbodyConstraints.FreezePositionX;
         RB.isKinematic = false;
         RB.useGravity = true;
     }
