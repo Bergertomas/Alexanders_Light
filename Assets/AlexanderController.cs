@@ -1,4 +1,5 @@
 ﻿//using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -104,12 +105,13 @@ public class AlexanderController : MonoBehaviour
     //bool crawling;
     float courage;
     bool isAlive;
-    private bool isMoving = false;
+    private bool isMovingOnX = false;
     private bool isBored = false;
     public bool isDarknened;
     [SerializeField]
     private float timeToGetBored = 10f;
     private float timeWithoutAction = 0f;
+    private bool didSomethingDurningFrame = false;
     //private bool jumped = false;
     // private float originalLocalScaleX;
     [SerializeField]
@@ -440,10 +442,10 @@ public class AlexanderController : MonoBehaviour
         for (int i = 0; i < 8; i++)
         {
             Vector3 newPos = new Vector3
-              (Random.Range(anchorBackward * (float)currentDirection, anchorForward * (float)currentDirection),
-               Random.Range(anchorDownward, anchorUpward),
+              (UnityEngine.Random.Range(anchorBackward * (float)currentDirection, anchorForward * (float)currentDirection),
+               UnityEngine.Random.Range(anchorDownward, anchorUpward),
                (lbc.IsPushed ? anchorOutWard : 0f));
-            if (isMoving)
+            if (isMovingOnX)
             {
                 newPos += new Vector3(ballAnchorLeadDistance * (float)currentDirection, 0, 0);
             }
@@ -454,12 +456,12 @@ public class AlexanderController : MonoBehaviour
             }
             //Try again if the randomised position aint far enough from the player..
         }
-        Invoke("ChangeAnchorPosition", Random.Range(0.7f, 5f));
+        Invoke("ChangeAnchorPosition", UnityEngine.Random.Range(0.7f, 5f));
         //ballAnchor.transform.position = new Vector3(ballAnchor.transform.position.x, ballAnchor.transform.position.y,ballAnchorZ);
     }
     void Update()
     {
-        bool didSomething = false;
+        didSomethingDurningFrame = false;
         //Draw player so that it looks look he's looking at the appropriate direction
         //graphics.transform.localScale = new Vector3(1 * (float)currentDirection, 1, 1);
         anim.SetBool("crawling", (state == PlayerStates.Crawl));
@@ -473,22 +475,17 @@ public class AlexanderController : MonoBehaviour
             {
                 if (Input.GetButtonDown("Jump"))
                 {
-                    anim.SetBool("midair", true);
-                    state = PlayerStates.None;
-                    didSomething = true;
-                    ReleaseDraggedObject();
-                    currentVelocity.y = jumpForce;
+                    Jump();
                 }
                 else if (Input.GetButtonDown("Interact"))
                 {
                     //ReleaseDraggedObject();
-                    didSomething = true;
+                    
                     Interact();//Hmmm I suppose we can't interact midair
                 }
                 else if (Input.GetButtonDown("Crawl"))
                 {
-
-                    didSomething = true;
+                    didSomethingDurningFrame = true;
                     // crawling = !crawling; )-;
                     if (state == PlayerStates.Crawl)
                     {
@@ -509,12 +506,14 @@ public class AlexanderController : MonoBehaviour
 
         if (state == PlayerStates.Crawl || state == PlayerStates.Drag)
         {
-            if (state == PlayerStates.Crawl)
+            walkSpeed = crawlSpeed;
+            /*if (state == PlayerStates.Crawl)
             {
                 // physicalColliderObject.transform.localScale = new Vector3(1f, 0.5f, 1f);
                 // physicalCollider.bounds.min.y += 1;
             }
-            else if (state == PlayerStates.Drag)
+            else*/
+            if (state == PlayerStates.Drag)
             {
                 if (movedObjRelative.x > 0)
                 {
@@ -526,8 +525,7 @@ public class AlexanderController : MonoBehaviour
                     graphics.transform.localPosition = new Vector3(-0.5f, 0, 0);
                     Debug.Log("moved model to the left");
                 }
-            }
-            walkSpeed = crawlSpeed;
+            }     
             //should the player get horter when he drags?
         }
         else
@@ -535,7 +533,7 @@ public class AlexanderController : MonoBehaviour
             walkSpeed = originalWalkSpeed;
             // physicalColliderObject.transform.localScale = new Vector3(1f, 1f, 1f);      
         }
-        currentVelocity.y += ((currentVelocity.y > 0) ? ascendinGravity : descendinGravity) * Time.deltaTime;
+        
 
         float xInput = Input.GetAxisRaw("Horizontal");
 
@@ -609,7 +607,7 @@ public class AlexanderController : MonoBehaviour
         }*/
         //Debug.Log("Horizontal X: " + Input.GetAxis("Horizontal"));
         #endregion
-        if (xInput != 0)
+        if (xInput != 0&&state!=PlayerStates.Climb)
         {
             anim.SetBool("walking", true);
             //if (state == PlayerStates.Drag)
@@ -617,62 +615,62 @@ public class AlexanderController : MonoBehaviour
             //    anim.SetBool("pushing", true);
             //}
 
-            isMoving = true;
-            didSomething = true;
+            isMovingOnX = true;
+            didSomethingDurningFrame = true;
             if (xInput < 0) //character going right
             {
                 if (currentDirection != Directions.LEFT)
                 {
-                    if (state != PlayerStates.Drag)
-                    {
-                        graphics.transform.eulerAngles = new Vector3(0, 270, 0); //character face left
-                    }
-                    else
-                    {                       
-                        if (movedObjRelative.x > 0)
-                        {
-                            anim.SetBool("pushing", true);
-                        }
-                        else
-                        {
-                            anim.SetBool("pushing", false);
-                        }
-                    }
+
                     ChangeAnchorPosition();
                     currentDirection = Directions.LEFT;
+                }
+                if (state != PlayerStates.Drag)//This part used to be inside  if (currentDirection != Directions.LEFT)
+                {
+                    graphics.transform.eulerAngles = new Vector3(0, 270, 0); //character face left
+                }
+                else
+                {
+                    if (movedObjRelative.x > 0)
+                    {
+                        anim.SetBool("pushing", true);
+                    }
+                    else
+                    {
+                        anim.SetBool("pushing", false);
+                    }
                 }
             }
             else //character going left
             {
                 if (currentDirection != Directions.RIGHT)
+                {           
+                    ChangeAnchorPosition();
+                    currentDirection = Directions.RIGHT;
+                }
+                if (state != PlayerStates.Drag)//This part used to be inside  if (currentDirection != Directions.RIGHT)
                 {
-                    if (state != PlayerStates.Drag)
+                    graphics.transform.eulerAngles = new Vector3(0, 90, 0); //character face right                       
+                }
+                else
+                {
+                    if (movedObjRelative.x < 0)
                     {
-                        graphics.transform.eulerAngles = new Vector3(0, 90, 0); //character face right                       
+                        anim.SetBool("pushing", true);
                     }
                     else
                     {
-                        if (movedObjRelative.x < 0)
-                        {
-                            anim.SetBool("pushing", true);
-                        }
-                        else
-                        {
-                            anim.SetBool("pushing", false);
-                        }
+                        anim.SetBool("pushing", false);
                     }
-                    ChangeAnchorPosition();
-                    currentDirection = Directions.RIGHT;
                 }
             }
         }
         else
         {
-
             //anim.SetBool("pushing", false);
             anim.SetBool("walking", false);
             //Debug.Log("Not Moving");
-            isMoving = false;
+            isMovingOnX = false;
             /* if (CameraXOffset != 0 && currentHorizontalSpeed == 0)
              {
                  if ((Mathf.Abs(CameraXOffset) - ((CameraXOffset / Mathf.Abs(CameraXOffset)) * CameraXOffsetStandingSpeed * Time.deltaTime)) > 0)
@@ -686,57 +684,69 @@ public class AlexanderController : MonoBehaviour
              }*/
         }
 
-
+       
         //If the player is in rope distance and midair
         if (canClimb == true && !collisionInfo.Below)
         {
-            float yInput = Input.GetAxisRaw("Vertical");
-            //move up/down
-            if (yInput != 0)
+            if (Input.GetButtonDown("Vertical"))
             {
-                if (yInput > 0)
-                    anim.SetBool("climbing", true);
-
                 state = PlayerStates.Climb;
-                anim.SetBool("hanging", true);
-                currentVelocity.y = yInput;
-                isMoving = true;
-                var moveY = currentVelocity.y * Time.deltaTime;
-                var moveClimb = new Vector2(0, moveY);
-                transform.Translate(moveClimb * Time.deltaTime * climbSpeed);
-                graphics.transform.eulerAngles = new Vector3(0, 0, 0);
-                transform.position = new Vector3(ropeX, transform.position.y, 0);
             }
-            else if (xInput != 0)
-            {
-                isMoving = false;
-            }
+            /*  else if (xInput != 0)
+              {
+                  isMoving = false;
+              }*/
         }
-
-        if (state == PlayerStates.Climb && Input.GetAxisRaw("Vertical") == 0)
+        
+       /* if (state == PlayerStates.Climb && Input.GetAxisRaw("Vertical") == 0)
         {
             anim.SetBool("climbing", false);
             currentVelocity.y = 0f;
-        }
-
-        currentVelocity.x = currentHorizontalSpeed;
-
+        }*/
+       
         if (state == PlayerStates.Climb)
         {
-            currentVelocity.x = 0;
-
-            if (Input.GetButtonDown("Jump"))
+            float yInput = Input.GetAxisRaw("Vertical");
+            if (yInput != 0)//move up/down
             {
-                anim.SetBool("midair", true);
+                if (yInput > 0)
+                {
+                    anim.SetBool("climbing", true);
+                }
+                
+                anim.SetBool("hanging", true);
+                currentVelocity.y = yInput * climbSpeed;
+                #region commented out on 4.12
+                //var moveY = currentVelocity.y * Time.deltaTime;
+                //var moveClimb = new Vector2(0, moveY);
+                //transform.Translate(moveClimb * Time.deltaTime * climbSpeed);
+                #endregion
+
+                //isMoving = true;
+            }
+            else //if (yInput == 0)
+            {
                 anim.SetBool("climbing", false);
-                anim.SetBool("hanging", false);
-                state = PlayerStates.None;
-                didSomething = true;
-                ReleaseDraggedObject();
-                currentVelocity.y = jumpForce;
+                currentVelocity.y = 0f;
+            }
+            transform.position = new Vector3(ropeX, transform.position.y, 0);
+            graphics.transform.eulerAngles = new Vector3(0, 0, 0);
+            //currentVelocity.x = 0;
+            if (Input.GetButtonDown("Jump")&&xInput!=0)
+            {     
+                Jump();
             }
         }
+        else//Player falls when he's not climbing
+        {
+            currentVelocity.y += ((currentVelocity.y > 0) ? ascendinGravity : descendinGravity) * Time.deltaTime;
+        }  
+        currentVelocity.x = (state==PlayerStates.Climb?0: currentHorizontalSpeed);//Hmm why is this written in such a weird position? moved it down here on 4.12 
         Move(currentVelocity * Time.deltaTime);
+        if (currentVelocity != Vector3.zero)
+        {
+            didSomethingDurningFrame = true;
+        }
         #endregion
         if (!isBored)
         {
@@ -757,11 +767,6 @@ public class AlexanderController : MonoBehaviour
                     CameraXOffset = CameraXOffsetWhenRunning * (float)currentDirection;
                 }*/
             }
-            /* 
-             else*/
-            {
-
-            }
         }
         else if (CameraXOffset != 0)
         {
@@ -775,7 +780,7 @@ public class AlexanderController : MonoBehaviour
             }
         }
 
-        if (!didSomething)
+        if (!didSomethingDurningFrame)
         {
             timeWithoutAction += Time.deltaTime;
             if (timeWithoutAction > timeToGetBored)
@@ -873,6 +878,17 @@ public class AlexanderController : MonoBehaviour
         //Debug.Log("Input X is " + bx + " and input Y is " + by);
     }
 
+    private void Jump()
+    {
+        anim.SetBool("midair", true);
+        anim.SetBool("climbing", false);
+        anim.SetBool("hanging", false);
+        state = PlayerStates.None;
+        didSomethingDurningFrame = true;
+        ReleaseDraggedObject();
+        currentVelocity.y = jumpForce;
+    }
+
     #region draggedObject related:
     public void Grab(DragInteractable grabbed, DragInteractable previousDragged)
     {
@@ -906,6 +922,7 @@ public class AlexanderController : MonoBehaviour
 
     private void Interact()
     {
+        didSomethingDurningFrame = true;
         Debug.Log("Interact");
         DragInteractable currentDraggedObject = draggedObject;
         ReleaseDraggedObject();
