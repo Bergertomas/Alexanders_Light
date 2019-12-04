@@ -6,69 +6,46 @@ using UnityEngine.UI;
 public class KeyInventory : MonoBehaviour
 {
     KeyItem someKey = null;
-    KeyCharger targetCharger;
     KeyLock targetLock;
-    [SerializeField]
-    Dictionary<string, KeyItem> keyBag = new Dictionary<string, KeyItem>();
+    Stack<KeyItem> keybag1 = new Stack<KeyItem>();
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
 
     void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "Key")
         {
             someKey = other.gameObject.GetComponent<KeyItem>();
-            Debug.Log("found keyname " + someKey.keyname);
+            Debug.Log("found key");
             Destroy(other.gameObject);
-            keyBag.Add(someKey.keyname, someKey);
+            keybag1.Push(someKey);
             someKey = null;
+            //TODO: add UI element to represent number of keys held.
+            //easy mode: a picture of the key with number next to it.
+            //hard mode: a line of images of keys. images appear and disappear according to number of keys
         }
 
-        if (other.gameObject.tag == "KeyCharger")
-        {
-            targetCharger = other.gameObject.GetComponent<KeyCharger>();
-            if (keyBag.ContainsKey(targetCharger.chargeableKey))
-            {
-                keyBag[targetCharger.chargeableKey].keyActive = true;
-                Debug.Log(targetCharger.chargeableKey + " is charged");
-            }
-            else
-            {
-                Debug.Log("No key to charge");
-            }
-            targetCharger = null;
-        }
 
         if (other.gameObject.tag == "KeyLock")
         {
             targetLock = other.gameObject.GetComponent<KeyLock>();
-            if (keyBag.ContainsKey(targetLock.rightKey))
+            if (targetLock.unlocked == false)
             {
-                if (keyBag[targetLock.rightKey].keyActive == true)
+                if (keybag1.Count > 0)
                 {
                     targetLock.unlocked = true;
-                    keyBag.Remove(targetLock.rightKey);
-                    Debug.Log("unlocked with keyname " + targetLock.rightKey);
+                    keybag1.Pop();
+                    Debug.Log("unlocked a lock and I have " + keybag1.Count + " keys left");
                 }
                 else
                 {
-                    Debug.Log("key is not charged");
+                    Debug.Log("no keys left for this lock");
                 }
             }
             else
             {
-                Debug.Log("No key");
+                Debug.Log("already unlocked this lock");
             }
+
             targetLock = null;
         }
     }

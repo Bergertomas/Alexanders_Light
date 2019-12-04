@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class KeyItem : MonoBehaviour
 {
-    public string keyname;
     public bool keyActive;
 
     // Start is called before the first frame update
