@@ -100,6 +100,7 @@ public class AlexanderController : MonoBehaviour
     private DragInteractable draggedObject = null;
     private bool dragging = false;
     private Vector3 movedObjRelative;
+    private Vector3 draggedObjectPreviousPosition = Vector3.zero;
     [SerializeField]
     private float interactionDistance = 1f;
     //bool crawling;
@@ -199,8 +200,10 @@ public class AlexanderController : MonoBehaviour
         collisionInfo.VelocityOld = velocity;
         Collisions.UpdateRayCastOrigins(physicalCollider, ref rayCastOrigins);//maybe we shouldnt do this every Move()
         Collisions.CalculateRaySpacing(physicalCollider, ref rayCastOrigins);//maybe we shouldnt do this every Move()
+
         if (draggedObject != null)
         {
+            draggedObjectPreviousPosition = draggedObject.transform.position;
             movedObjRelative = draggedObject.gameObject.transform.InverseTransformPoint(transform.position);
             Collisions.UpdateRayCastOrigins(draggedObject.Collider, ref draggedObject.RayCastOrigins);
             Collisions.CalculateRaySpacing(draggedObject.Collider, ref draggedObject.RayCastOrigins);
@@ -248,7 +251,8 @@ public class AlexanderController : MonoBehaviour
         transform.Translate(velocity);
         if (draggedObject != null)
         {
-            draggedObject.transform.Translate(new Vector3(0, velocity.y, 0));
+            draggedObject.transform.position = draggedObjectPreviousPosition;//an ugly solution to an ugly problem...
+            draggedObject.transform.Translate(new Vector3(velocity.x, velocity.y, 0));
         }
     }
     private GameObject HorizontalCollisions(ref Vector3 velocity)
@@ -345,7 +349,7 @@ public class AlexanderController : MonoBehaviour
                     rayLength = hit.distance;
                 }
 
-            }
+            }   
         }
     }
     private void ClimbSlope(ref Vector3 velocity, float slopeAngle)//Ori does not understand this one at all
@@ -515,14 +519,19 @@ public class AlexanderController : MonoBehaviour
             else*/
             if (state == PlayerStates.Drag)
             {
+                float distanceFromDragged = 0.66f;
                 if (movedObjRelative.x > 0)
                 {
-                    graphics.transform.localPosition = new Vector3(0.5f, 0, 0);
+                    //graphics.transform.localPosition = new Vector3(0.5f, 0, 0);
+                    graphics.transform.localPosition = new Vector3
+                        ((draggedObject.Collider.bounds.max.x-transform.position.x) + distanceFromDragged , 0, 0);
                     Debug.Log("moved model to the right");
                 }
                 else
                 {
-                    graphics.transform.localPosition = new Vector3(-0.5f, 0, 0);
+                    //graphics.transform.localPosition = new Vector3(-0.5f, 0, 0);
+                    graphics.transform.localPosition = new Vector3
+                       ((draggedObject.Collider.bounds.min.x - transform.position.x) -  distanceFromDragged, 0, 0);
                     Debug.Log("moved model to the left");
                 }
             }     
@@ -634,10 +643,12 @@ public class AlexanderController : MonoBehaviour
                     if (movedObjRelative.x > 0)
                     {
                         anim.SetBool("pushing", true);
+                        Debug.Log("anim.SetBool(pushing, true);");
                     }
                     else
                     {
                         anim.SetBool("pushing", false);
+                        Debug.Log("anim.SetBool(pushing, false);");
                     }
                 }
             }
@@ -657,10 +668,12 @@ public class AlexanderController : MonoBehaviour
                     if (movedObjRelative.x < 0)
                     {
                         anim.SetBool("pushing", true);
+                        Debug.Log("anim.SetBool(pushing, true);");
                     }
                     else
                     {
                         anim.SetBool("pushing", false);
+                        Debug.Log("anim.SetBool(pushing, false);");
                     }
                 }
             }

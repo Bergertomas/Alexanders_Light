@@ -83,6 +83,7 @@
     <Compile Include="Assets\InactiveOnAwake.cs" />
     <Compile Include="Assets\Interactable.cs" />
     <Compile Include="Assets\KeyCharger.cs" />
+    <Compile Include="Assets\KeyDoor.cs" />
     <Compile Include="Assets\KeyInventory.cs" />
     <Compile Include="Assets\KeyItem.cs" />
     <Compile Include="Assets\KeyLock.cs" />
