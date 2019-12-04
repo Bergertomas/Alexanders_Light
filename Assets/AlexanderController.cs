@@ -90,6 +90,7 @@ public class AlexanderController : MonoBehaviour
     private float climbSpeed = 5.0f;
     [SerializeField]
     bool canClimb = false;
+    private float ropeX;
     // private bool isGrounded;
     /*[SerializeField]
     float jumpHeight = 2f;
@@ -703,6 +704,8 @@ public class AlexanderController : MonoBehaviour
                 var moveY = currentVelocity.y * Time.deltaTime;
                 var moveClimb = new Vector2(0, moveY);
                 transform.Translate(moveClimb * Time.deltaTime * climbSpeed);
+                graphics.transform.eulerAngles = new Vector3(0, 0, 0);
+                transform.position = new Vector3(ropeX, transform.position.y, 0);
             }
             else if (xInput != 0)
             {
@@ -929,6 +932,7 @@ public class AlexanderController : MonoBehaviour
     {
         if (other.gameObject.tag == "Ladder")
         {
+            ropeX = other.gameObject.transform.position.x;
             canClimb = true;
         }
 
@@ -944,9 +948,13 @@ public class AlexanderController : MonoBehaviour
         {
             anim.SetBool("hanging", false);
             anim.SetBool("climbing", false);
+            //ropeX = other.gameObject.transform.position.x;
             canClimb = false;
             if (state == PlayerStates.Climb)
+            {
                 state = PlayerStates.None;
+            }
+
         }
 
         if (other.gameObject.tag == "Evil")
