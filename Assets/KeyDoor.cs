@@ -1,15 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.Events;
 public class KeyDoor : MonoBehaviour
 {
     public KeyLock[] lockset;
-
+    public UnityEvent OnUnlock;
     //check if all locks are unlocked
     public void CheckForUnlock()
     {
-        for (int i = 0; i < lockset.Length - 1; i++)
+        for (int i = 0; i < lockset.Length; i++)
         {
             if (lockset[i].unlocked == false)
             {
@@ -19,5 +19,10 @@ public class KeyDoor : MonoBehaviour
         }
         //replace this line with door opening instead of destroying itself
         Destroy(this.gameObject);
+    }
+
+    private void Unlock()
+    {
+        OnUnlock.Invoke();
     }
 }

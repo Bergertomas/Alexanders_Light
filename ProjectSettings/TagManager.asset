@@ -10,7 +10,7 @@ TagManager:
   - Ladder
   - Evil
   - Key
-  - KeyCharger
+  - KeyLock
   layers:
   - Default
   - TransparentFX
