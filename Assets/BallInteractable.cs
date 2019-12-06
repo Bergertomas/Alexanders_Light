@@ -3,62 +3,87 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
+
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(Collider))]
 public class BallInteractable : MonoBehaviour
 {
-    //public bool DidInteract = false;
     public UnityEvent WhenInteracting;
     public UnityEvent OnInteract;
     public UnityEvent OnInteractionExit;
-    public UnityEvent OnDeath;
 
-    private bool isDead = false;
+    private int triggerStayCounter = 0;
     private bool interactedPreviousFrame = false;
-    [SerializeField]
-    private float life;
-    private bool beingInteractedWith;
+    protected bool beingInteractedWith;
 
-    public virtual void Interact()
+    protected virtual void Initialise(){ }
+
+    protected virtual void Start()
     {
+        gameObject.layer = 11;//BOLInteractable is 11..
+        MasterController.Instance.CheckPointReached += RecordCurrentState;
+        MasterController.Instance.RevertToPreviousCheckPoint += RevertToPreviousCheckPoint;
+        Initialise();
+    }
 
-        if (life > 0)
+    protected virtual void RecordCurrentState(Transform t) { }
+
+    protected virtual void RevertToPreviousCheckPoint()
+    {
+        beingInteractedWith = false;
+    }
+
+    protected virtual void Interact()
+    {
+      /*  if (life > 0)
         {
             Debug.Log("Interact Life>0");
-            life -= LightManager.Instance.DecreaseLight();
+            life -= LightManager.Instance.DecreaseLight();*/
             WhenInteracting.Invoke();
             if (interactedPreviousFrame == false)
             {
                 interactedPreviousFrame = true;
                 OnInteract.Invoke();
             }
+            /*
         }
         else
         {
             Die();
-        }
+        }*/
     }
-    public virtual void Die()
-    {
-        OnDeath.Invoke();
-        isDead = true;
-    }
+
     private void OnTriggerStay(Collider other)
     {
-        if (!isDead && other.GetComponent<LightballController>() && other.GetComponent<LightballController>().State==LightBallStates.Amplify)
+        if (/*!isDead && */other.GetComponent<LightballController>() && other.GetComponent<LightballController>().State==LightBallStates.Amplify)
         {
-            beingInteractedWith = true;
+            Debug.Log("beingInteractedWith");
+            if (triggerStayCounter < 10)//Update vs FixedUpdate thingy...
+            {
+                triggerStayCounter+=3;
+            }
+            //beingInteractedWith = true;
         }
-        else
+        /*else
         {
             beingInteractedWith = false;
-        }
+        }*/
         /*else if (interactedPreviousFrame == true) {
             interactedPreviousFrame = false;
         }*/
     }
-    private void Update()
+   /* private void LateUpdate()
     {
+        beingInteractedWith = false;
+    }*/
+   
+    protected virtual void Update()
+    {
+        if (triggerStayCounter > 0)//Update vs FixedUpdate thingy...
+        {
+            triggerStayCounter--;
+        }
+        beingInteractedWith = (triggerStayCounter > 0);
         if (beingInteractedWith)
         {
             Interact();
@@ -70,8 +95,4 @@ public class BallInteractable : MonoBehaviour
         }
     }
 
-    private void FixedUpdate()
-    {
-        
-    }
 }

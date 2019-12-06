@@ -1,4 +1,5 @@
 ﻿//using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,6 +14,10 @@ public enum PlayerStates
 public struct RayCastOrigins
 {
     public Vector3 TopLeft, TopRight, BottomLeft, BottomRight;
+    public float HorizontalRaySpacing;
+    public float VerticalRaySpacing;
+    public int HorizontalRayCount;//= 5;
+    public int VerticalRayCount;// = 4;
 }
 public struct CollisionInfo
 {
@@ -29,11 +34,12 @@ public struct CollisionInfo
         DescendingSlope = false;
         PreviousSlopeAngle = CurrentSlopeAngle;
         CurrentSlopeAngle = 0;
-
     }
 }
 public class AlexanderController : MonoBehaviour
 {
+    [SerializeField]
+    Animator anim;
     [SerializeField]
     Rigidbody rigidbody;
     [SerializeField]
@@ -44,14 +50,13 @@ public class AlexanderController : MonoBehaviour
     Collider physicalCollider;
     [SerializeField]
     private float maxClimbSlopeAngle = 60f;
+    [SerializeField]
     private float maxDescendSlopeAngle = 60f;
     private RayCastOrigins rayCastOrigins;
     private CollisionInfo collisionInfo;
-    private int horizontalRayCount = 5;
-    private int verticalRayCount = 4;
-    private float horizontalRaySpacing;
-    private float verticalRaySpacing;
-    private const float SKIN_WIDTH = 0.06f;// 0.01f;
+    private GameObject collisionObject;
+
+
     [SerializeField]
     private float ascendinGravity = -18f;
     [SerializeField]
@@ -82,32 +87,45 @@ public class AlexanderController : MonoBehaviour
     private float CameraXOffsetStandingSpeed = 1f;
     private float currentRightSpeed = 0f;
     private float currentLeftSpeed = 0f;
-    private float climbSpeed;
+    [SerializeField]
+    private float climbSpeed = 5.0f;
+    [SerializeField]
     bool canClimb = false;
+    private float ropeX;
     // private bool isGrounded;
     /*[SerializeField]
     float jumpHeight = 2f;
     [SerializeField]
     float artificialGravity = -0.666f;*/
     private DragInteractable draggedObject = null;
+    private bool dragging = false;
+    private Vector3 movedObjRelative;
+    private Vector3 draggedObjectPreviousPosition = Vector3.zero;
     [SerializeField]
     private float interactionDistance = 1f;
     //bool crawling;
     float courage;
     bool isAlive;
-    private bool isMoving = false;
+    private bool isMovingOnX = false;
     private bool isBored = false;
+    private bool isInsideDarkFire;
+    public event DamageDelegates PlayerIsInsideDarkness;
     [SerializeField]
     private float timeToGetBored = 10f;
     private float timeWithoutAction = 0f;
+    private bool didSomethingDurningFrame = false;
     //private bool jumped = false;
     // private float originalLocalScaleX;
     [SerializeField]
     private GameObject graphics;
     private Directions currentDirection = Directions.RIGHT;//the direction the player's currently facing
+    [SerializeField]
     private PlayerStates state = PlayerStates.None;
+    private Vector3 positionAtPreviousCheckPoint;
 
     public bool hasCalledBoL;
+    [SerializeField]
+    private Transform healPoint;
     public LightballController lbc;
     #region Ball Anchor:
     [Header("Ball Anchor")]
@@ -139,103 +157,218 @@ public class AlexanderController : MonoBehaviour
 
     void Start()
     {
+        MasterController.Instance.CheckPointReached += RecordCurrentState;
+        MasterController.Instance.RevertToPreviousCheckPoint += RevertToPreviousCheckPoint;
         // originalLocalScaleX = transform.localScale.x;
+        rayCastOrigins.HorizontalRayCount = 5;
+        rayCastOrigins.VerticalRayCount = 4;
         ChangeAnchorPosition();
 
-        UpdateRayCastOrigins();
-        CalculateRaySpacing();
+        Collisions.UpdateRayCastOrigins(physicalCollider, ref rayCastOrigins);
+        Collisions.CalculateRaySpacing(physicalCollider, ref rayCastOrigins);
+        DarknessParticles[] darknesses = FindObjectsOfType<DarknessParticles>();
+        for (int i = 0; i < darknesses.Length; i++)
+        {
+            darknesses[i].PlayerIsInsideMe += BeDarkened;
+        }
         //Physics.IgnoreCollision(balloflight.GetComponent<Collider>(), GetComponent<Collider>(),true);
     }
 
-    private void UpdateRayCastOrigins()
+    private void BeDarkened()
     {
-        Bounds bounds = physicalCollider.bounds;
-        bounds.Expand(SKIN_WIDTH * -2);
-        rayCastOrigins.BottomLeft = new Vector2(bounds.min.x, bounds.min.y);
-        rayCastOrigins.BottomRight = new Vector2(bounds.max.x, bounds.min.y);
-        rayCastOrigins.TopLeft = new Vector2(bounds.min.x, bounds.max.y);
-        rayCastOrigins.TopRight = new Vector2(bounds.max.x, bounds.max.y);
+        PlayerIsInsideDarkness.Invoke(false);
     }
-    private void CalculateRaySpacing()
+
+    public void RecordCurrentState(Transform checkPointTransform)
     {
-        Bounds bounds = physicalCollider.bounds;
-        bounds.Expand(SKIN_WIDTH * -2);
-        horizontalRayCount = Mathf.Clamp(horizontalRayCount, 2, int.MaxValue);
-        verticalRayCount = Mathf.Clamp(verticalRayCount, 2, int.MaxValue);
-        horizontalRaySpacing = bounds.size.y / (horizontalRayCount - 1);
-        verticalRaySpacing = bounds.size.x / (verticalRayCount - 1);
+        positionAtPreviousCheckPoint = new Vector3
+            (checkPointTransform.position.x, checkPointTransform.position.y,0);//We dont want the checkpoint to tell us what Z to go to
     }
+    public void RevertToPreviousCheckPoint()
+    {
+        transform.position = positionAtPreviousCheckPoint;
+    }
+    /* private void UpdateRayCastOrigins()
+     {
+         Bounds bounds = physicalCollider.bounds;
+         bounds.Expand(Collisions.SKIN_WIDTH * -2);
+         rayCastOrigins.BottomLeft = new Vector2(bounds.min.x, bounds.min.y);
+         rayCastOrigins.BottomRight = new Vector2(bounds.max.x, bounds.min.y);
+         rayCastOrigins.TopLeft = new Vector2(bounds.min.x, bounds.max.y);
+         rayCastOrigins.TopRight = new Vector2(bounds.max.x, bounds.max.y);
+     }
+    /* private void CalculateRaySpacing()
+     {
+         Bounds bounds = physicalCollider.bounds;
+         bounds.Expand(Collisions.SKIN_WIDTH * -2);
+         horizontalRayCount = Mathf.Clamp(horizontalRayCount, 2, int.MaxValue);
+         verticalRayCount = Mathf.Clamp(verticalRayCount, 2, int.MaxValue);
+         horizontalRaySpacing = bounds.size.y / (horizontalRayCount - 1);
+         verticalRaySpacing = bounds.size.x / (verticalRayCount - 1);
+     }*/
     private void Move(Vector3 velocity)
     {
         collisionInfo.Clear();
         collisionInfo.VelocityOld = velocity;
-        UpdateRayCastOrigins();//maybe we shouldnt do this every Move()
-        CalculateRaySpacing();//maybe we shouldnt do this every Move()
+        Collisions.UpdateRayCastOrigins(physicalCollider, ref rayCastOrigins);//maybe we shouldnt do this every Move()
+        Collisions.CalculateRaySpacing(physicalCollider, ref rayCastOrigins);//maybe we shouldnt do this every Move()
+
+        if (draggedObject != null)
+        {
+            draggedObjectPreviousPosition = draggedObject.transform.position;
+            movedObjRelative = draggedObject.gameObject.transform.InverseTransformPoint(transform.position);
+            Collisions.UpdateRayCastOrigins(draggedObject.Collider, ref draggedObject.RayCastOrigins);
+            Collisions.CalculateRaySpacing(draggedObject.Collider, ref draggedObject.RayCastOrigins);
+            if (velocity.x != 0)
+            {
+                DraggedHorizontalCollisions(ref velocity);
+            }
+            draggedObject.transform.Translate(new Vector3(velocity.x, 0, 0));
+        }
         if (velocity.y < 0)
         {
             DescendSlope(ref velocity);
         }
         if (velocity.x != 0)
         {
-            HorizontalCollisions(ref velocity);
+            collisionObject = HorizontalCollisions(ref velocity);
+            if (collisionObject != null)
+            {
+                if (collisionObject.GetComponent<Collectible>())
+                {
+                    collisionObject.GetComponent<Collectible>().Collect();
+                }
+            }
+;
         }
         if (velocity.y != 0)
         {
-            VerticalCollisions(ref velocity);
+            collisionObject = VerticalCollisions(ref velocity);
+            if (collisionObject != null)
+            {
+                if (collisionObject.GetComponent<Collectible>())
+                {
+                    collisionObject.GetComponent<Collectible>().Collect();
+                }
+                else if (collisionObject.GetComponentInParent<MovingPlatform>()|| collisionObject.GetComponent<AmplifiedMovingPlatform>())
+                {
+                    this.transform.parent = collisionObject.transform.parent;
+                }
+            }
+            else
+            {
+                this.transform.parent = null;
+            }
         }
         transform.Translate(velocity);
+        if (draggedObject != null)
+        {
+            draggedObject.transform.position = draggedObjectPreviousPosition;//an ugly solution to an ugly problem...
+            draggedObject.transform.Translate(new Vector3(velocity.x, velocity.y, 0));
+        }
     }
-    private void HorizontalCollisions(ref Vector3 velocity)
+    private GameObject HorizontalCollisions(ref Vector3 velocity)
     {
+        GameObject collisionObject=null;
         float XDirection = Mathf.Sign(velocity.x);
-        float rayLength = Mathf.Abs(velocity.x) + SKIN_WIDTH;
-        for (int i = 0; i < horizontalRayCount; i++)
+        float rayLength = Mathf.Abs(velocity.x) + Collisions.SKIN_WIDTH;
+        for (int i = 0; i < rayCastOrigins.HorizontalRayCount; i++)
         {
             Vector3 rayOrigin = (XDirection == -1) ? rayCastOrigins.BottomLeft : rayCastOrigins.BottomRight;
-            rayOrigin += Vector3.up * (/*velocity.y +why not? */(horizontalRaySpacing * i));
+            rayOrigin += Vector3.up * (/*velocity.y +why not? */(rayCastOrigins.HorizontalRaySpacing * i));
             RaycastHit hit;
             Physics.Raycast(rayOrigin, Vector3.right * XDirection, out hit, rayLength, collisionMask);
             Debug.DrawLine(rayOrigin, rayOrigin + (Vector3.right * XDirection * rayLength), Color.red);
             if (hit.collider != null)
             {
+                collisionObject= hit.collider.gameObject;
                 float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
-                if(i==0&&slopeAngle<=maxClimbSlopeAngle)
+                if (i == 0 && slopeAngle <= maxClimbSlopeAngle)
                 {
                     if (collisionInfo.DescendingSlope)
                     {
                         collisionInfo.DescendingSlope = false;
-                        velocity= collisionInfo.VelocityOld;
+                        velocity = collisionInfo.VelocityOld;
                     }
                     Debug.Log("Angle:" + slopeAngle);
                     float distanceToSlopeStart = 0;
                     if (slopeAngle != collisionInfo.PreviousSlopeAngle)
                     {
-                        distanceToSlopeStart = hit.distance-SKIN_WIDTH;
+                        distanceToSlopeStart = hit.distance - Collisions.SKIN_WIDTH;
                         velocity.x -= distanceToSlopeStart * XDirection;
                     }
-                    ClimbSlope(ref  velocity, slopeAngle);
+                    ClimbSlope(ref velocity, slopeAngle);
                     velocity.x += distanceToSlopeStart * XDirection;
                 }
-                if(!collisionInfo.ClimbingSlope|| slopeAngle > maxClimbSlopeAngle)
+                if (!collisionInfo.ClimbingSlope || slopeAngle > maxClimbSlopeAngle)
                 {
-                    velocity.x = (hit.distance - SKIN_WIDTH) * XDirection;
-                    rayLength = hit.distance;
-                    if(collisionInfo.ClimbingSlope)
+                    /*if (hit.collider.gameObject.GetComponent<Drag
+                     * ctable>()&& hit.collider.gameObject.GetComponent<DragInteractable>() == draggedObject)
                     {
-                        velocity.y = Mathf.Tan(collisionInfo.CurrentSlopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x);
+                       transform.Translate(-SKIN_WIDTH * XDirection) =  ;
+                    }*/
+                    //else
+                    {
+                        velocity.x = (hit.distance - Collisions.SKIN_WIDTH) * XDirection;
+                        rayLength = hit.distance;
+                        if (collisionInfo.ClimbingSlope)
+                        {
+                            velocity.y = Mathf.Tan(collisionInfo.CurrentSlopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x);
+                        }
                     }
+
                     collisionInfo.Left = (XDirection == -1);
                     collisionInfo.Right = (XDirection == 1);
                 }
-
             }
         }
+        return collisionObject;
     }
-    private void ClimbSlope(ref Vector3 velocity,float slopeAngle)//Ori does not understand this one at all
+    private void DraggedHorizontalCollisions(ref Vector3 velocity)//One should merge this with HorizontalCollisions..
     {
-        float moveDistance =Mathf.Abs( velocity.x);
+        float XDirection = Mathf.Sign(velocity.x);
+        float rayLength = Mathf.Abs(velocity.x) + Collisions.SKIN_WIDTH;
+        for (int i = 0; i < draggedObject.RayCastOrigins.HorizontalRayCount; i++)
+        {
+            Vector3 rayOrigin = (XDirection == -1) ? draggedObject.RayCastOrigins.BottomLeft : draggedObject.RayCastOrigins.BottomRight;
+            rayOrigin += Vector3.up * (/*velocity.y +why not? */(draggedObject.RayCastOrigins.HorizontalRaySpacing * i));
+            RaycastHit hit;
+            Physics.Raycast(rayOrigin, Vector3.right * XDirection, out hit, rayLength, collisionMask);
+            Debug.DrawLine(rayOrigin, rayOrigin + (Vector3.right * XDirection * rayLength), Color.red);
+            if (hit.collider != null)
+            {
+                /* float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
+                 if (i == 0 && slopeAngle <= maxClimbSlopeAngle)
+                 {
+                     if (collisionInfo.DescendingSlope)
+                     {
+                         collisionInfo.DescendingSlope = false;
+                         velocity = collisionInfo.VelocityOld;
+                     }
+                     Debug.Log("Angle:" + slopeAngle);
+                     float distanceToSlopeStart = 0;
+                     if (slopeAngle != collisionInfo.PreviousSlopeAngle)
+                     {
+                         distanceToSlopeStart = hit.distance - Collisions.SKIN_WIDTH;
+                         velocity.x -= distanceToSlopeStart * XDirection;
+                     }
+                     ClimbSlope(ref velocity, slopeAngle);
+                     velocity.x += distanceToSlopeStart * XDirection;
+                 }*/
+                //if (!collisionInfo.ClimbingSlope || slopeAngle > maxClimbSlopeAngle)
+                {
+                    velocity.x = (hit.distance - Collisions.SKIN_WIDTH) * XDirection;
+                    rayLength = hit.distance;
+                }
+
+            }   
+        }
+    }
+    private void ClimbSlope(ref Vector3 velocity, float slopeAngle)//Ori does not understand this one at all
+    {
+        float moveDistance = Mathf.Abs(velocity.x);
         float climbVelocityY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * moveDistance;
-        if( velocity.y<= climbVelocityY)
+        if (velocity.y <= climbVelocityY)
         {
             velocity.y = climbVelocityY;
             velocity.x = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * moveDistance * Mathf.Sign(velocity.x);
@@ -254,7 +387,7 @@ public class AlexanderController : MonoBehaviour
         float XDirection = Mathf.Sign(velocity.x);
         Vector3 rayOrigin = (XDirection == 1 ? rayCastOrigins.BottomLeft : rayCastOrigins.BottomRight);
         RaycastHit hit;
-        Physics.Raycast(rayOrigin, -Vector3.up , out hit, Mathf.Infinity, collisionMask);
+        Physics.Raycast(rayOrigin, -Vector3.up, out hit, Mathf.Infinity, collisionMask);
         if (hit.collider != null)
         {
             float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
@@ -262,7 +395,7 @@ public class AlexanderController : MonoBehaviour
             {
                 if (Mathf.Sign(hit.normal.x) == XDirection)
                 {
-                    if (hit.distance - SKIN_WIDTH <= Mathf.Tan(slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x))
+                    if (hit.distance - Collisions.SKIN_WIDTH <= Mathf.Tan(slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x))
                     {
                         float moveDistance = Mathf.Abs(velocity.x);
                         float descendVelocityY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * moveDistance;
@@ -276,20 +409,22 @@ public class AlexanderController : MonoBehaviour
 
         }
     }
-    private void VerticalCollisions(ref Vector3 velocity)
+    private GameObject VerticalCollisions(ref Vector3 velocity)
     {
+        GameObject collisionObject = null;
         float YDirection = Mathf.Sign(velocity.y);
-        float rayLength = Mathf.Abs(velocity.y) + SKIN_WIDTH;
-        for (int i = 0; i < verticalRayCount; i++)
+        float rayLength = Mathf.Abs(velocity.y) + Collisions.SKIN_WIDTH;
+        for (int i = 0; i < rayCastOrigins.VerticalRayCount; i++)
         {
             Vector3 rayOrigin = (YDirection == -1) ? rayCastOrigins.BottomLeft : rayCastOrigins.TopLeft;
-            rayOrigin += Vector3.right * (velocity.x + (verticalRaySpacing * i));
+            rayOrigin += Vector3.right * (velocity.x + (rayCastOrigins.VerticalRaySpacing * i));
             RaycastHit hit;
             Physics.Raycast(rayOrigin, Vector3.up * YDirection, out hit, rayLength, collisionMask);
             Debug.DrawLine(rayOrigin, rayOrigin + (Vector3.up * YDirection * rayLength), Color.red);
             if (hit.collider != null)
             {
-                velocity.y = (hit.distance - SKIN_WIDTH) * YDirection;
+                collisionObject = hit.collider.gameObject;
+                velocity.y = (hit.distance - Collisions.SKIN_WIDTH) * YDirection;
                 rayLength = hit.distance;
                 if (collisionInfo.ClimbingSlope)
                 {
@@ -302,8 +437,8 @@ public class AlexanderController : MonoBehaviour
         if (collisionInfo.ClimbingSlope)
         {
             float XDirection = Mathf.Sign(velocity.x);
-            rayLength = Mathf.Abs(velocity.x) + SKIN_WIDTH;
-            Vector3 rayOrigin = ((XDirection == -1) ? rayCastOrigins.BottomLeft : rayCastOrigins.BottomRight)+ (velocity.y*Vector3.up);
+            rayLength = Mathf.Abs(velocity.x) + Collisions.SKIN_WIDTH;
+            Vector3 rayOrigin = ((XDirection == -1) ? rayCastOrigins.BottomLeft : rayCastOrigins.BottomRight) + (velocity.y * Vector3.up);
             RaycastHit hit;
             Physics.Raycast(rayOrigin, Vector3.right * XDirection, out hit, rayLength, collisionMask);
             if (hit.collider != null)
@@ -311,21 +446,22 @@ public class AlexanderController : MonoBehaviour
                 float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
                 if (slopeAngle != collisionInfo.CurrentSlopeAngle)
                 {
-                    velocity.x = (hit.distance - SKIN_WIDTH) * XDirection;
+                    velocity.x = (hit.distance - Collisions.SKIN_WIDTH) * XDirection;
                     collisionInfo.CurrentSlopeAngle = slopeAngle;
                 }
             }
         }
+        return collisionObject;
     }
     private void ChangeAnchorPosition()
     {
         for (int i = 0; i < 8; i++)
         {
             Vector3 newPos = new Vector3
-              (Random.Range(anchorBackward * (float)currentDirection, anchorForward * (float)currentDirection),
-               Random.Range(anchorDownward, anchorUpward),
+              (UnityEngine.Random.Range(anchorBackward * (float)currentDirection, anchorForward * (float)currentDirection),
+               UnityEngine.Random.Range(anchorDownward, anchorUpward),
                (lbc.IsPushed ? anchorOutWard : 0f));
-            if (isMoving)
+            if (isMovingOnX)
             {
                 newPos += new Vector3(ballAnchorLeadDistance * (float)currentDirection, 0, 0);
             }
@@ -336,41 +472,45 @@ public class AlexanderController : MonoBehaviour
             }
             //Try again if the randomised position aint far enough from the player..
         }
-        Invoke("ChangeAnchorPosition", Random.Range(0.7f, 5f));
+        Invoke("ChangeAnchorPosition", UnityEngine.Random.Range(0.7f, 5f));
         //ballAnchor.transform.position = new Vector3(ballAnchor.transform.position.x, ballAnchor.transform.position.y,ballAnchorZ);
     }
     void Update()
     {
-        bool didSomething = false;
+        if (isInsideDarkFire)
+        {
+            PlayerIsInsideDarkness(true);
+        }
+        didSomethingDurningFrame = false;
         //Draw player so that it looks look he's looking at the appropriate direction
-        graphics.transform.localScale = new Vector3(1 * (float)currentDirection, 1, 1);
+        //graphics.transform.localScale = new Vector3(1 * (float)currentDirection, 1, 1);
+        anim.SetBool("crawling", (state == PlayerStates.Crawl));
+        anim.SetBool("holding", (state == PlayerStates.Drag));
         #region New collision system 
         if (collisionInfo.Above || collisionInfo.Below)
         {
+            anim.SetBool("midair", false);
             currentVelocity.y = 0;
             if (collisionInfo.Below)
             {
                 if (Input.GetButtonDown("Jump"))
                 {
-                    state = PlayerStates.None;
-                    didSomething = true;
-                    ReleaseDraggedObject();
-                    currentVelocity.y = jumpForce;
+                    Jump();
                 }
                 else if (Input.GetButtonDown("Interact"))
                 {
                     //ReleaseDraggedObject();
-                    didSomething = true;
+                    
                     Interact();//Hmmm I suppose we can't interact midair
                 }
                 else if (Input.GetButtonDown("Crawl"))
                 {
-                    didSomething = true;
+                    didSomethingDurningFrame = true;
                     // crawling = !crawling; )-;
                     if (state == PlayerStates.Crawl)
                     {
                         state = PlayerStates.None;
-                        if(collisionInfo.Below)
+                        if (collisionInfo.Below)
                         {
                             transform.Translate(0, 0.5f, 0);
                         }
@@ -386,20 +526,39 @@ public class AlexanderController : MonoBehaviour
 
         if (state == PlayerStates.Crawl || state == PlayerStates.Drag)
         {
-            if (state == PlayerStates.Crawl)
-            {
-                physicalColliderObject.transform.localScale = new Vector3(1f, 0.5f, 1f);
-               // physicalCollider.bounds.min.y += 1;
-            }
             walkSpeed = crawlSpeed;
+            /*if (state == PlayerStates.Crawl)
+            {
+                // physicalColliderObject.transform.localScale = new Vector3(1f, 0.5f, 1f);
+                // physicalCollider.bounds.min.y += 1;
+            }
+            else*/
+            if (state == PlayerStates.Drag)
+            {
+                float distanceFromDragged = 0.66f;
+                if (movedObjRelative.x > 0)
+                {
+                    //graphics.transform.localPosition = new Vector3(0.5f, 0, 0);
+                    graphics.transform.localPosition = new Vector3
+                        ((draggedObject.Collider.bounds.max.x-transform.position.x) + distanceFromDragged , 0, 0);
+                    Debug.Log("moved model to the right");
+                }
+                else
+                {
+                    //graphics.transform.localPosition = new Vector3(-0.5f, 0, 0);
+                    graphics.transform.localPosition = new Vector3
+                       ((draggedObject.Collider.bounds.min.x - transform.position.x) -  distanceFromDragged, 0, 0);
+                    Debug.Log("moved model to the left");
+                }
+            }     
             //should the player get horter when he drags?
         }
         else
         {
             walkSpeed = originalWalkSpeed;
-            physicalColliderObject.transform.localScale = new Vector3(1f, 1f, 1f);      
+            // physicalColliderObject.transform.localScale = new Vector3(1f, 1f, 1f);      
         }
-        currentVelocity.y += ((currentVelocity.y > 0) ? ascendinGravity : descendinGravity) * Time.deltaTime;
+        
 
         float xInput = Input.GetAxisRaw("Horizontal");
 
@@ -415,14 +574,14 @@ public class AlexanderController : MonoBehaviour
                 currentRightSpeed = walkSpeed;
             }
 
-           /* if (CameraXOffset < CameraXOffsetWhenRunning)
-            {
-                CameraXOffset += CameraXOffsetMovingSpeed * Time.deltaTime;
-            }
-            else
-            {
-                CameraXOffset = CameraXOffsetWhenRunning;
-            }*/
+            /* if (CameraXOffset < CameraXOffsetWhenRunning)
+             {
+                 CameraXOffset += CameraXOffsetMovingSpeed * Time.deltaTime;
+             }
+             else
+             {
+                 CameraXOffset = CameraXOffsetWhenRunning;
+             }*/
         }
         else if (currentRightSpeed != 0)
         {
@@ -446,14 +605,14 @@ public class AlexanderController : MonoBehaviour
                 currentLeftSpeed = -walkSpeed;
             }
 
-           /* if (CameraXOffset > -CameraXOffsetWhenRunning)
-            {
-                CameraXOffset -= CameraXOffsetMovingSpeed * Time.deltaTime;
-            }
-            else
-            {
-                CameraXOffset = -CameraXOffsetWhenRunning;
-            }*/
+            /* if (CameraXOffset > -CameraXOffsetWhenRunning)
+             {
+                 CameraXOffset -= CameraXOffsetMovingSpeed * Time.deltaTime;
+             }
+             else
+             {
+                 CameraXOffset = -CameraXOffsetWhenRunning;
+             }*/
         }
         else if (currentLeftSpeed != 0)
         {
@@ -473,71 +632,150 @@ public class AlexanderController : MonoBehaviour
         }*/
         //Debug.Log("Horizontal X: " + Input.GetAxis("Horizontal"));
         #endregion
-        if (xInput != 0)
+        if (xInput != 0&&state!=PlayerStates.Climb)
         {
-            isMoving = true;
-            didSomething = true;
-            if (xInput < 0)
+            anim.SetBool("walking", true);
+            //if (state == PlayerStates.Drag)
+            //{
+            //    anim.SetBool("pushing", true);
+            //}
+
+            isMovingOnX = true;
+            didSomethingDurningFrame = true;
+            if (xInput < 0) //character going right
             {
                 if (currentDirection != Directions.LEFT)
                 {
+
                     ChangeAnchorPosition();
                     currentDirection = Directions.LEFT;
                 }
+                if (state != PlayerStates.Drag)//This part used to be inside  if (currentDirection != Directions.LEFT)
+                {
+                    graphics.transform.eulerAngles = new Vector3(0, 270, 0); //character face left
+                }
+                else
+                {
+                    if (movedObjRelative.x > 0)
+                    {
+                        anim.SetBool("pushing", true);
+                        Debug.Log("anim.SetBool(pushing, true);");
+                    }
+                    else
+                    {
+                        anim.SetBool("pushing", false);
+                        Debug.Log("anim.SetBool(pushing, false);");
+                    }
+                }
             }
-            else
+            else //character going left
             {
                 if (currentDirection != Directions.RIGHT)
-                {
+                {           
                     ChangeAnchorPosition();
                     currentDirection = Directions.RIGHT;
+                }
+                if (state != PlayerStates.Drag)//This part used to be inside  if (currentDirection != Directions.RIGHT)
+                {
+                    graphics.transform.eulerAngles = new Vector3(0, 90, 0); //character face right                       
+                }
+                else
+                {
+                    if (movedObjRelative.x < 0)
+                    {
+                        anim.SetBool("pushing", true);
+                        Debug.Log("anim.SetBool(pushing, true);");
+                    }
+                    else
+                    {
+                        anim.SetBool("pushing", false);
+                        Debug.Log("anim.SetBool(pushing, false);");
+                    }
                 }
             }
         }
         else
         {
+            //anim.SetBool("pushing", false);
+            anim.SetBool("walking", false);
             //Debug.Log("Not Moving");
-            isMoving = false;
-           /* if (CameraXOffset != 0 && currentHorizontalSpeed == 0)
-            {
-                if ((Mathf.Abs(CameraXOffset) - ((CameraXOffset / Mathf.Abs(CameraXOffset)) * CameraXOffsetStandingSpeed * Time.deltaTime)) > 0)
-                {
-                    CameraXOffset -= (CameraXOffset / Mathf.Abs(CameraXOffset)) * CameraXOffsetStandingSpeed * Time.deltaTime;
-                }
-                else
-                {
-                    CameraXOffset = 0;
-                }
-            }*/
+            isMovingOnX = false;
+            /* if (CameraXOffset != 0 && currentHorizontalSpeed == 0)
+             {
+                 if ((Mathf.Abs(CameraXOffset) - ((CameraXOffset / Mathf.Abs(CameraXOffset)) * CameraXOffsetStandingSpeed * Time.deltaTime)) > 0)
+                 {
+                     CameraXOffset -= (CameraXOffset / Mathf.Abs(CameraXOffset)) * CameraXOffsetStandingSpeed * Time.deltaTime;
+                 }
+                 else
+                 {
+                     CameraXOffset = 0;
+                 }
+             }*/
         }
 
-        //If the player is in a ladder
-        if (canClimb == true)
+       
+        //If the player is in rope distance and midair
+        if (canClimb == true && !collisionInfo.Below)
         {
-            float yInput = Input.GetAxisRaw("Vertical");
-            //move up/down
-            if (yInput != 0)
+            if (Input.GetButtonDown("Vertical"))
             {
                 state = PlayerStates.Climb;
-                currentVelocity.y = yInput;
-                isMoving = true;
-                var moveY = currentVelocity.y * climbSpeed * Time.deltaTime;
-                var moveClimb = new Vector2(0, moveY);
-                transform.Translate(moveClimb * Time.deltaTime * climbSpeed);
             }
-            else
-            {
-                isMoving = false;
-            }
+            /*  else if (xInput != 0)
+              {
+                  isMoving = false;
+              }*/
         }
-
-        if (state == PlayerStates.Climb && Input.GetAxisRaw("Vertical") == 0)
+        
+       /* if (state == PlayerStates.Climb && Input.GetAxisRaw("Vertical") == 0)
         {
+            anim.SetBool("climbing", false);
             currentVelocity.y = 0f;
-        }
+        }*/
+       
+        if (state == PlayerStates.Climb)
+        {
+            float yInput = Input.GetAxisRaw("Vertical");
+            if (yInput != 0)//move up/down
+            {
+                if (yInput > 0)
+                {
+                    anim.SetBool("climbing", true);
+                }
+                
+                anim.SetBool("hanging", true);
+                currentVelocity.y = yInput * climbSpeed;
+                #region commented out on 4.12
+                //var moveY = currentVelocity.y * Time.deltaTime;
+                //var moveClimb = new Vector2(0, moveY);
+                //transform.Translate(moveClimb * Time.deltaTime * climbSpeed);
+                #endregion
 
-        currentVelocity.x = currentHorizontalSpeed;
+                //isMoving = true;
+            }
+            else //if (yInput == 0)
+            {
+                anim.SetBool("climbing", false);
+                currentVelocity.y = 0f;
+            }
+            transform.position = new Vector3(ropeX, transform.position.y, 0);
+            graphics.transform.eulerAngles = new Vector3(0, 0, 0);
+            //currentVelocity.x = 0;
+            if (Input.GetButtonDown("Jump")&&xInput!=0)
+            {     
+                Jump();
+            }
+        }
+        else//Player falls when he's not climbing
+        {
+            currentVelocity.y += ((currentVelocity.y > 0) ? ascendinGravity : descendinGravity) * Time.deltaTime;
+        }  
+        currentVelocity.x = (state==PlayerStates.Climb?0: currentHorizontalSpeed);//Hmm why is this written in such a weird position? moved it down here on 4.12 
         Move(currentVelocity * Time.deltaTime);
+        if (currentVelocity != Vector3.zero)
+        {
+            didSomethingDurningFrame = true;
+        }
         #endregion
         if (!isBored)
         {
@@ -545,30 +783,25 @@ public class AlexanderController : MonoBehaviour
             {
                 //if (Mathf.Abs(CameraXOffset) + CameraXOffsetMovingSpeed * Time.deltaTime< CameraXOffsetWhenRunning)
                 //if (CameraXOffset + ((float)currentDirection) * (CameraXOffsetMovingSpeed * Time.deltaTime) < CameraXOffsetWhenRunning)
-               
-                 CameraXOffset +=((float)currentDirection) * (CameraXOffsetMovingSpeed * Time.deltaTime);
-                 if((currentDirection==Directions.RIGHT&&CameraXOffset> CameraXOffsetWhenRunning)||
-                    (currentDirection == Directions.LEFT && CameraXOffset < -CameraXOffsetWhenRunning))//Ugly math..
-                 {
-                      CameraXOffset = CameraXOffsetWhenRunning * (float)currentDirection;
-                 }
-               
+
+                CameraXOffset += ((float)currentDirection) * (CameraXOffsetMovingSpeed * Time.deltaTime);
+                if ((currentDirection == Directions.RIGHT && CameraXOffset > CameraXOffsetWhenRunning) ||
+                   (currentDirection == Directions.LEFT && CameraXOffset < -CameraXOffsetWhenRunning))//Ugly math..
+                {
+                    CameraXOffset = CameraXOffsetWhenRunning * (float)currentDirection;
+                }
+
                 /*else
                 {
                     CameraXOffset = CameraXOffsetWhenRunning * (float)currentDirection;
                 }*/
             }
-           /* 
-            else*/
-            {
-                
-            }
         }
-        else if(CameraXOffset!=0)
+        else if (CameraXOffset != 0)
         {
-            if ((Mathf.Abs(CameraXOffset)- (CameraXOffsetStandingSpeed * Time.deltaTime))>0)
+            if ((Mathf.Abs(CameraXOffset) - (CameraXOffsetStandingSpeed * Time.deltaTime)) > 0)
             {
-                CameraXOffset -=(Mathf.Abs(CameraXOffset) /CameraXOffset)* CameraXOffsetStandingSpeed * Time.deltaTime;
+                CameraXOffset -= (Mathf.Abs(CameraXOffset) / CameraXOffset) * CameraXOffsetStandingSpeed * Time.deltaTime;
             }
             else
             {
@@ -576,7 +809,7 @@ public class AlexanderController : MonoBehaviour
             }
         }
 
-        if (!didSomething)
+        if (!didSomethingDurningFrame)
         {
             timeWithoutAction += Time.deltaTime;
             if (timeWithoutAction > timeToGetBored)
@@ -618,7 +851,7 @@ public class AlexanderController : MonoBehaviour
 
             if (bmove.magnitude < 0.01f && lbc.State != LightBallStates.Amplify)//if (Input.GetAxisRaw("BallHorizontal") == 0.0f && Input.GetAxisRaw("BallVertical") == 0.0f)
             {
-                lbc.transform.position = Vector3.Lerp(lbc.transform.position, lbc.targetSpot.position, Time.deltaTime * lbc.IdleMovementSpeed);
+                lbc.transform.position = Vector3.Lerp(lbc.transform.position, ballAnchor.transform.position, Time.deltaTime * lbc.IdleMovementSpeed);
             }
             if (Input.GetButton("DragBOL"))//Moving with the mouse
             {
@@ -637,7 +870,7 @@ public class AlexanderController : MonoBehaviour
                 }
                 else
                 {
-                    lbc.transform.position = Vector3.Lerp(lbc.transform.position, this.transform.position, Time.deltaTime * lbc.HealMovementSpeed);
+                    lbc.transform.position = Vector3.Lerp(lbc.transform.position, healPoint.position + new Vector3((float)currentDirection * 0.3f, 0.8f, 0), Time.deltaTime * lbc.HealMovementSpeed);
                 }
             }
             else if (lbc.State == LightBallStates.Charge)
@@ -674,6 +907,17 @@ public class AlexanderController : MonoBehaviour
         //Debug.Log("Input X is " + bx + " and input Y is " + by);
     }
 
+    private void Jump()
+    {
+        anim.SetBool("midair", true);
+        anim.SetBool("climbing", false);
+        anim.SetBool("hanging", false);
+        state = PlayerStates.None;
+        didSomethingDurningFrame = true;
+        ReleaseDraggedObject();
+        currentVelocity.y = jumpForce;
+    }
+
     #region draggedObject related:
     public void Grab(DragInteractable grabbed, DragInteractable previousDragged)
     {
@@ -681,7 +925,7 @@ public class AlexanderController : MonoBehaviour
         {
             draggedObject = grabbed;
             draggedObject.MoveToDraggedState();
-            draggedObject.transform.parent = this.gameObject.transform;
+            //draggedObject.transform.parent = this.gameObject.transform;
             //Joint joint= draggedObject.gameObject.AddComponent<FixedJoint>();
             //joint.connectedBody = rigidbody;
             state = PlayerStates.Drag;
@@ -696,22 +940,28 @@ public class AlexanderController : MonoBehaviour
              {
                  Destroy(draggedObject.gameObject.GetComponent<FixedJoint>());
              }*/
-            draggedObject.transform.parent = null;
+            //draggedObject.transform.parent = null;
             draggedObject.MoveToFreeState();
             draggedObject = null;
             state = PlayerStates.None;
+            graphics.transform.localPosition = new Vector3(0, 0, 0);
         }
     }
     #endregion
 
     private void Interact()
     {
+        didSomethingDurningFrame = true;
+        Debug.Log("Interact");
         DragInteractable currentDraggedObject = draggedObject;
         ReleaseDraggedObject();
         RaycastHit interactionHit;
-        Physics.Raycast(this.transform.position, Vector3.right * (float)currentDirection, out interactionHit, interactionDistance);
+        Vector3 rayOrigin = physicalCollider.transform.position + new Vector3(0, 0.5f, 0);
+        Physics.Raycast(rayOrigin, Vector3.right * (float)currentDirection, out interactionHit, interactionDistance, collisionMask);//TODO-send more than one ray
+        Debug.DrawLine(rayOrigin, rayOrigin + (Vector3.right * (float)currentDirection * interactionDistance), Color.yellow, 0.5f);
         if (interactionHit.collider != null)
         {
+            Debug.Log("interactionHit.collider != null");
             GameObject hitObject = interactionHit.collider.gameObject;
             if (hitObject.GetComponent<Interactable>())
             {
@@ -728,16 +978,34 @@ public class AlexanderController : MonoBehaviour
     {
         if (other.gameObject.tag == "Ladder")
         {
+            ropeX = other.gameObject.transform.position.x;
             canClimb = true;
+        }
+
+        if (other.gameObject.tag == "Evil")
+        {
+            isInsideDarkFire = true;
+            //Debug.Log("2spooky4me");
         }
     }
     void OnTriggerExit(Collider other)
     {
         if (other.gameObject.tag == "Ladder")
         {
+            anim.SetBool("hanging", false);
+            anim.SetBool("climbing", false);
+            //ropeX = other.gameObject.transform.position.x;
             canClimb = false;
             if (state == PlayerStates.Climb)
+            {
                 state = PlayerStates.None;
+            }
+
+        }
+
+        if (other.gameObject.tag == "Evil")
+        {
+            isInsideDarkFire = false;
         }
     }
 

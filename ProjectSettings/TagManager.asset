@@ -8,6 +8,9 @@ TagManager:
   - BOL
   - BOLPusher
   - Ladder
+  - Evil
+  - Key
+  - KeyLock
   layers:
   - Default
   - TransparentFX
@@ -20,7 +23,7 @@ TagManager:
   - Player
   - BOLPusher
   - BOL
-  - 
+  - BOLInteractable
   - 
   - 
   - 

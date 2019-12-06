@@ -22,7 +22,7 @@ public class LightballController : MonoBehaviour
     //[SerializeField]
     //private LightManager lm;
 
-    public Transform targetSpot;
+    //public Transform targetSpot;
     public float ControlledSpeed = 6f;
     public float IdleMovementSpeed = 4f;
     public float HealMovementSpeed = 8f;

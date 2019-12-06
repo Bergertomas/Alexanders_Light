@@ -63,22 +63,42 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\AlexanderController.cs" />
+    <Compile Include="Assets\AmplifiedMovingPlatform.cs" />
     <Compile Include="Assets\BallInteractable.cs" />
     <Compile Include="Assets\CameraController.cs" />
     <Compile Include="Assets\CameraController1.cs" />
     <Compile Include="Assets\CameraRapist.cs" />
     <Compile Include="Assets\CameraRapistCollider.cs" />
     <Compile Include="Assets\Charger.cs" />
+    <Compile Include="Assets\CheckPoint.cs" />
+    <Compile Include="Assets\Collectible.cs" />
+    <Compile Include="Assets\ColliderRemover.cs" />
+    <Compile Include="Assets\Collisions.cs" />
     <Compile Include="Assets\CourageManager.cs" />
+    <Compile Include="Assets\DarkFire.cs" />
+    <Compile Include="Assets\Darkness.cs" />
+    <Compile Include="Assets\DarknessParticles.cs" />
+    <Compile Include="Assets\DeathPit.cs" />
     <Compile Include="Assets\DragInteractable.cs" />
     <Compile Include="Assets\Fantasy Forest Environment\Scripts\TexturePan.cs" />
     <Compile Include="Assets\Grass And Flowers Pack 1\Example Scene\SimpleTextureDrawing.cs" />
     <Compile Include="Assets\InactiveOnAwake.cs" />
     <Compile Include="Assets\Interactable.cs" />
+    <Compile Include="Assets\KeyCharger.cs" />
+    <Compile Include="Assets\KeyDoor.cs" />
+    <Compile Include="Assets\KeyInventory.cs" />
+    <Compile Include="Assets\KeyItem.cs" />
+    <Compile Include="Assets\KeyLock.cs" />
+    <Compile Include="Assets\KillableBallInteractable.cs" />
     <Compile Include="Assets\Ladder.cs" />
     <Compile Include="Assets\LightballController.cs" />
     <Compile Include="Assets\LightManager.cs" />
     <Compile Include="Assets\MasterController.cs" />
+    <Compile Include="Assets\MovingPlatform.cs" />
+    <Compile Include="Assets\Pause Menu Assets\Scripts\Pausemenu\PauseManager.cs" />
+    <Compile Include="Assets\Pause Menu Assets\Scripts\Pausemenu\SaveSettings.cs" />
+    <Compile Include="Assets\Pause Menu Assets\Scripts\Utlities\CoroutineUtlities.cs" />
+    <Compile Include="Assets\Pause Menu Assets\Scripts\Utlities\Rotate.cs" />
     <Compile Include="Assets\PlatformCollision.cs" />
     <Compile Include="Assets\PlayerController.cs" />
     <Compile Include="Assets\PushInteractable.cs" />
@@ -132,9 +152,11 @@
     <Compile Include="Assets\Unused\BallPusherCollider.cs" />
     <Compile Include="Assets\Unused\Unused.cs" />
     <Compile Include="Assets\Utilities.cs" />
+    <None Include="Assets\Pause Menu Assets\Fonts\open-sans\Apache License.txt" />
     <None Include="Assets\MegaPack1Lite\RomanCityPack1Lite\README.txt" />
     <None Include="Assets\Grass And Flowers Pack 1\Example Scene\Skyboxes\_skybox info.txt" />
     <None Include="Assets\MegaPack1Lite\EnchantedForestPack1\README.txt" />
+    <None Include="Assets\Pause Menu Assets\Fonts\exo\SIL Open Font License.txt" />
     <None Include="Assets\MegaPack1Lite\TropicalIslandPack1\README.txt" />
     <None Include="Assets\MegaPack1Lite\ToolsAndWeapons\README.txt" />
     <None Include="Assets\Fantasy Forest Environment\Shaders\VS_indirect.cginc" />
@@ -143,49 +165,49 @@
     <None Include="Assets\MegaPack1Lite\Steampunk\README.txt" />
     <None Include="Assets\MegaPack1Lite\SciFiPack1\README.txt" />
     <Reference Include="Unity.Timeline.Editor">
-      <HintPath>E:/Unity/AlexandersLight/Alex/Alexanders_Light/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
+      <HintPath>E:/Unity/AlexandersLight/27.11/Alexanders_Light/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VSCode.Editor">
-      <HintPath>E:/Unity/AlexandersLight/Alex/Alexanders_Light/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
+      <HintPath>E:/Unity/AlexandersLight/27.11/Alexanders_Light/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro.Editor">
-      <HintPath>E:/Unity/AlexandersLight/Alex/Alexanders_Light/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
+      <HintPath>E:/Unity/AlexandersLight/27.11/Alexanders_Light/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>E:/Unity/AlexandersLight/Alex/Alexanders_Light/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
+      <HintPath>E:/Unity/AlexandersLight/27.11/Alexanders_Light/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Timeline">
-      <HintPath>E:/Unity/AlexandersLight/Alex/Alexanders_Light/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
+      <HintPath>E:/Unity/AlexandersLight/27.11/Alexanders_Light/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
     </Reference>
     <Reference Include="Unity.CollabProxy.Editor">
-      <HintPath>E:/Unity/AlexandersLight/Alex/Alexanders_Light/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
+      <HintPath>E:/Unity/AlexandersLight/27.11/Alexanders_Light/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Postprocessing.Editor">
-      <HintPath>E:/Unity/AlexandersLight/Alex/Alexanders_Light/Library/ScriptAssemblies/Unity.Postprocessing.Editor.dll</HintPath>
+      <HintPath>E:/Unity/AlexandersLight/27.11/Alexanders_Light/Library/ScriptAssemblies/Unity.Postprocessing.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Rider.Editor">
-      <HintPath>E:/Unity/AlexandersLight/Alex/Alexanders_Light/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
+      <HintPath>E:/Unity/AlexandersLight/27.11/Alexanders_Light/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.2D.Sprite.Editor">
-      <HintPath>E:/Unity/AlexandersLight/Alex/Alexanders_Light/Library/ScriptAssemblies/Unity.2D.Sprite.Editor.dll</HintPath>
+      <HintPath>E:/Unity/AlexandersLight/27.11/Alexanders_Light/Library/ScriptAssemblies/Unity.2D.Sprite.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Postprocessing.Runtime">
-      <HintPath>E:/Unity/AlexandersLight/Alex/Alexanders_Light/Library/ScriptAssemblies/Unity.Postprocessing.Runtime.dll</HintPath>
+      <HintPath>E:/Unity/AlexandersLight/27.11/Alexanders_Light/Library/ScriptAssemblies/Unity.Postprocessing.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="Unity.2D.Tilemap.Editor">
-      <HintPath>E:/Unity/AlexandersLight/Alex/Alexanders_Light/Library/ScriptAssemblies/Unity.2D.Tilemap.Editor.dll</HintPath>
+      <HintPath>E:/Unity/AlexandersLight/27.11/Alexanders_Light/Library/ScriptAssemblies/Unity.2D.Tilemap.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VisualStudio.Editor">
-      <HintPath>E:/Unity/AlexandersLight/Alex/Alexanders_Light/Library/ScriptAssemblies/Unity.VisualStudio.Editor.dll</HintPath>
+      <HintPath>E:/Unity/AlexandersLight/27.11/Alexanders_Light/Library/ScriptAssemblies/Unity.VisualStudio.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
-      <HintPath>E:/Unity/AlexandersLight/Alex/Alexanders_Light/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
+      <HintPath>E:/Unity/AlexandersLight/27.11/Alexanders_Light/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.DataPrivacy">
-      <HintPath>E:/Unity/AlexandersLight/Alex/Alexanders_Light/Library/ScriptAssemblies/Unity.Analytics.DataPrivacy.dll</HintPath>
+      <HintPath>E:/Unity/AlexandersLight/27.11/Alexanders_Light/Library/ScriptAssemblies/Unity.Analytics.DataPrivacy.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.UI">
-      <HintPath>E:/Unity/AlexandersLight/Alex/Alexanders_Light/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
+      <HintPath>E:/Unity/AlexandersLight/27.11/Alexanders_Light/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AIModule">
       <HintPath>C:/Program Files/Unity/2019.2.11f1/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>
@@ -365,13 +387,13 @@
       <HintPath>C:/Program Files/Unity/2019.2.11f1/Editor/Data/Managed/UnityEngine/UnityEngine.XRModule.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.Editor">
-      <HintPath>E:/Unity/AlexandersLight/Alex/Alexanders_Light/Library/PackageCache/com.unity.analytics@3.3.2/Unity.Analytics.Editor.dll</HintPath>
+      <HintPath>E:/Unity/AlexandersLight/27.11/Alexanders_Light/Library/PackageCache/com.unity.analytics@3.3.2/Unity.Analytics.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.StandardEvents">
-      <HintPath>E:/Unity/AlexandersLight/Alex/Alexanders_Light/Library/PackageCache/com.unity.analytics@3.3.2/Unity.Analytics.StandardEvents.dll</HintPath>
+      <HintPath>E:/Unity/AlexandersLight/27.11/Alexanders_Light/Library/PackageCache/com.unity.analytics@3.3.2/Unity.Analytics.StandardEvents.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.Tracker">
-      <HintPath>E:/Unity/AlexandersLight/Alex/Alexanders_Light/Library/PackageCache/com.unity.analytics@3.3.2/Unity.Analytics.Tracker.dll</HintPath>
+      <HintPath>E:/Unity/AlexandersLight/27.11/Alexanders_Light/Library/PackageCache/com.unity.analytics@3.3.2/Unity.Analytics.Tracker.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>C:/Program Files/Unity/2019.2.11f1/Editor/Data/MonoBleedingEdge/lib/mono/4.7.1-api/mscorlib.dll</HintPath>

@@ -12,12 +12,15 @@ public class CameraController : MonoBehaviour
     [SerializeField]
     private float normalYSpeed = 5f;
     [SerializeField]
+    private float fieldOfViewSpeed = 2f;
+    [SerializeField]
     private float currentXSpeed = 5f;
     [SerializeField]
     private float currentYSpeed = 5f;
     [SerializeField]
     private float yOffsetFromPlayer = 1;
-
+    private float originalFieldOfView;
+   // private float currentFieldOfView;
     private void LowerSpeed()
     {
         //if (rapists.Count < 1)
@@ -45,12 +48,18 @@ public class CameraController : MonoBehaviour
             Destroy(this);
         }
     }
+    private void Start()
+    {
+        player = FindObjectOfType<AlexanderController>();
+        originalFieldOfView = Camera.main.fieldOfView;
+    }
 
     public void AddRapist(CameraRapist rapist)
     {
         if (!rapists.Contains(rapist))
         {
             rapists.Add(rapist);
+            rapist.RapistStrength = 0;
             // LowerSpeed();
         }
         else
@@ -93,24 +102,39 @@ public class CameraController : MonoBehaviour
         }
         float newX = 0; //this.transform.position.x;
         float newY = 0;// this.transform.position.y;
+        float newFieldOfView = 0;
+        float fieldOfViewModifier = 0;
         //float playerXOffset = player.currentHorizontalSpeed * xOffsetWhenRunning;
         if (rapists.Count > 0)
         {
             float membersX = 0f;
             float membersY = 0f;
-            int numberOfMembers = 0;
+            float numberOfMembers = 0;
+            CameraRapist removableRapist = null;
             foreach (CameraRapist r in rapists)
             {
-                numberOfMembers += r.PlayerStrength + r.RapistStrength;
-                membersX +=
-                  (((player.transform.position.x + player.CameraXOffset) - this.transform.position.x) * r.PlayerStrength) +
-                  ((r.Centre.position.x - this.transform.position.x) * r.RapistStrength);
-                membersY +=
-                  (((player.transform.position.y + yOffsetFromPlayer) - this.transform.position.y) * r.PlayerStrength) +
-                  ((r.Centre.position.y - this.transform.position.y) * r.RapistStrength);
+                
+                     numberOfMembers += r.PlayerStrength + r.RapistStrength;
+                    membersX +=
+                      (((player.transform.position.x + player.CameraXOffset) - this.transform.position.x) * r.PlayerStrength) +
+                      ((r.Centre.position.x - this.transform.position.x) * r.RapistStrength);
+                    membersY +=
+                      (((player.transform.position.y + yOffsetFromPlayer) - this.transform.position.y) * r.PlayerStrength) +
+                      ((r.Centre.position.y - this.transform.position.y) * r.RapistStrength);
+                fieldOfViewModifier += r.FieldOfViewModifier;
+                    r.RapistUpdate();
+               if (!r.gameObject.activeSelf)
+               {
+                    removableRapist = r;
+               }
             }
             newX += (membersX / (float)numberOfMembers);
             newY += (membersY / (float)numberOfMembers);
+            fieldOfViewModifier/= (float)rapists.Count;
+            if (removableRapist != null)//We're doing it this way cause we cant modify a list while going through it..
+            {
+                RemoveRapist(removableRapist);
+            }
         }
         else//Normal noncoersive camera movement
         {
@@ -122,7 +146,9 @@ public class CameraController : MonoBehaviour
         //TODO- we might wanna change the speed on certain occasions, like existing a rapist
         newX = (newX * currentXSpeed * Time.deltaTime) + this.transform.position.x;
         newY = (newY * currentYSpeed * Time.deltaTime) + this.transform.position.y;
-
+        newFieldOfView = (((originalFieldOfView + fieldOfViewModifier) - Camera.main.fieldOfView) * Time.deltaTime*fieldOfViewSpeed)
+            + Camera.main.fieldOfView;
         transform.position = new Vector3(newX, newY, transform.position.z);
+        Camera.main.fieldOfView = newFieldOfView;
     }
 }
