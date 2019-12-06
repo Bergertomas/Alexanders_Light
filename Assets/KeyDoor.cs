@@ -18,7 +18,8 @@ public class KeyDoor : MonoBehaviour
             }
         }
         //replace this line with door opening instead of destroying itself
-        Destroy(this.gameObject);
+        //  Destroy(this.gameObject);
+        Unlock();
     }
 
     private void Unlock()

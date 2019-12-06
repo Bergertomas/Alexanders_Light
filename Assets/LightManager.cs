@@ -34,7 +34,8 @@ public class LightManager : MonoBehaviour
             return currentCharge;
         }
     }
-    public float sphereRadius = 10f;
+    private float chargeAtPreviousCheckPoint;
+    //public float sphereRadius = 10f;
     private string chargeableTag = "Chargeable";
     [SerializeField]
     float chargePerTick = 4f;
@@ -164,6 +165,8 @@ public class LightManager : MonoBehaviour
 
     void Start()
     {
+        MasterController.Instance.CheckPointReached += RecordCurrentState;
+        MasterController.Instance.RevertToPreviousCheckPoint += RevertToPreviousCheckPoint;
         bControl = FindObjectOfType<LightballController>();
         currentCharge = 50f;
         lightGauge.minValue = minCharge;
@@ -171,17 +174,31 @@ public class LightManager : MonoBehaviour
         lightGauge.value = currentCharge;
     }
 
+    public void RecordCurrentState(Transform checkPointTransform)
+    {
+        chargeAtPreviousCheckPoint = currentCharge;
+    }
+    public void RevertToPreviousCheckPoint()
+    {
+        currentCharge = chargeAtPreviousCheckPoint;
+        DrawChargeBar();
+    }
     void IncreaseLight()
     {
         currentCharge += (increasePerSecond * Time.deltaTime);
-        lightGauge.value = currentCharge;
+        DrawChargeBar();
     }
 
     public float DecreaseLight()
     {
         currentCharge -= (decreasePerSecond * Time.deltaTime);
-        lightGauge.value = currentCharge;
+        DrawChargeBar();
         return (decreasePerSecond * Time.deltaTime);
+    }
+
+    private void DrawChargeBar()
+    {
+        lightGauge.value = currentCharge;
     }
 }
 
