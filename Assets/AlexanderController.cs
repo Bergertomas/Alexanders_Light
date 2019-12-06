@@ -108,7 +108,8 @@ public class AlexanderController : MonoBehaviour
     bool isAlive;
     private bool isMovingOnX = false;
     private bool isBored = false;
-    public bool isDarknened;
+    private bool isInsideDarkFire;
+    public event DamageDelegates PlayerIsInsideDarkness;
     [SerializeField]
     private float timeToGetBored = 10f;
     private float timeWithoutAction = 0f;
@@ -165,8 +166,19 @@ public class AlexanderController : MonoBehaviour
 
         Collisions.UpdateRayCastOrigins(physicalCollider, ref rayCastOrigins);
         Collisions.CalculateRaySpacing(physicalCollider, ref rayCastOrigins);
+        DarknessParticles[] darknesses = FindObjectsOfType<DarknessParticles>();
+        for (int i = 0; i < darknesses.Length; i++)
+        {
+            darknesses[i].PlayerIsInsideMe += BeDarkened;
+        }
         //Physics.IgnoreCollision(balloflight.GetComponent<Collider>(), GetComponent<Collider>(),true);
     }
+
+    private void BeDarkened()
+    {
+        PlayerIsInsideDarkness.Invoke(false);
+    }
+
     public void RecordCurrentState(Transform checkPointTransform)
     {
         positionAtPreviousCheckPoint = new Vector3
@@ -465,6 +477,10 @@ public class AlexanderController : MonoBehaviour
     }
     void Update()
     {
+        if (isInsideDarkFire)
+        {
+            PlayerIsInsideDarkness(true);
+        }
         didSomethingDurningFrame = false;
         //Draw player so that it looks look he's looking at the appropriate direction
         //graphics.transform.localScale = new Vector3(1 * (float)currentDirection, 1, 1);
@@ -968,7 +984,7 @@ public class AlexanderController : MonoBehaviour
 
         if (other.gameObject.tag == "Evil")
         {
-            isDarknened = true;
+            isInsideDarkFire = true;
             //Debug.Log("2spooky4me");
         }
     }
@@ -989,7 +1005,7 @@ public class AlexanderController : MonoBehaviour
 
         if (other.gameObject.tag == "Evil")
         {
-            isDarknened = false;
+            isInsideDarkFire = false;
         }
     }
 

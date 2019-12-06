@@ -20,6 +20,7 @@ public class BallInteractable : MonoBehaviour
 
     protected virtual void Start()
     {
+        gameObject.layer = 11;//BOLInteractable is 11..
         MasterController.Instance.CheckPointReached += RecordCurrentState;
         MasterController.Instance.RevertToPreviousCheckPoint += RevertToPreviousCheckPoint;
         Initialise();

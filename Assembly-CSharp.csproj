@@ -76,6 +76,8 @@
     <Compile Include="Assets\Collisions.cs" />
     <Compile Include="Assets\CourageManager.cs" />
     <Compile Include="Assets\DarkFire.cs" />
+    <Compile Include="Assets\Darkness.cs" />
+    <Compile Include="Assets\DarknessParticles.cs" />
     <Compile Include="Assets\DeathPit.cs" />
     <Compile Include="Assets\DragInteractable.cs" />
     <Compile Include="Assets\Fantasy Forest Environment\Scripts\TexturePan.cs" />

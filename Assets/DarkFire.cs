@@ -20,9 +20,4 @@ public class DarkFire : MonoBehaviour
         editableShape.scale = scaler.transform.localScale;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

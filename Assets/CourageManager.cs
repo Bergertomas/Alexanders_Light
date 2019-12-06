@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
+public delegate void DamageDelegates(bool isSerious);
 public class CourageManager : MonoBehaviour
 {
     [SerializeField]
@@ -15,6 +15,10 @@ public class CourageManager : MonoBehaviour
     [SerializeField]
     LightManager lm;
     private float increasePerSecond = 7f;
+    [SerializeField]
+    private float seriousDamagePerSecond = 14f;
+    [SerializeField]
+    private float moderateDamagePerSecond = 7f;
     [SerializeField]
     float maxHealth = 100f;
     [SerializeField]
@@ -39,6 +43,7 @@ public class CourageManager : MonoBehaviour
         MasterController.Instance.RevertToPreviousCheckPoint += RevertToPreviousCheckPoint;
         lm = GetComponent<LightManager>();
         pControl = FindObjectOfType<AlexanderController>();
+        pControl.PlayerIsInsideDarkness += DecreaseCourage;
         sd = FindObjectOfType<ShadowDetector>();
         courageGauge.minValue = minHealth;
         courageGauge.maxValue = maxHealth;
@@ -72,9 +77,9 @@ public class CourageManager : MonoBehaviour
     {
 
     }*/
-    void DecreaseCourage()
+    void DecreaseCourage(bool isSerious)
     {
-        currentHealth -= (increasePerSecond * Time.deltaTime);
+        currentHealth -= ((isSerious?seriousDamagePerSecond:moderateDamagePerSecond) * Time.deltaTime);
 
         DrawHealthBar();
         //Debug.Log(courageGauge.value);
@@ -126,10 +131,10 @@ public class CourageManager : MonoBehaviour
         //    hasWaited = false;
         //}
 
-        if (pControl.isDarknened)
+        /*if (pControl.isDarknened)
         {
-            DecreaseCourage();
-        }
+            DecreaseCourage(seriousDamagePerSecond);
+        }*/
     }
 
 
