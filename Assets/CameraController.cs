@@ -146,9 +146,10 @@ public class CameraController : MonoBehaviour
         //TODO- we might wanna change the speed on certain occasions, like existing a rapist
         newX = (newX * currentXSpeed * Time.deltaTime) + this.transform.position.x;
         newY = (newY * currentYSpeed * Time.deltaTime) + this.transform.position.y;
-        newFieldOfView = (((originalFieldOfView + fieldOfViewModifier) - Camera.main.fieldOfView) * Time.deltaTime*fieldOfViewSpeed)
-            + Camera.main.fieldOfView;
+        //newFieldOfView = (((originalFieldOfView + fieldOfViewModifier) - Camera.main.fieldOfView) * Time.deltaTime*fieldOfViewSpeed)
+        //    + Camera.main.fieldOfView;
         transform.position = new Vector3(newX, newY, transform.position.z);
-        Camera.main.fieldOfView = newFieldOfView;
+        //Camera.main.fieldOfView = newFieldOfView;
+        Camera.main.fieldOfView = originalFieldOfView;
     }
 }
