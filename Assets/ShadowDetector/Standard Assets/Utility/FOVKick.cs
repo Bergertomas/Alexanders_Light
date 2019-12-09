@@ -50,7 +50,7 @@ namespace UnityStandardAssets.Utility
             float t = Mathf.Abs((Camera.fieldOfView - originalFov)/FOVIncrease);
             while (t < TimeToIncrease)
             {
-                Camera.fieldOfView = originalFov + (IncreaseCurve.Evaluate(t/TimeToIncrease)*FOVIncrease);
+              //  Camera.fieldOfView = originalFov + (IncreaseCurve.Evaluate(t/TimeToIncrease)*FOVIncrease);
                 t += Time.deltaTime;
                 yield return new WaitForEndOfFrame();
             }
@@ -62,12 +62,12 @@ namespace UnityStandardAssets.Utility
             float t = Mathf.Abs((Camera.fieldOfView - originalFov)/FOVIncrease);
             while (t > 0)
             {
-                Camera.fieldOfView = originalFov + (IncreaseCurve.Evaluate(t/TimeToDecrease)*FOVIncrease);
+               // Camera.fieldOfView = originalFov + (IncreaseCurve.Evaluate(t/TimeToDecrease)*FOVIncrease);
                 t -= Time.deltaTime;
                 yield return new WaitForEndOfFrame();
             }
             //make sure that fov returns to the original size
-            Camera.fieldOfView = originalFov;
+          //  Camera.fieldOfView = originalFov;
         }
     }
 }
