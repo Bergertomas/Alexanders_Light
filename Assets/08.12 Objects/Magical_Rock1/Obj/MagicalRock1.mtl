@@ -1,0 +1,11 @@
+# File produced by Open Asset Import Library (http://www.assimp.sf.net)
+# (assimp v3.1.151580502)
+
+newmtl RockTop
+kd 0.0745098 0.176471 0.054902
+illum 1
+
+newmtl RockBottom
+kd 0.192157 0.192157 0.192157
+illum 1
+
