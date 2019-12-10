@@ -9,8 +9,11 @@ public class MasterController : MonoBehaviour
 {
     CourageManager cm;
     public PauseManager pm;
+    public event Action GameOverEvent;
     public event Action RevertToPreviousCheckPoint;
     public event CheckPointDelegate CheckPointReached;
+    [SerializeField]
+    private float timeToWaitBeforeStartOver = 3f;
 
     public static MasterController Instance;
 
@@ -30,13 +33,13 @@ public class MasterController : MonoBehaviour
     private void Start()
     {
         cm = GetComponent<CourageManager>();
-        cm.CourageDepleted += ResetGame;
+        cm.CourageDepleted += GameOver;
         pm.GetComponent<PauseManager>();
-        pm.RestartGame += ResetGame;
+        pm.RestartGame += GameOver;
         DeathPit[] deathPits= FindObjectsOfType<DeathPit>();
         for (int i = 0; i < deathPits.Length; i++)
         {
-            deathPits[i].Pitfall += ResetGame;
+            deathPits[i].Pitfall += GameOver;
         }
         CheckPoint[] checkPoints = FindObjectsOfType<CheckPoint>();
         for (int i = 0; i < checkPoints.Length; i++)
@@ -44,14 +47,13 @@ public class MasterController : MonoBehaviour
             checkPoints[i].CheckPointReached += NewCheckPoint;
         }
         
-        Invoke("FirstCheckPoint", 0.1f);
+        Invoke("FirstCheckPoint", 0.7f);
     }
     private void FirstCheckPoint()
     {
         CheckPointReached.Invoke(FindObjectOfType<AlexanderController>().transform);
     }
     
-
     private void NewCheckPoint(Transform checkPointTransform)
     {
         CheckPointReached.Invoke(checkPointTransform);
@@ -63,14 +65,18 @@ public class MasterController : MonoBehaviour
         }*/
     }
 
-    private void ResetGame()
+    private void GameOver()
     {
-        RevertToPreviousCheckPoint.Invoke();
+        GameOverEvent.Invoke();
+        Invoke("StartOver", timeToWaitBeforeStartOver);
         Debug.Log("GAy mover!!!!!");
-        //SceneManager.LoadScene("Alpha1");
-        
+        //SceneManager.LoadScene("Alpha1");      
     }
 
+    private void StartOver()
+    {
+        RevertToPreviousCheckPoint.Invoke();
+    }
     /*private void RevertToPreviousCheckPoint()
     {
         BallInteractable[] ballInteractables = FindObjectsOfType<BallInteractable>();

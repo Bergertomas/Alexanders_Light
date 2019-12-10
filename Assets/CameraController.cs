@@ -20,13 +20,18 @@ public class CameraController : MonoBehaviour
     [SerializeField]
     private float yOffsetFromPlayer = 1;
     private float originalFieldOfView;
-   // private float currentFieldOfView;
-    private void LowerSpeed()
+    [SerializeField]
+    private float riseSpeed = 0.5f;
+    // private float currentFieldOfView;
+    private Vector3 positionAtPreviousCheckPoint;
+    private bool followAlex = true;
+    private void LowerSpeed(CameraRapist rapist)
     {
         //if (rapists.Count < 1)
         {
-            currentXSpeed = 0;
-            currentYSpeed = 0;
+            float speedDivider = ((rapist.PlayerStrength + rapist.RapistStrength) / rapist.PlayerStrength)*2.2f;
+            currentXSpeed = normalXSpeed / speedDivider;
+            currentYSpeed = normalYSpeed / speedDivider;
         }
     }
 
@@ -52,8 +57,20 @@ public class CameraController : MonoBehaviour
     {
         player = FindObjectOfType<AlexanderController>();
         originalFieldOfView = Camera.main.fieldOfView;
+        MasterController.Instance.CheckPointReached += RecordCurrentState;
+        MasterController.Instance.RevertToPreviousCheckPoint += RevertToPreviousCheckPoint;
+        MasterController.Instance.GameOverEvent += delegate () { followAlex = false; };
     }
 
+    public void RecordCurrentState(Transform checkPointTransform)
+    {
+        positionAtPreviousCheckPoint = this.transform.position;//We dont want the checkpoint to tell us what Z to go to
+    }
+    public void RevertToPreviousCheckPoint()
+    {
+        transform.position = positionAtPreviousCheckPoint;
+        followAlex = true;
+    }
     public void AddRapist(CameraRapist rapist)
     {
         if (!rapists.Contains(rapist))
@@ -72,7 +89,7 @@ public class CameraController : MonoBehaviour
         if (rapists.Contains(rapist))
         {
             rapists.Remove(rapist);
-            LowerSpeed();
+            LowerSpeed(rapist);
         }
         else
         {
@@ -83,73 +100,81 @@ public class CameraController : MonoBehaviour
 
     void Update()
     {
-        //speed recovery: 
-        if (currentXSpeed < normalXSpeed)
+        if (followAlex)
         {
-            currentXSpeed += speedRecoverySpeed * Time.deltaTime;
-        }
-        else
-        {
-            currentXSpeed = normalXSpeed;
-        }
-        if (currentYSpeed < normalYSpeed)
-        {
-            currentYSpeed += speedRecoverySpeed * Time.deltaTime;
-        }
-        else
-        {
-            currentYSpeed = normalYSpeed;
-        }
-        float newX = 0; //this.transform.position.x;
-        float newY = 0;// this.transform.position.y;
-        float newFieldOfView = 0;
-        float fieldOfViewModifier = 0;
-        //float playerXOffset = player.currentHorizontalSpeed * xOffsetWhenRunning;
-        if (rapists.Count > 0)
-        {
-            float membersX = 0f;
-            float membersY = 0f;
-            float numberOfMembers = 0;
-            CameraRapist removableRapist = null;
-            foreach (CameraRapist r in rapists)
+            //speed recovery: 
+            if (currentXSpeed < normalXSpeed)
             {
-                
-                     numberOfMembers += r.PlayerStrength + r.RapistStrength;
+                currentXSpeed += speedRecoverySpeed * Time.deltaTime;
+            }
+            else
+            {
+                currentXSpeed = normalXSpeed;
+            }
+            if (currentYSpeed < normalYSpeed)
+            {
+                currentYSpeed += speedRecoverySpeed * Time.deltaTime;
+            }
+            else
+            {
+                currentYSpeed = normalYSpeed;
+            }
+            float newX = 0; //this.transform.position.x;
+            float newY = 0;// this.transform.position.y;
+            float newFieldOfView = 0;
+            float fieldOfViewModifier = 0;
+            //float playerXOffset = player.currentHorizontalSpeed * xOffsetWhenRunning;
+            if (rapists.Count > 0)
+            {
+                float membersX = 0f;
+                float membersY = 0f;
+                float numberOfMembers = 0;
+                CameraRapist removableRapist = null;
+                foreach (CameraRapist r in rapists)
+                {
+
+                    numberOfMembers += r.PlayerStrength + r.RapistStrength;
                     membersX +=
                       (((player.transform.position.x + player.CameraXOffset) - this.transform.position.x) * r.PlayerStrength) +
                       ((r.Centre.position.x - this.transform.position.x) * r.RapistStrength);
                     membersY +=
                       (((player.transform.position.y + yOffsetFromPlayer) - this.transform.position.y) * r.PlayerStrength) +
                       ((r.Centre.position.y - this.transform.position.y) * r.RapistStrength);
-                fieldOfViewModifier += r.FieldOfViewModifier;
+                    fieldOfViewModifier += r.FieldOfViewModifier;
                     r.RapistUpdate();
-               if (!r.gameObject.activeSelf)
-               {
-                    removableRapist = r;
-               }
+                    if (!r.gameObject.activeSelf)
+                    {
+                        removableRapist = r;
+                    }
+                }
+                newX += (membersX / (float)numberOfMembers);
+                newY += (membersY / (float)numberOfMembers);
+                fieldOfViewModifier /= (float)rapists.Count;
+                if (removableRapist != null)//We're doing it this way cause we cant modify a list while going through it..
+                {
+                    RemoveRapist(removableRapist);
+                }
             }
-            newX += (membersX / (float)numberOfMembers);
-            newY += (membersY / (float)numberOfMembers);
-            fieldOfViewModifier/= (float)rapists.Count;
-            if (removableRapist != null)//We're doing it this way cause we cant modify a list while going through it..
+            else//Normal noncoersive camera movement
             {
-                RemoveRapist(removableRapist);
+                newX += ((player.transform.position.x + player.CameraXOffset) - this.transform.position.x);
+                newY += ((player.transform.position.y + yOffsetFromPlayer) - this.transform.position.y);
             }
+
+            //TODO- we might wanna change the speed on certain occasions, like existing a rapist
+            newX = (newX * currentXSpeed * Time.deltaTime) + this.transform.position.x;
+            newY = (newY * currentYSpeed * Time.deltaTime) + this.transform.position.y;
+            newFieldOfView =
+            (((originalFieldOfView + fieldOfViewModifier) - Camera.main.fieldOfView) * Time.deltaTime * fieldOfViewSpeed)
+            + Camera.main.fieldOfView;
+            transform.position = new Vector3(newX, newY, transform.position.z);
+            Camera.main.fieldOfView = newFieldOfView;
+            //Camera.main.fieldOfView = originalFieldOfView;
         }
-        else//Normal noncoersive camera movement
+        else
         {
-
-            newX += ((player.transform.position.x + player.CameraXOffset) - this.transform.position.x);
-            newY += ((player.transform.position.y + yOffsetFromPlayer) - this.transform.position.y);
+            transform.position = new Vector3
+                (transform.position.x, transform.position.y + (riseSpeed * Time.deltaTime), transform.position.z);
         }
-
-        //TODO- we might wanna change the speed on certain occasions, like existing a rapist
-        newX = (newX * currentXSpeed * Time.deltaTime) + this.transform.position.x;
-        newY = (newY * currentYSpeed * Time.deltaTime) + this.transform.position.y;
-        //newFieldOfView = (((originalFieldOfView + fieldOfViewModifier) - Camera.main.fieldOfView) * Time.deltaTime*fieldOfViewSpeed)
-        //    + Camera.main.fieldOfView;
-        transform.position = new Vector3(newX, newY, transform.position.z);
-        //Camera.main.fieldOfView = newFieldOfView;
-        Camera.main.fieldOfView = originalFieldOfView;
     }
 }
