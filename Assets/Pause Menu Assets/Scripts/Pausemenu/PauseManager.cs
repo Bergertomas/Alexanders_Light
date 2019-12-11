@@ -363,7 +363,7 @@ namespace GreatArcStudios
         /// </summary>
         public void Restart()
         {
-            //Application.LoadLevel(Application.loadedLevel);
+            Application.LoadLevel(Application.loadedLevel);
             //SceneManager.LoadScene("Alpha1");
             Time.timeScale = timeScale;
             mainPanel.SetActive(false);
