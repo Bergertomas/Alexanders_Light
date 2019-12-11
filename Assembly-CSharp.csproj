@@ -152,6 +152,7 @@
     <Compile Include="Assets\ShadowDetector\Standard Assets\Utility\WaypointCircuit.cs" />
     <Compile Include="Assets\ShadowDetector\Standard Assets\Utility\WaypointProgressTracker.cs" />
     <Compile Include="Assets\ShadowEnemyController.cs" />
+    <Compile Include="Assets\TimerSwitch.cs" />
     <Compile Include="Assets\Tutorial_Info\Scripts\Readme.cs" />
     <Compile Include="Assets\TutorialButtonDetector.cs" />
     <Compile Include="Assets\Unused\BallPusherCollider.cs" />

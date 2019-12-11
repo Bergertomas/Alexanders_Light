@@ -13,7 +13,7 @@ public class BallInteractable : MonoBehaviour
     public UnityEvent OnInteractionExit;
 
     private int triggerStayCounter = 0;
-    private bool interactedPreviousFrame = false;
+    protected bool interactedPreviousFrame = false;
     protected bool beingInteractedWith;
 
     protected virtual void Initialise(){ }
@@ -72,10 +72,6 @@ public class BallInteractable : MonoBehaviour
             interactedPreviousFrame = false;
         }*/
     }
-   /* private void LateUpdate()
-    {
-        beingInteractedWith = false;
-    }*/
    
     protected virtual void Update()
     {
