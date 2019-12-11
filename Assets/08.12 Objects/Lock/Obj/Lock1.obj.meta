@@ -3,7 +3,17 @@ guid: c30de9420fdf56e49a4b2c63d12cc600
 ModelImporter:
   serializedVersion: 26
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: BottomKey_BottomKeyMat
+    second: {fileID: 2100000, guid: 43f52a3b85317524181ed3b2c5ea6c30, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Plane001_Plane001Mat
+    second: {fileID: 2100000, guid: 43f52a3b85317524181ed3b2c5ea6c30, type: 2}
   materials:
     importMaterials: 1
     materialName: 0

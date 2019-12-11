@@ -3,7 +3,17 @@ guid: 0587b8a0736e324438a43804154eebef
 ModelImporter:
   serializedVersion: 26
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: BottomKey_BottomKeyMat
+    second: {fileID: 2100000, guid: d0efd03f3b411f044a70878f8bae9dba, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Keyhole_Pi_Keyhole_PiMat
+    second: {fileID: 2100000, guid: 9558b1adef351ba499a34c8fb03218c8, type: 2}
   materials:
     importMaterials: 1
     materialName: 0
