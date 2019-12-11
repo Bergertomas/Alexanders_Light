@@ -465,7 +465,7 @@ namespace GreatArcStudios
 
             if (Input.GetKeyDown(KeyCode.Escape) && mainPanel.active == false)
             {
-
+                Debug.Log("Pause");
                 uiEventSystem.SetSelectedGameObject(defualtSelectedMain);
                 mainPanel.SetActive(true);
                 vidPanel.SetActive(false);
