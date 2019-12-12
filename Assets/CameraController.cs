@@ -14,12 +14,16 @@ public class CameraController : MonoBehaviour
     [SerializeField]
     private float fieldOfViewSpeed = 2f;
     [SerializeField]
+    private bool ZMovement = true;
+    private bool ZMovementAdaptations = false;
+    [SerializeField]
     private float currentXSpeed = 5f;
     [SerializeField]
     private float currentYSpeed = 5f;
     [SerializeField]
     private float yOffsetFromPlayer = 1;
     private float originalFieldOfView;
+    private float originalZ;
     [SerializeField]
     private float riseSpeed = 0.5f;
     // private float currentFieldOfView;
@@ -57,6 +61,7 @@ public class CameraController : MonoBehaviour
     {
         player = FindObjectOfType<AlexanderController>();
         originalFieldOfView = Camera.main.fieldOfView;
+        originalZ = transform.position.z;
         MasterController.Instance.CheckPointReached += RecordCurrentState;
         MasterController.Instance.RevertToPreviousCheckPoint += RevertToPreviousCheckPoint;
         MasterController.Instance.GameOverEvent += delegate () { followAlex = false; };
@@ -170,12 +175,29 @@ public class CameraController : MonoBehaviour
             //TODO- we might wanna change the speed on certain occasions, like existing a rapist
             newX = (newX * currentXSpeed * Time.deltaTime) + this.transform.position.x;
             newY = (newY * currentYSpeed * Time.deltaTime) + this.transform.position.y;
-            newFieldOfView =
-            (((originalFieldOfView + fieldOfViewModifier) - Camera.main.fieldOfView) * Time.deltaTime * fieldOfViewSpeed)
-            + Camera.main.fieldOfView;
-            transform.position = new Vector3(newX, newY, transform.position.z);
-            Camera.main.fieldOfView = newFieldOfView;
-            //Camera.main.fieldOfView = originalFieldOfView;
+            if (ZMovement)
+            {
+              /*  if (!ZMovementAdaptations)
+                {
+                    //Camera.main.fieldOfView = 60;
+                    originalZ -= 5;
+                    ZMovementAdaptations = true;
+                }*/
+                float newZ = transform.position.z+
+                    (((originalZ-(fieldOfViewModifier/5.3f))-transform.position.z)*Time.deltaTime* fieldOfViewSpeed);
+
+                transform.position = new Vector3(newX, newY, newZ);
+            }
+            else
+            {
+                newFieldOfView =
+                  (((originalFieldOfView + fieldOfViewModifier) - Camera.main.fieldOfView) * Time.deltaTime * fieldOfViewSpeed)
+                  + Camera.main.fieldOfView;
+                transform.position = new Vector3(newX, newY, transform.position.z);
+                Camera.main.fieldOfView = newFieldOfView;
+                //Camera.main.fieldOfView = originalFieldOfView;
+            }
+
         }
         else
         {

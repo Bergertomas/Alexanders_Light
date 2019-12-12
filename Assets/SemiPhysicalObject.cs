@@ -23,7 +23,7 @@ public class SemiPhysicalObject : MonoBehaviour
 
     public void DoPhysics(bool simulated)
     {
-        rb.isKinematic = simulated;
+        rb.isKinematic = !simulated;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -37,7 +37,7 @@ public class SemiPhysicalObject : MonoBehaviour
 
     private void KinematorMet()
     {
-        DoPhysics(true);
+        DoPhysics(false);
     }
      public void RecordCurrentState(Transform checkPointTransform)
      {
