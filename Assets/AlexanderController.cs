@@ -36,6 +36,11 @@ public struct CollisionInfo
         CurrentSlopeAngle = 0;
     }
 }
+public enum PlayerPhotosituation
+{
+    NONE,DARK_FIRE,DARK_FOG,
+}
+
 public class AlexanderController : MonoBehaviour
 {
     [SerializeField]
@@ -109,6 +114,7 @@ public class AlexanderController : MonoBehaviour
     private bool isMovingOnX = false;
     private bool isBored = false;
     private bool isInsideDarkFire;
+    private bool isInsideDarkFog;
     public event DamageDelegates PlayerIsInsideDarkness;
     [SerializeField]
     private float timeToGetBored = 10f;
@@ -176,7 +182,9 @@ public class AlexanderController : MonoBehaviour
 
     private void BeDarkened()
     {
-        PlayerIsInsideDarkness.Invoke(false);
+
+        //PlayerIsInsideDarkness.Invoke(false);
+        isInsideDarkFog = true;
     }
 
     public void RecordCurrentState(Transform checkPointTransform)
@@ -188,6 +196,7 @@ public class AlexanderController : MonoBehaviour
     {
         transform.position = positionAtPreviousCheckPoint;
         isInsideDarkFire = false;
+        isInsideDarkFog = false;
         currentVelocity = Vector3.zero;
         collisionInfo.Clear();
         state = PlayerStates.None;
@@ -484,8 +493,18 @@ public class AlexanderController : MonoBehaviour
     {
         if (isInsideDarkFire)
         {
-            PlayerIsInsideDarkness(true);
+            PlayerIsInsideDarkness(PlayerPhotosituation.DARK_FIRE);
         }
+        else if (isInsideDarkFog)
+        {
+            PlayerIsInsideDarkness(PlayerPhotosituation.DARK_FOG);
+        }
+        else
+        {
+            PlayerIsInsideDarkness(PlayerPhotosituation.NONE);
+        }
+
+        isInsideDarkFog = false;
         didSomethingDurningFrame = false;
         //Draw player so that it looks look he's looking at the appropriate direction
         //graphics.transform.localScale = new Vector3(1 * (float)currentDirection, 1, 1);

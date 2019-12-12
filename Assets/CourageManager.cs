@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-public delegate void DamageDelegates(bool isSerious);
+public delegate void DamageDelegates(PlayerPhotosituation photosituation);
 public class CourageManager : MonoBehaviour
 {
     [SerializeField]
@@ -19,6 +19,8 @@ public class CourageManager : MonoBehaviour
     private float seriousDamagePerSecond = 14f;
     [SerializeField]
     private float moderateDamagePerSecond = 7f;
+    [SerializeField]
+    private float healPerSecond = 4f;
     [SerializeField]
     float maxHealth = 100f;
     [SerializeField]
@@ -36,14 +38,13 @@ public class CourageManager : MonoBehaviour
 
     public event Action CourageDepleted;
 
-    // Start is called before the first frame update
     void Start()
     {
         MasterController.Instance.CheckPointReached += RecordCurrentState;
         MasterController.Instance.RevertToPreviousCheckPoint += RevertToPreviousCheckPoint;
         lm = GetComponent<LightManager>();
         pControl = FindObjectOfType<AlexanderController>();
-        pControl.PlayerIsInsideDarkness += DecreaseCourage;
+        pControl.PlayerIsInsideDarkness += ManageCourage;
         sd = FindObjectOfType<ShadowDetector>();
         courageGauge.minValue = minHealth;
         courageGauge.maxValue = maxHealth;
@@ -77,15 +78,38 @@ public class CourageManager : MonoBehaviour
     {
 
     }*/
-    void DecreaseCourage(bool isSerious)
+    private void ManageCourage(PlayerPhotosituation photosituation)
     {
-        currentHealth -= ((isSerious?seriousDamagePerSecond:moderateDamagePerSecond) * Time.deltaTime);
-
-        DrawHealthBar();
-        //Debug.Log(courageGauge.value);
-        if (currentHealth <= 0f)
+        float courageManip = 0f;
+        switch (photosituation)
         {
-            CourageDepleted();
+            case PlayerPhotosituation.NONE:
+                courageManip = healPerSecond;
+                break;
+            case PlayerPhotosituation.DARK_FOG:
+                courageManip = moderateDamagePerSecond;
+                break;
+            case PlayerPhotosituation.DARK_FIRE:
+                courageManip = seriousDamagePerSecond;
+                break;
+        }
+        //currentHealth -= ((isSerious?seriousDamagePerSecond:moderateDamagePerSecond) * Time.deltaTime);
+
+
+        //Debug.Log(courageGauge.value);
+        courageManip *= Time.deltaTime;
+        currentHealth += courageManip;
+        if (currentHealth >= maxHealth)
+        {
+            currentHealth = maxHealth;
+        }
+        else
+        {
+            DrawHealthBar();
+            if (currentHealth <= 0f)
+            {
+                CourageDepleted();
+            }
         }
     }
 
