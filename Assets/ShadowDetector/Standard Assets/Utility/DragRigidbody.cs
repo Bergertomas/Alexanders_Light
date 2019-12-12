@@ -18,6 +18,7 @@ namespace UnityStandardAssets.Utility
 
         private void Update()
         {
+            Debug.Log("What am I doing here???");
             // Make sure the user pressed the mouse down
             if (!Input.GetMouseButtonDown(0))
             {

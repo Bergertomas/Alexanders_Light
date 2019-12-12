@@ -187,6 +187,11 @@ public class AlexanderController : MonoBehaviour
     public void RevertToPreviousCheckPoint()
     {
         transform.position = positionAtPreviousCheckPoint;
+        isInsideDarkFire = false;
+        currentVelocity = Vector3.zero;
+        collisionInfo.Clear();
+        state = PlayerStates.None;
+
     }
     /* private void UpdateRayCastOrigins()
      {

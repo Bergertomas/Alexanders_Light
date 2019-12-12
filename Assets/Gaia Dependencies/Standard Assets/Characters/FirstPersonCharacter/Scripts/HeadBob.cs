@@ -28,6 +28,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private void Update()
         {
+            Debug.Log("Who am I???");
           //  m_CameraRefocus.GetFocusPoint();
             Vector3 newCameraPosition;
             if (rigidbodyFirstPersonController.Velocity.magnitude > 0 && rigidbodyFirstPersonController.Grounded)

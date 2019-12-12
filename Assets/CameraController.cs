@@ -29,7 +29,7 @@ public class CameraController : MonoBehaviour
     {
         //if (rapists.Count < 1)
         {
-            float speedDivider = ((rapist.PlayerStrength + rapist.RapistStrength) / rapist.PlayerStrength)*2.2f;
+            float speedDivider = ((rapist.PlayerStrength + rapist.RapistStrength) / rapist.PlayerStrength)*2.4f;
             currentXSpeed = normalXSpeed / speedDivider;
             currentYSpeed = normalYSpeed / speedDivider;
         }
@@ -66,17 +66,23 @@ public class CameraController : MonoBehaviour
     {
         positionAtPreviousCheckPoint = this.transform.position;//We dont want the checkpoint to tell us what Z to go to
     }
+
     public void RevertToPreviousCheckPoint()
     {
         transform.position = positionAtPreviousCheckPoint;
         followAlex = true;
     }
+
     public void AddRapist(CameraRapist rapist)
     {
         if (!rapists.Contains(rapist))
         {
             rapists.Add(rapist);
-            rapist.RapistStrength = 0;
+            if (rapists.Count <= 1)
+            {
+                rapist.RapistStrength = 0;
+            }
+
             // LowerSpeed();
         }
         else
@@ -84,6 +90,7 @@ public class CameraController : MonoBehaviour
             Debug.Log("Tried to add a rapist more than once");
         }
     }
+
     public void RemoveRapist(CameraRapist rapist)
     {
         if (rapists.Contains(rapist))
@@ -96,7 +103,6 @@ public class CameraController : MonoBehaviour
             Debug.Log("Tried to remove a rapist more than once");
         }
     }
-
 
     void Update()
     {
