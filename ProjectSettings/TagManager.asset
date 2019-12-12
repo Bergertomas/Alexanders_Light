@@ -11,6 +11,7 @@ TagManager:
   - Evil
   - Key
   - KeyLock
+  - Kinemator
   layers:
   - Default
   - TransparentFX

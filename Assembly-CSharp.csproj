@@ -110,6 +110,7 @@
     <Compile Include="Assets\Scripts\ShadowDetector.cs" />
     <Compile Include="Assets\Scripts\ShadowDetectorChecker.cs" />
     <Compile Include="Assets\Scripts\SimpleCameraController.cs" />
+    <Compile Include="Assets\SemiPhysicalObject.cs" />
     <Compile Include="Assets\ShadowDetector\Demo\Scripts\DragAndDrop.cs" />
     <Compile Include="Assets\ShadowDetector\Demo\Scripts\LightFade.cs" />
     <Compile Include="Assets\ShadowDetector\Demo\Scripts\PlatformMove.cs" />

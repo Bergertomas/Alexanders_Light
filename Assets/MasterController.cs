@@ -8,7 +8,9 @@ using GreatArcStudios;
 public class MasterController : MonoBehaviour
 {
     CourageManager cm;
-    public PauseManager pm;
+    //public PauseManager pm;
+    [SerializeField]
+    private GameObject pauseObj;
     public event Action GameOverEvent;
     public event Action RevertToPreviousCheckPoint;
     public event CheckPointDelegate CheckPointReached;
@@ -32,10 +34,11 @@ public class MasterController : MonoBehaviour
 
     private void Start()
     {
+        pauseObj.SetActive(true);
         cm = GetComponent<CourageManager>();
         cm.CourageDepleted += GameOver;
-        pm.GetComponent<PauseManager>();
-        pm.RestartGame += GameOver;
+        //pm.GetComponent<PauseManager>();
+        //pm.RestartGame += GameOver;
         DeathPit[] deathPits= FindObjectsOfType<DeathPit>();
         for (int i = 0; i < deathPits.Length; i++)
         {

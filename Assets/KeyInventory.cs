@@ -13,12 +13,16 @@ public class KeyInventory : MonoBehaviour
     void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "Key")
-        {
+        { 
             someKey = other.gameObject.GetComponent<KeyItem>();
-            Debug.Log("found key");
-            Destroy(other.gameObject);
-            keybag1.Push(someKey);
-            someKey = null;
+            if (!keybag1.Contains(someKey))
+            {
+                Debug.Log("found key");
+                Destroy(other.gameObject);
+                keybag1.Push(someKey);
+                someKey = null;
+            }
+
             //TODO: add UI element to represent number of keys held.
             //easy mode: a picture of the key with number next to it.
             //hard mode: a line of images of keys. images appear and disappear according to number of keys
