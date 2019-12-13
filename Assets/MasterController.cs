@@ -51,6 +51,7 @@ public class MasterController : MonoBehaviour
         }
         
         Invoke("FirstCheckPoint", 0.7f);
+       StartCoroutine( MusicPlayer.Instance.ChangeTrackAndPlayIn(MusicTracks.Main,2f));
     }
     private void FirstCheckPoint()
     {
