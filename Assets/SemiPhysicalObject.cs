@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-//using UnityEngine.Events;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(Rigidbody))]
 public class SemiPhysicalObject : MonoBehaviour
@@ -11,7 +11,7 @@ public class SemiPhysicalObject : MonoBehaviour
     private Vector3 positionAtPreviousCheckPoint;
     private Quaternion rotationAtPreviousCheckPoint;
     private bool isKinematicAtPreviousCheckPoint;
-    //public UnityEvent OnStart
+    public UnityEvent OnKinematorMet;
 
     // Start is called before the first frame update
     void Start()
@@ -35,10 +35,12 @@ public class SemiPhysicalObject : MonoBehaviour
         }
     }
 
-    private void KinematorMet()
-    {
-        DoPhysics(false);
-    }
+     private void KinematorMet()
+     {
+         DoPhysics(false);
+         OnKinematorMet.Invoke();
+     }
+
      public void RecordCurrentState(Transform checkPointTransform)
      {
         positionAtPreviousCheckPoint = transform.position;
