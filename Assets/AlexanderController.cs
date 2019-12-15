@@ -940,6 +940,7 @@ public class AlexanderController : MonoBehaviour
         didSomethingDurningFrame = true;
         ReleaseDraggedObject();
         currentVelocity.y = jumpForce;
+        SoundEffectsManager.Instance.PlaySoundEffectAt(SoundEffects.Jump, transform.position);
     }
 
     #region draggedObject related:

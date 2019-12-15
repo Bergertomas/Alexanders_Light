@@ -59,7 +59,7 @@ public class MusicPlayer : MonoBehaviour
                 //audioSource.Stop();
                 audioSource.Play();
                 //Invoke("PlayNow", waitTime);
-               // return;
+                yield break;
             }
         }
         //if (!trackFound)
@@ -80,7 +80,7 @@ public class MusicPlayer : MonoBehaviour
                 //audioSource.Stop();
                 audioSource.Play();
                 //Invoke("PlayNow", waitTime);
-                // return;
+                 return;
             }
         }
         //if (!trackFound)
