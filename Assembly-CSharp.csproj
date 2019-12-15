@@ -63,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\AlexanderController.cs" />
+    <Compile Include="Assets\AlexSounds.cs" />
     <Compile Include="Assets\AmplifiedMovingPlatform.cs" />
     <Compile Include="Assets\BlackScreen.cs" />
     <Compile Include="Assets\CameraController.cs" />
@@ -74,6 +75,7 @@
     <Compile Include="Assets\ColliderRemover.cs" />
     <Compile Include="Assets\Collisions.cs" />
     <Compile Include="Assets\CourageManager.cs" />
+    <Compile Include="Assets\DoorAnimation.cs" />
     <Compile Include="Assets\DoorJustOpened.cs" />
     <Compile Include="Assets\DragInteractable.cs" />
     <Compile Include="Assets\EventTriggerObject.cs" />

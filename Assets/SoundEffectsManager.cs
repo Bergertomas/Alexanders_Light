@@ -1,11 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public enum SoundEffects
 {
-    Drag = 0, Jump = 1
+    Drag = 0, Jump = 1, DoorRise = 2, DoorImpact = 3, WalkStep=4,JumpVoice=5
 }
+
 [System.Serializable]
 public class SoundEffect
 {
@@ -22,6 +24,8 @@ public class SoundEffectsManager : MonoBehaviour
     [SerializeField]
     SoundEffectObject soundEffectPrefab;
     public static SoundEffectsManager Instance;
+    [SerializeField]
+    private AudioMixer soundEffectsMixer;
 
     private void Awake()
     {
@@ -37,9 +41,16 @@ public class SoundEffectsManager : MonoBehaviour
         }
     }
 
-    public void PlaySoundEffectAt(SoundEffects soundEffect, Vector3 position)
+    public void CaveState()
     {
-
+        soundEffectsMixer.SetFloat("ReverbParam", 0);
+    }
+    public void OutdoorsState()
+    {
+        soundEffectsMixer.SetFloat("ReverbParam", -10000f);
+    }
+    public SoundEffectObject PlaySoundEffectAt(SoundEffects soundEffect, Vector3 position, float randomisePitch=0)
+    {
         for (int i = 0; i < soundEffects.Length; i++)
         {
             if (soundEffects[i].SoundName == soundEffect)
@@ -49,13 +60,37 @@ public class SoundEffectsManager : MonoBehaviour
                 //audioSource.outputAudioMixerGroup=
                 soundObject.SoundEffectAudioSource.clip = soundEffects[i].Clips[Random.Range(0, soundEffects[i].Clips.Length)];
                 soundObject.SoundEffectAudioSource.volume = soundEffects[i].DesiredVolume;
-                soundObject.SoundEffectAudioSource.pitch += Random.Range(-0.2f, 0.2f);
+                soundObject.SoundEffectAudioSource.pitch += Random.Range(-randomisePitch, randomisePitch);
                 soundObject.SoundEffectAudioSource.Play();
-                return;
+                return soundObject;
             }
         }
         {
             Debug.Log("Failed to find the soundEffect");
+            return null;
         }
     }
+
+    public AudioClip FindSoundEffect(SoundEffects soundEffect)
+    {
+        for (int i = 0; i < soundEffects.Length; i++)
+        {
+            if (soundEffects[i].SoundName == soundEffect)
+            {
+                return soundEffects[i].Clips[Random.Range(0, soundEffects[i].Clips.Length)];
+            }
+        }
+        return null;
+    }
+  /*  private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            CaveState();
+        }
+        if (Input.GetKeyDown(KeyCode.O))
+        {
+            OutdoorsState();
+        }
+    }*/
 }

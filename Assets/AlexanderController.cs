@@ -177,6 +177,7 @@ public class AlexanderController : MonoBehaviour
         {
             darknesses[i].PlayerIsInsideMe += BeDarkened;
         }
+       
         //Physics.IgnoreCollision(balloflight.GetComponent<Collider>(), GetComponent<Collider>(),true);
     }
 
@@ -659,6 +660,11 @@ public class AlexanderController : MonoBehaviour
         if (xInput != 0&&state!=PlayerStates.Climb)
         {
             anim.SetBool("walking", true);
+            if (state == PlayerStates.None && collisionInfo.Below)
+            {
+                anim.speed = 1.2f;
+            }
+
             //if (state == PlayerStates.Drag)
             //{
             //    anim.SetBool("pushing", true);
@@ -722,6 +728,7 @@ public class AlexanderController : MonoBehaviour
         {
             //anim.SetBool("pushing", false);
             anim.SetBool("walking", false);
+            anim.speed = 1f;
             //Debug.Log("Not Moving");
             isMovingOnX = false;
             /* if (CameraXOffset != 0 && currentHorizontalSpeed == 0)
@@ -940,9 +947,18 @@ public class AlexanderController : MonoBehaviour
         didSomethingDurningFrame = true;
         ReleaseDraggedObject();
         currentVelocity.y = jumpForce;
-        SoundEffectsManager.Instance.PlaySoundEffectAt(SoundEffects.Jump, transform.position);
+        if (UnityEngine.Random.Range(0f, 1f) > 0.15f)
+        {
+            Invoke("JumpVoice", 0.1f);
+           
+        }
+        
     }
 
+    private void JumpVoice()
+    {
+        SoundEffectsManager.Instance.PlaySoundEffectAt(SoundEffects.JumpVoice, transform.position,0.01666f);
+    }
     #region draggedObject related:
     public void Grab(DragInteractable grabbed, DragInteractable previousDragged)
     {

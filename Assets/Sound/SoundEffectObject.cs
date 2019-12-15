@@ -5,8 +5,6 @@ using UnityEngine;
 public class SoundEffectObject : MonoBehaviour
 {
     public AudioSource SoundEffectAudioSource;
-
-    // Update is called once per frame
     void Update()
     {
         if (!SoundEffectAudioSource.isPlaying)
