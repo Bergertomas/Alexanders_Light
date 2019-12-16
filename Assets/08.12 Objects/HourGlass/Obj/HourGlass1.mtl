@@ -1,0 +1,15 @@
+# File produced by Open Asset Import Library (http://www.assimp.sf.net)
+# (assimp v3.1.151580502)
+
+newmtl Wood
+kd 0.215686 0.027451 0.027451
+illum 1
+
+newmtl Hourglass
+kd 0.992157 0.992157 0.992157
+illum 1
+
+newmtl Gold
+kd 0.392157 0.254902 0.0156863
+illum 1
+
