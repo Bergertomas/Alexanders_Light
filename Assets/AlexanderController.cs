@@ -748,7 +748,8 @@ public class AlexanderController : MonoBehaviour
         //If the player is in rope distance and midair
         if (canClimb == true && !collisionInfo.Below)
         {
-            if (Input.GetButtonDown("Vertical"))
+            float yInput = Input.GetAxisRaw("Vertical");
+            if (yInput != 0)//move up/down
             {
                 state = PlayerStates.Climb;
             }

@@ -24,7 +24,7 @@ public class TutorialButtonDetector : MonoBehaviour
     }*/
     public void Disappear()
     {
-        this.gameObject.SetActive(false);
+        //this.gameObject.SetActive(false);
     }
     private void OnTriggerEnter(Collider other)
     {
