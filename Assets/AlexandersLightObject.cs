@@ -16,8 +16,12 @@ public class AlexandersLightObject : MonoBehaviour
     }
     public void KillTrackedSoundEffect( )
     {
-        trackedSoundEffectObject.SoundEffectAudioSource.Stop();
-        Destroy(trackedSoundEffectObject.gameObject);
+        if (trackedSoundEffectObject != null)
+        {
+            trackedSoundEffectObject.SoundEffectAudioSource.Stop();
+            Destroy(trackedSoundEffectObject.gameObject);
+        }
+
     }
 
 }

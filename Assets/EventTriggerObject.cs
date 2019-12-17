@@ -8,10 +8,12 @@ public class EventTriggerObject : MonoBehaviour
     [SerializeField]
     float timeToWait = 2f;
     public UnityEvent PostWaitOnTriggerEntered;
+    private bool triggered = false;
     private void OnTriggerEnter(Collider other)
     {
-        if (other.GetComponent<AlexanderController>())
+        if (other.GetComponent<AlexanderController>()&&!triggered)
         {
+            triggered = true;
             OnTriggerEntered.Invoke();
             Invoke("PostWaitOnTriggerEnter", timeToWait);
         }
