@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 
 [RequireComponent(typeof(Rigidbody))]
-public class SemiPhysicalObject : MonoBehaviour
+public class SemiPhysicalObject : AlexandersLightObject
 {
     private Rigidbody rb;
     //private Transform transformAtPreviousCheckPoint;
@@ -12,6 +12,7 @@ public class SemiPhysicalObject : MonoBehaviour
     private Quaternion rotationAtPreviousCheckPoint;
     private bool isKinematicAtPreviousCheckPoint;
     public UnityEvent OnKinematorMet;
+    public UnityEvent OnKinematorEntered;
 
     // Start is called before the first frame update
     void Start()
@@ -31,6 +32,7 @@ public class SemiPhysicalObject : MonoBehaviour
         if (other.tag == "Kinemator")
         {
             Debug.Log("SemiPhysicalObject entered a Kinemator");
+            OnKinematorEntered.Invoke();
             Invoke("KinematorMet", 0.2f);
         }
     }
@@ -53,5 +55,7 @@ public class SemiPhysicalObject : MonoBehaviour
         transform.position = positionAtPreviousCheckPoint;
         transform.rotation = rotationAtPreviousCheckPoint;
         rb.isKinematic = isKinematicAtPreviousCheckPoint;
-    }
+     }
+
+
 }

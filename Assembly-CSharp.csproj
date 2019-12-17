@@ -63,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\AlexanderController.cs" />
+    <Compile Include="Assets\AlexandersLightObject.cs" />
     <Compile Include="Assets\AlexSounds.cs" />
     <Compile Include="Assets\AmplifiedMovingPlatform.cs" />
     <Compile Include="Assets\BlackScreen.cs" />

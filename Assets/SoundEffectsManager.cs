@@ -5,7 +5,7 @@ using UnityEngine.Audio;
 
 public enum SoundEffects
 {
-    Drag = 0, Jump = 1, DoorRise = 2, DoorImpact = 3, WalkStep=4,JumpVoice=5, FireStart=6, FireCrackle=7,
+    Drag = 0, Jump = 1, DoorRise = 2, DoorImpact = 3, WalkStep=4,JumpVoice=5, FireStart=6, FireCrackle=7, RockImpact=8, WoodSqueak=9, WoodImpact=10,
 }
 
 [System.Serializable]
