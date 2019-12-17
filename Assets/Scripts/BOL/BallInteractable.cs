@@ -24,6 +24,25 @@ public class BallInteractable : MonoBehaviour
         MasterController.Instance.CheckPointReached += RecordCurrentState;
         MasterController.Instance.RevertToPreviousCheckPoint += RevertToPreviousCheckPoint;
         Initialise();
+        Invoke("AddOutline", 1f);
+    }
+
+    private void AddOutline()
+    {
+        if (this.GetComponent<MeshRenderer>()&&this.GetComponent<MeshRenderer>().enabled)
+        {
+            var outline = gameObject.AddComponent<cakeslice.Outline>();
+            outline.color = 0;
+        }
+        MeshRenderer[] renderers = GetComponentsInChildren<MeshRenderer>();
+        for (int i = 0; i < renderers.Length; i++)
+        {
+            if (renderers[i].enabled)
+            {
+                renderers[i].gameObject.AddComponent<cakeslice.Outline>();
+            }
+
+        }
     }
 
     protected virtual void RecordCurrentState(Transform t) { }

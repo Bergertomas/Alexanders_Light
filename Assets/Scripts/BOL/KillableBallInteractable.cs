@@ -39,6 +39,15 @@ public class KillableBallInteractable : BallInteractable
         }
         else
         {
+            if (GetComponent<cakeslice.Outline>())
+            {
+                GetComponent<cakeslice.Outline>().enabled = true;
+            }
+            cakeslice.Outline[] outlines = GetComponentsInChildren<cakeslice.Outline>();
+            for (int i = 0; i < outlines.Length; i++)
+            {
+                outlines[i].enabled = true;
+            }
             OnResurrection.Invoke();
         }
     }
@@ -59,6 +68,15 @@ public class KillableBallInteractable : BallInteractable
     protected virtual void Die()
     {
         OnDeath.Invoke();
+        if (GetComponent<cakeslice.Outline>())
+        {
+            GetComponent<cakeslice.Outline>().enabled = false;
+        }
+        cakeslice.Outline[] outlines = GetComponentsInChildren<cakeslice.Outline>(); 
+        for (int i = 0; i < outlines.Length; i++)
+        {
+            outlines[i].enabled = false;
+        }
         isDead = true;
     }
 

@@ -31,8 +31,8 @@ public class BlackScreen : MonoBehaviour
         }
     }
 
-   /* public void FadeTo(bool black)
+    public void FadeTo(bool black)
     {
         fadeToBlack = black;
-    }*/
+    }
 }
