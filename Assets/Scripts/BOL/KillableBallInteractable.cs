@@ -14,6 +14,7 @@ public class KillableBallInteractable : BallInteractable
     private float lifeAtStart;
     private bool isDeadOnLastCheckPoint;
     private float lifeOnLastCheckPoint;
+    private SoundEffectObject fireSoundLoop = null;
     // Start is called before the first frame update
 
     protected override void Initialise()
@@ -48,6 +49,10 @@ public class KillableBallInteractable : BallInteractable
             {
                 outlines[i].enabled = true;
             }
+            if (fireSoundLoop != null)
+            {
+                Destroy(fireSoundLoop.gameObject);
+            }
             OnResurrection.Invoke();
         }
     }
@@ -60,7 +65,7 @@ public class KillableBallInteractable : BallInteractable
             life -= LightManager.Instance.DecreaseLight();
             base.Interact();
         }
-        else
+        else if(!isDead)
         {
             Die();
         }
@@ -80,4 +85,12 @@ public class KillableBallInteractable : BallInteractable
         isDead = true;
     }
 
+    public void StartFireSoundLoop()
+    {
+       fireSoundLoop= SoundEffectsManager.Instance.StartFireLoop(this.transform.position);
+    }
+    public void StartFireSound()
+    {
+        SoundEffectsManager.Instance.StartFire(this.transform.position);
+    }
 }

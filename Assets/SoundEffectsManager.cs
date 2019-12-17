@@ -5,7 +5,7 @@ using UnityEngine.Audio;
 
 public enum SoundEffects
 {
-    Drag = 0, Jump = 1, DoorRise = 2, DoorImpact = 3, WalkStep=4,JumpVoice=5
+    Drag = 0, Jump = 1, DoorRise = 2, DoorImpact = 3, WalkStep=4,JumpVoice=5, FireStart=6, FireCrackle=7,
 }
 
 [System.Serializable]
@@ -49,7 +49,7 @@ public class SoundEffectsManager : MonoBehaviour
     {
         soundEffectsMixer.SetFloat("ReverbParam", -10000f);
     }
-    public SoundEffectObject PlaySoundEffectAt(SoundEffects soundEffect, Vector3 position, float randomisePitch=0)
+    public SoundEffectObject PlaySoundEffectAt(SoundEffects soundEffect, Vector3 position, float randomisePitch=0,bool loop=false)
     {
         for (int i = 0; i < soundEffects.Length; i++)
         {
@@ -61,6 +61,7 @@ public class SoundEffectsManager : MonoBehaviour
                 soundObject.SoundEffectAudioSource.clip = soundEffects[i].Clips[Random.Range(0, soundEffects[i].Clips.Length)];
                 soundObject.SoundEffectAudioSource.volume = soundEffects[i].DesiredVolume;
                 soundObject.SoundEffectAudioSource.pitch += Random.Range(-randomisePitch, randomisePitch);
+                soundObject.SoundEffectAudioSource.loop=loop;
                 soundObject.SoundEffectAudioSource.Play();
                 return soundObject;
             }
@@ -82,15 +83,25 @@ public class SoundEffectsManager : MonoBehaviour
         }
         return null;
     }
-  /*  private void Update()
+
+    public SoundEffectObject StartFireLoop(Vector3 position)
     {
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            CaveState();
-        }
-        if (Input.GetKeyDown(KeyCode.O))
-        {
-            OutdoorsState();
-        }
-    }*/
+        PlaySoundEffectAt(SoundEffects.FireStart, position, 0, false);
+       return PlaySoundEffectAt(SoundEffects.FireCrackle, position, 0, true);
+    }
+    public void StartFire(Vector3 position)
+    {
+        PlaySoundEffectAt(SoundEffects.FireStart, position, 0, false);
+    }
+    /*  private void Update()
+      {
+          if (Input.GetKeyDown(KeyCode.C))
+          {
+              CaveState();
+          }
+          if (Input.GetKeyDown(KeyCode.O))
+          {
+              OutdoorsState();
+          }
+      }*/
 }

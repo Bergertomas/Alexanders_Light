@@ -7,7 +7,7 @@ public class SoundEffectObject : MonoBehaviour
     public AudioSource SoundEffectAudioSource;
     void Update()
     {
-        if (!SoundEffectAudioSource.isPlaying)
+        if (!SoundEffectAudioSource.isPlaying&& !SoundEffectAudioSource.loop)
         {
             Destroy(this.gameObject);
         }

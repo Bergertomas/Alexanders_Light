@@ -34,6 +34,15 @@ public class TimerSwitch : BallInteractable
                 interactedPreviousFrame = true;
                 OnInteract.Invoke();
             }
+            if (GetComponent<cakeslice.Outline>())
+            {
+                GetComponent<cakeslice.Outline>().enabled = false;
+            }
+            cakeslice.Outline[] outlines = GetComponentsInChildren<cakeslice.Outline>();
+            for (int i = 0; i < outlines.Length; i++)
+            {
+                outlines[i].enabled = false;
+            }
             reallowSwitchTimer = timeToReallowSwitch + timeSpentInSwitchedState;
             switchedStateTimer = timeSpentInSwitchedState;
         }
@@ -57,6 +66,15 @@ public class TimerSwitch : BallInteractable
             if (reallowSwitchTimer <= 0)
             {
                 OnSwitchReallowed.Invoke();
+                if (GetComponent<cakeslice.Outline>())
+                {
+                    GetComponent<cakeslice.Outline>().enabled = true;
+                }
+                cakeslice.Outline[] outlines = GetComponentsInChildren<cakeslice.Outline>();
+                for (int i = 0; i < outlines.Length; i++)
+                {
+                    outlines[i].enabled = true;
+                }
             }
         }
     }
