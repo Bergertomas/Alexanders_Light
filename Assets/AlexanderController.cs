@@ -43,6 +43,7 @@ public enum PlayerPhotosituation
 
 public class AlexanderController : MonoBehaviour
 {
+    public bool Won = false;
     [SerializeField]
     Animator anim;
     [SerializeField]
@@ -159,6 +160,21 @@ public class AlexanderController : MonoBehaviour
     private float ballAnchorSpeed = 2f;
     #endregion
 
+
+    public static AlexanderController Instance;
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Debug.Log("Tried to create another AlexanderController.");
+            Destroy(this);
+        }
+    }
     // TODO: SET UP CAMERA SCRIPT WHICH WILL MAKE THE CAMERA ZOOM A LITTLE OUT WHILE BOL IS FAR AWAY (ORI)
 
     void Start()
@@ -492,6 +508,10 @@ public class AlexanderController : MonoBehaviour
     }
     void Update()
     {
+        if (Won)
+        {
+            return;
+        }
         if (isInsideDarkFire)
         {
             PlayerIsInsideDarkness(PlayerPhotosituation.DARK_FIRE);
@@ -528,7 +548,7 @@ public class AlexanderController : MonoBehaviour
                     
                     Interact();//Hmmm I suppose we can't interact midair
                 }
-                else if (Input.GetButtonDown("Crawl"))
+                else if (false&& Input.GetButtonDown("Crawl"))
                 {
                     didSomethingDurningFrame = true;
                     // crawling = !crawling; )-;
@@ -948,10 +968,9 @@ public class AlexanderController : MonoBehaviour
         didSomethingDurningFrame = true;
         ReleaseDraggedObject();
         currentVelocity.y = jumpForce;
-        if (UnityEngine.Random.Range(0f, 1f) > 0.15f)
+        if (UnityEngine.Random.Range(0f, 1f) > 0.18f)
         {
-            Invoke("JumpVoice", 0.1f);
-           
+            Invoke("JumpVoice", UnityEngine.Random.Range(0.05f, 0.12f));   
         }
         
     }

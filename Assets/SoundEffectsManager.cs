@@ -47,7 +47,7 @@ public class SoundEffectsManager : MonoBehaviour
     }
     public void OutdoorsState()
     {
-        soundEffectsMixer.SetFloat("ReverbParam", -10000f);
+        soundEffectsMixer.SetFloat("ReverbParam", -7143f);
     }
     public SoundEffectObject PlaySoundEffectAt(SoundEffects soundEffect, Vector3 position, float randomisePitch=0,bool loop=false)
     {

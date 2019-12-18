@@ -18,12 +18,14 @@ public class MusicTrack
 public class MusicPlayer : MonoBehaviour
 {
     [SerializeField]
-    private MusicTrack[] tracks;
+    public MusicTrack[] Tracks;
+    public int CurrentTrackIndex = 0;
     [SerializeField]
-    private AudioSource audioSource;
+    public AudioSource MusicAudioSource;
     private bool isFadingOut = false;
     private float fadeOutSpeed = 0.2f;
-
+    [SerializeField]
+    private SoundEffectObject collectSoundPrefab;
     public static MusicPlayer Instance;
 
     private void Awake()
@@ -49,15 +51,16 @@ public class MusicPlayer : MonoBehaviour
     {
        yield return new WaitForSeconds(waitTime);
        // bool trackFound = false;
-        for (int i = 0; i < tracks.Length; i++)
+        for (int i = 0; i < Tracks.Length; i++)
         {
-            if (tracks[i].TrackName == track)
+            if (Tracks[i].TrackName == track)
             {
                 isFadingOut = false;
-                audioSource.volume = tracks[i].desiredVolume;
-                audioSource.clip = tracks[i].clip;
+                MusicAudioSource.volume = Tracks[i].desiredVolume;
+                MusicAudioSource.clip = Tracks[i].clip;
+                CurrentTrackIndex = i;
                 //audioSource.Stop();
-                audioSource.Play();
+                MusicAudioSource.Play();
                 //Invoke("PlayNow", waitTime);
                 yield break;
             }
@@ -70,15 +73,16 @@ public class MusicPlayer : MonoBehaviour
 
     public void ChangeTrackAndPlayNow(int track)
     {
-        for (int i = 0; i < tracks.Length; i++)
+        for (int i = 0; i < Tracks.Length; i++)
         {
-            if (tracks[i].TrackName ==(MusicTracks) track)
+            if (Tracks[i].TrackName ==(MusicTracks) track)
             {
                 isFadingOut = false;
-                audioSource.volume = tracks[i].desiredVolume;
-                audioSource.clip = tracks[i].clip;
+                MusicAudioSource.volume = Tracks[i].desiredVolume;
+                MusicAudioSource.clip = Tracks[i].clip;
+                CurrentTrackIndex = i;
                 //audioSource.Stop();
-                audioSource.Play();
+                MusicAudioSource.Play();
                 //Invoke("PlayNow", waitTime);
                  return;
             }
@@ -98,7 +102,23 @@ public class MusicPlayer : MonoBehaviour
     {
         if (isFadingOut)
         {
-            audioSource.volume -= fadeOutSpeed * Time.deltaTime;
+            MusicAudioSource.volume -= fadeOutSpeed * Time.deltaTime;
+        }
+        else if(MusicAudioSource.volume< Tracks[CurrentTrackIndex].desiredVolume)
+        {
+            MusicAudioSource.volume +=   Time.deltaTime/7f;
         }
     }
+
+    public void PlayCollectSound()
+    {
+      //  audioSource.Pause();
+        Instantiate(collectSoundPrefab, Vector3.zero, Quaternion.identity);
+   //     Invoke("ResumeMusic", 2f);
+
+    }
+   /* private void ResumeMusic()
+    {
+        audioSource.Play();
+    }*/
 }

@@ -82,6 +82,12 @@ public class MasterController : MonoBehaviour
     {
         RevertToPreviousCheckPoint.Invoke();
     }
+
+    public void Win()
+    {
+        AlexanderController.Instance.Won=true;
+        EndText.Instance.ShouldDesplayEndMessage = true;
+    }
     /*private void RevertToPreviousCheckPoint()
     {
         BallInteractable[] ballInteractables = FindObjectsOfType<BallInteractable>();

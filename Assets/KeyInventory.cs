@@ -21,6 +21,7 @@ public class KeyInventory : MonoBehaviour
                 Destroy(other.gameObject);
                 keybag1.Push(someKey);
                 someKey = null;
+                MusicPlayer.Instance.PlayCollectSound();
             }
 
             //TODO: add UI element to represent number of keys held.

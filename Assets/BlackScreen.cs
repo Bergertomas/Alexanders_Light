@@ -6,28 +6,28 @@ using UnityEngine.UI;
 public class BlackScreen : MonoBehaviour
 {
     [SerializeField]
-    private Image image;
+    public Image Image;
     private bool fadeToBlack = false;
     [SerializeField]
     private float fadeSpeed=0.1f;
-
+    public bool IBelongToEndLight = false;
     void Start()
     {
         // image.color = Color.black;
-        image.color = new Color(0, 0, 0, 0);
+        Image.color = new Color(0, 0, 0, 0);
         MasterController.Instance.RevertToPreviousCheckPoint += delegate () { fadeToBlack = false; };
         MasterController.Instance.GameOverEvent += delegate () { fadeToBlack = true; };
     }
 
     void Update()
     {
-        if(fadeToBlack&& image.color.a < 1)
+        if(fadeToBlack&& Image.color.a < 1)
         {
-            image.color = new Color(0, 0, 0, image.color.a+(fadeSpeed*Time.deltaTime));
+            Image.color = new Color(0, 0, 0, Image.color.a+(fadeSpeed*Time.deltaTime));
         }
-        else if (!fadeToBlack && image.color.a > 0)
+        else if (!fadeToBlack && Image.color.a > 0&& !IBelongToEndLight)
         {
-            image.color = new Color(0, 0, 0, image.color.a - (fadeSpeed * Time.deltaTime));
+            Image.color = new Color(0, 0, 0, Image.color.a - (fadeSpeed * Time.deltaTime));
         }
     }
 
